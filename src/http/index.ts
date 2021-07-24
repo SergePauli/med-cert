@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios"
-export const API_URL = "http://localhost:5000/"
+export const API_URL = "http://localhost:5000/REST_API/v1/"
 const $api = axios.create({
   withCredentials: true,
   baseURL: API_URL,
