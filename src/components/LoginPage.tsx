@@ -1,12 +1,13 @@
-import React from 'react';
-import { useState } from 'react';
-import { FC } from 'react';
+import React, { useContext } from 'react'
+import { useState } from 'react'
+import { FC } from 'react'
+import { Context } from '..'
 
-type LoginPageProps = {}
 
-export const LoginPage: FC = ({}: LoginPageProps) => {
+export const LoginPage: FC = () => {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
+  const {store} = useContext(Context)
   return (
   <>
     <h1>Login Form</h1>
@@ -21,7 +22,7 @@ export const LoginPage: FC = ({}: LoginPageProps) => {
         type="password"
         placeholder="password"
       />
-      <button>login</button>
+      <button onClick={()=>store.login(email,password)}>login</button>
     </div>
   </>
-)};
+)}
