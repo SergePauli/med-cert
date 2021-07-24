@@ -1,7 +1,7 @@
-import React, { createContext } from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import Store from './store/store';
+import React, { createContext } from 'react'
+import ReactDOM from 'react-dom'
+import App from './App'
+import Store from './store/store'
 interface IState{
   store: Store
 }
@@ -12,6 +12,6 @@ ReactDOM.render(
     <App />,  
   </Context.Provider> , 
   document.getElementById('root')
-);
+)
 
 
