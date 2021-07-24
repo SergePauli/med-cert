@@ -23,6 +23,10 @@ export const LoginPage: FC = () => {
         placeholder="password"
       />
       <button onClick={()=>store.login(email,password)}>login</button>
+      <button onClick={()=>store.logout()}>logout</button>
+      <span style={{color: "#999999"}}>
+        {store.user.email} {store.user.id} {store.user.roles}
+      </span>
     </div>
   </>
 )}
