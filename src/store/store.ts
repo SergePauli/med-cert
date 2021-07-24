@@ -37,6 +37,7 @@ export default class Store {
       await AuthService.logout()
       this.setAuth(false)
       localStorage.removeItem("token")
+      this.setUser({} as IUser)
     } catch (e) {
       console.log(e.response?.data?.message)
     }
