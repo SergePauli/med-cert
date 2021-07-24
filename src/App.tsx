@@ -1,12 +1,13 @@
-import React, {FC} from 'react';
+import React, {FC} from 'react'
+import { LoginPage } from './components/LoginPage'
 
 
 const App: FC =() => {
   return (
     <div>
-      123rerer
+      <LoginPage />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
