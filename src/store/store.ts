@@ -27,8 +27,16 @@ export default class Store {
   }
   async registration(user: IRegistration) {
     try {
-      const response = await AuthService.registration(user)
-      localStorage.setItem("token", response.data.accessToken)
+      await AuthService.registration(user)
+    } catch (e) {
+      console.log(e.response?.data?.message)
+    }
+  }
+  async logout() {
+    try {
+      await AuthService.logout()
+      this.setAuth(false)
+      localStorage.removeItem("token")
     } catch (e) {
       console.log(e.response?.data?.message)
     }
