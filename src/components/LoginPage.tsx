@@ -1,10 +1,11 @@
+import { observer } from 'mobx-react-lite'
 import React, { useContext } from 'react'
 import { useState } from 'react'
 import { FC } from 'react'
 import { Context } from '..'
 
 
-export const LoginPage: FC = () => {
+const LoginPage: FC = () => {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
   const {store} = useContext(Context)
@@ -27,3 +28,4 @@ export const LoginPage: FC = () => {
     </div>
   </>
 )}
+export default observer(LoginPage)
