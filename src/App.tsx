@@ -15,7 +15,10 @@ const App: FC =() => {
   return (
     <div>
       <h1>{store.isAuth ? `Авторизован ${store.user.email}`: 'Авторизуйтесь'}</h1>
-      <LoginPage />
+      {store.isAuth
+        ? <button onClick={()=>store.logout()}>logout</button>
+        : <LoginPage /> 
+      }
     </div>
   )
 }
