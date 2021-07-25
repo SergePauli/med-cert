@@ -9,6 +9,7 @@ import AuthService from "../services/AuthService"
 export default class Store {
   user = {} as IUser
   isAuth = false
+  isLoding = false
   constructor() {
     makeAutoObservable(this)
   }
@@ -17,6 +18,9 @@ export default class Store {
   }
   setUser(user: IUser) {
     this.user = user
+  }
+  setLoading(isLoding: boolean) {
+    this.isLoding = isLoding
   }
   async login(email: string, password: string) {
     try {
