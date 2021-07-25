@@ -11,16 +11,17 @@ const App: FC =() => {
     if (localStorage.getItem('token')) {
       store.checkAuth()
     }
-  },[])
-  return (
+  })  
+  if (store.isLoding) {
+    return (<div>Загрузка...</div>)
+  }
+  if (store.isAuth) {
+    return (
     <div>
-      <h1>{store.isAuth ? `Авторизован ${store.user.email}`: 'Авторизуйтесь'}</h1>
-      {store.isAuth
-        ? <button onClick={()=>store.logout()}>logout</button>
-        : <LoginPage /> 
-      }
-    </div>
-  )
+      <h1>{`Авторизован ${store.user.email}`}</h1>      
+        <button onClick={()=>store.logout()}>logout</button>
+    </div>)
+  } else  return ( <LoginPage /> )
 }
 
 export default observer(App)
