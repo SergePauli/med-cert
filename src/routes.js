@@ -1,0 +1,34 @@
+import { AdminPage } from "./pages/AdminPage"
+import { CertificatePage } from "./pages/CertificatePage"
+import { ErrorPage } from "./pages/ErrorPage"
+import { ListPage } from "./pages/ListPage"
+import LoginPage from "./pages/LoginPage"
+import { MainPage } from "./pages/MainPage"
+import { MessagePage } from "./pages/MessagePage"
+import { PassordRecoveryPage } from "./pages/PasswordRecoveryPage"
+import { RegistrationPage } from "./pages/RegistrationPage"
+import {
+  ADMIN_ROUTE,
+  CERTIFICATE_ROUTE,
+  ERROR_ROUTE,
+  HOME_ROUTE,
+  LIST_ROUTE,
+  LOGIN_ROUTE,
+  MESSAGE_ROUTE,
+  PWD_RECOVERY_ROUTE,
+  REGISTRATION_ROUTE,
+} from "./utils/consts"
+
+export const AUTH_ROUTES = [
+  { path: ADMIN_ROUTE, Component: AdminPage },
+  { path: LIST_ROUTE, Component: ListPage },
+  { path: CERTIFICATE_ROUTE + "/:id", Component: CertificatePage },
+  { path: HOME_ROUTE, Component: MainPage },
+]
+export const PUBLIC_ROUTES = [
+  { path: REGISTRATION_ROUTE, Component: RegistrationPage },
+  { path: PWD_RECOVERY_ROUTE, Component: PassordRecoveryPage },
+  { path: MESSAGE_ROUTE + "/:message", Component: MessagePage },
+  { path: ERROR_ROUTE + "/:error", Component: ErrorPage },
+  { path: LOGIN_ROUTE, Component: LoginPage },
+]
