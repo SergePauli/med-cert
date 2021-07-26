@@ -6,22 +6,37 @@ import { IRegistration } from "../models/requests/IRegistration"
 import { AuthResponse } from "../models/responses/AuthResponse"
 import AuthService from "../services/AuthService"
 
-export default class Store {
-  user = {} as IUser
-  isAuth = false
-  isLoding = false
+export default class UserStore {
+  private _isAuth: boolean
+  private _user: IUser
+  private _isLoding: boolean
+
   constructor() {
+    this._user = {} as IUser
+    this._isAuth = false
+    this._isLoding = false
     makeAutoObservable(this)
   }
+
   setAuth(isAuth: boolean) {
-    this.isAuth = isAuth
+    this._isAuth = isAuth
+  }
+  isAuth() {
+    return this._isAuth
   }
   setUser(user: IUser) {
-    this.user = user
+    this._user = user
+  }
+  user() {
+    return this._user
   }
   setLoading(isLoding: boolean) {
-    this.isLoding = isLoding
+    this._isLoding = isLoding
   }
+  isLoading() {
+    return this._isLoding
+  }
+
   async login(email: string, password: string) {
     try {
       const response = await AuthService.login(email, password)
