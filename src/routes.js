@@ -3,7 +3,7 @@ import { CertificatePage } from "./pages/CertificatePage"
 import { ErrorPage } from "./pages/ErrorPage"
 import { ListPage } from "./pages/ListPage"
 import LoginPage from "./pages/LoginPage"
-import { MainPage } from "./pages/MainPage"
+import MainPage from "./pages/MainPage"
 import { MessagePage } from "./pages/MessagePage"
 import { PassordRecoveryPage } from "./pages/PasswordRecoveryPage"
 import { RegistrationPage } from "./pages/RegistrationPage"
@@ -20,15 +20,16 @@ import {
 } from "./utils/consts"
 
 export const AUTH_ROUTES = [
+  { path: HOME_ROUTE, Component: MainPage },
   { path: ADMIN_ROUTE, Component: AdminPage },
   { path: LIST_ROUTE, Component: ListPage },
   { path: CERTIFICATE_ROUTE + "/:id", Component: CertificatePage },
-  { path: HOME_ROUTE, Component: MainPage },
 ]
 export const PUBLIC_ROUTES = [
+  { path: LOGIN_ROUTE, Component: LoginPage },
   { path: REGISTRATION_ROUTE, Component: RegistrationPage },
   { path: PWD_RECOVERY_ROUTE, Component: PassordRecoveryPage },
   { path: MESSAGE_ROUTE + "/:message", Component: MessagePage },
   { path: ERROR_ROUTE + "/:error", Component: ErrorPage },
-  { path: LOGIN_ROUTE, Component: LoginPage },
+  { path: HOME_ROUTE, Component: LoginPage },
 ]
