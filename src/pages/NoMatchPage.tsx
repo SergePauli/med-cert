@@ -2,7 +2,6 @@
 import { FC } from 'react'
 
 export const NoMatchPage: FC = () => {  
-  
 
   return (
     <>
