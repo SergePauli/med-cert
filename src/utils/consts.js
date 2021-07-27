@@ -1,6 +1,6 @@
 export const HOME_ROUTE = "/"
 export const LOGIN_ROUTE = "/login"
-export const REGISTRATION_ROUTE = "/signin"
+export const REGISTRATION_ROUTE = "/registration"
 export const PWD_RECOVERY_ROUTE = "/pwd_recovery"
 export const MESSAGE_ROUTE = "/message"
 export const ERROR_ROUTE = "/error"
