@@ -1,23 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
+import { useContext } from 'react'
 import { FC } from 'react'
 import { Route, Switch } from 'react-router-dom'
+import { Context } from '..'
+import { NoMatchPage } from '../pages/NoMatchPage'
 import { AUTH_ROUTES, PUBLIC_ROUTES } from '../routes'
 
-type AppRouterProps = {}
-
-export const AppRouter: FC<AppRouterProps> = (props: AppRouterProps) => {
-  const [state, setState] = useState()
-
-  useEffect(() => {}, [])
-  const isAuth = false
+const AppRouter: FC = observer(() => {  
+  const {userStore} = useContext(Context)  
+  useEffect(()=>{
+    if (localStorage.getItem('token')) {
+      userStore.checkAuth()
+    }
+  },[userStore])     
   return (
-    <Switch>
-      {isAuth && AUTH_ROUTES.map(
+    <Switch> 
+      {userStore.isAuth() && AUTH_ROUTES.map(
         ({path, Component})=><Route key={path} path={path} component={Component} exact/>)
-      }
+      }      
       { PUBLIC_ROUTES.map(
         ({path, Component})=><Route key={path} path={path} component={Component} exact/>)
       }
-    </Switch>
+      <Route component={NoMatchPage} />                         
+    </Switch>     
   )
-}
+})
+export default AppRouter
