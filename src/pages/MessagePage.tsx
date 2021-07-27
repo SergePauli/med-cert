@@ -1,17 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { FC } from 'react';
 
-type MessagePageProps = {}
+import { FC } from 'react';
+import { IRouteMatch } from '../models/IRouteMatch';
+import { IRouteProps } from '../models/IRouteProps';
+
+interface IParams {message: string}
+interface IMatch extends IRouteMatch {  
+  params: IParams
+}
+interface MessagePageProps extends IRouteProps {  
+  match: IMatch  
+}
+
 
 export const MessagePage: FC<MessagePageProps> = (props: MessagePageProps) => {
-  const [state, setState] = useState();
-
-  useEffect(() => {}, []);
-
   return (
     <>
-      <h1>MessagePage React TS FC Component</h1>
-      <div>List</div>
+      <h1>Внимание:</h1>
+      <div>{props.match.params.message}!</div>
     </>
-  );
-};
+  )
+}
