@@ -8,7 +8,7 @@ import { Context } from '..'
 const LoginPage: FC = () => {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
-  const {store} = useContext(Context)
+  const {userStore} = useContext(Context)
   return (
   <>
     <h1>Login Form</h1>
@@ -23,7 +23,7 @@ const LoginPage: FC = () => {
         type="password"
         placeholder="password"
       />
-      <button onClick={()=>store.login(email,password)}>login</button>    
+      <button onClick={()=>userStore.login(email,password)}>login</button>    
       
     </div>
   </>
