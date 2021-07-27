@@ -1,19 +1,8 @@
-import { observer } from 'mobx-react-lite'
-import React, {FC, useState} from 'react'
-import { useContext } from 'react'
-import { useEffect } from 'react'
-import { Context } from '.'
+import React, {FC} from 'react'
 import { BrowserRouter } from 'react-router-dom'
-import { AppRouter } from './components/AppRouter'
+import AppRouter  from './components/AppRouter'
 
-const App: FC =() => {
-  const {store} = useContext(Context)  
-  useEffect(()=>{
-    if (localStorage.getItem('token')) {
-      store.checkAuth()
-    }
-  },[store]) 
-   
+const App: FC =() => {   
   return (
     <BrowserRouter>
       <AppRouter/>
@@ -21,4 +10,4 @@ const App: FC =() => {
   )  
 }
 
-export default observer(App)
+export default App
