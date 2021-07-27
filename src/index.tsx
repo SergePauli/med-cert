@@ -1,14 +1,14 @@
 import React, { createContext } from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
-import Store from './store/store'
+import UserStore from './store/userStore'
 interface IState{
-  store: Store
+  userStore: UserStore
 }
-const store = new Store()
-export const Context = createContext<IState>({store}) 
+const userStore = new UserStore()
+export const Context = createContext<IState>({userStore}) 
 ReactDOM.render(  
-  <Context.Provider value={{store}} >
+  <Context.Provider value={{userStore}} >
     <App />,  
   </Context.Provider> , 
   document.getElementById('root')
