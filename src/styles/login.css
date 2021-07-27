@@ -1,0 +1,119 @@
+.login-body {
+  background: #f8f9fa;
+  color: #495057;
+}
+
+.login-body .login-wrapper {
+  display: -ms-flexbox;
+  display: flex;
+  height: 100vh;
+}
+
+.login-body .login-wrapper .login-panel {
+  width: 30%;
+  height: 100%;
+  text-align: center;
+  padding: 40px 20px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.login-body .login-wrapper .login-image {
+  width: 70%;
+  height: 100%;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding: 40px 20px;
+  background-color: cadetblue;
+}
+
+.login-body .login-wrapper .login-panel .login-form {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.login-body .login-wrapper .login-panel .login-form>p {
+  font-weight: 600;
+  margin: 0;
+  color: #6c757d;
+  margin-bottom: 32px;
+}
+
+.login-body .login-wrapper .login-panel .login-form>p>a {
+  cursor: pointer;
+}
+
+.login-body .login-wrapper .login-panel .login-form>input {
+  width: 85%;
+  max-width: 310px;
+  margin-bottom: 20px;
+}
+
+.login-body .login-wrapper .login-panel .login-form>.p-password {
+  width: 85%;
+  max-width: 310px;
+  margin-bottom: 20px;
+}
+
+.login-body .login-wrapper .login-panel .login-form>.p-password .p-password-input {
+  width: 100%;
+}
+
+.login-body .login-wrapper .login-panel .logo {
+  height: 50px;
+}
+
+.login-body .login-wrapper .login-image .login-image-content>h1 {
+  font-size: 60px;
+  margin: 0;
+  color: #ffffff;
+}
+
+.login-body .login-wrapper .login-image .login-image-content h3 {
+  font-size: 24px;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 600;
+  margin-top: 32px;
+}
+
+.login-body .login-wrapper .login-image .image-footer {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+@media (min-width: 993px) {
+  .login-body .login-wrapper .login-image {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url("../images/bg-login.jpg");
+  }
+}
+
+@media (max-width: 992px) {
+  .login-body .login-wrapper .login-panel {
+    width: 100%;
+    z-index: 2;
+  }
+  .login-body .login-wrapper .login-image {
+    display: none;
+  }
+}
