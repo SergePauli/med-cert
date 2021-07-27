@@ -1,3 +1,12 @@
+html {
+  height: 100%;
+  font-size: 14px;
+}
+
+div {
+  display: block;
+}
+
 body {
   font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-weight: 400;

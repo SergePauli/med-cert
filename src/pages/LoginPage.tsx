@@ -40,9 +40,10 @@ const LoginPage: FC = () => {
               <h1>свидетельство</h1>
               <h1>о смерти</h1>
               <h3>версия 3.0</h3>
+              <h3>(с учетом требований CDA_R2 уровня 3)</h3>
             </div>
             <div className="login-footer">
-
+              <p>2021 АО "АМИАЦ"</p>
             </div>
           </div> 
       </div>

@@ -117,3 +117,17 @@
     display: none;
   }
 }
+
+.login-body .login-wrapper .login-image .image-footer {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.login-body .login-wrapper .login-image .image-footer>p {
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+  margin-right: 20px;
+}
