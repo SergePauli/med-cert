@@ -59,16 +59,18 @@
   cursor: pointer;
 }
 
-.login-body .login-wrapper .login-panel .login-form>input {
-  width: 85%;
-  max-width: 310px;
-  margin-bottom: 20px;
+.login-body .login-wrapper .login-panel .login-form .p-fluid .p-field {
+  margin-bottom: 1.7rem;
 }
 
-.login-body .login-wrapper .login-panel .login-form>.p-password {
-  width: 85%;
+.login-body .login-wrapper .login-panel .login-form .p-fluid .p-field .p-float-label .p-input-icon-right>input {
+  width: 100%;
   max-width: 310px;
-  margin-bottom: 20px;
+}
+
+.login-body .login-wrapper .login-panel .login-form .p-fluid>button {
+  width: 100%;
+  max-width: 310px;
 }
 
 .login-body .login-wrapper .login-panel .login-form>.p-password .p-password-input {
