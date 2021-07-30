@@ -188,6 +188,34 @@ i:last-of-type, .p-input-icon-right>svg:last-of-type, .p-input-icon-right>.p-inp
   font-size: 1rem;
 }
 
+.p-button.p-button-link {
+  color: #324191;
+  background: transparent;
+  border: transparent;
+}
+
+.p-button.p-button-link:enabled:hover {
+  background: transparent;
+  color: #324191;
+  border-color: transparent;
+}
+
+.p-button.p-button-link:enabled:hover .p-button-label {
+  text-decoration: underline;
+}
+
+.p-button.p-button-link:enabled:focus {
+  background: transparent;
+  box-shadow: 0 0 0 0.2rem #b0b8e4;
+  border-color: transparent;
+}
+
+.p-button.p-button-link:enabled:active {
+  background: transparent;
+  color: #324191;
+  border-color: transparent;
+}
+
 .p-dropdown {
   background: #ffffff;
   border: 1px solid #ced4da;
@@ -317,4 +345,54 @@ i:last-of-type, .p-input-icon-right>svg:last-of-type, .p-input-icon-right>.p-inp
 
 .p-dropdown .p-dropdown-label.p-placeholder {
   color: #6c757d;
+}
+
+.p-password-panel {
+  padding: 1rem;
+  background: #ffffff;
+  color: #495057;
+  border: 0 none;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+}
+
+.p-password-panel .p-password-meter {
+  margin-bottom: 0.5rem;
+}
+
+.p-inputtext:enabled:hover {
+  border-color: #3F51B5;
+}
+
+.p-inputtext:enabled:focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem #b0b8e4;
+  border-color: #3F51B5;
+}
+
+.p-inputtext.p-error, .p-inputtext.p-invalid {
+  border-color: #f44336;
+}
+
+.p-input-filled .p-inputtext {
+  background-color: #f8f9fa;
+}
+
+.p-input-filled .p-inputtext:enabled:hover {
+  background-color: #f8f9fa;
+}
+
+.p-input-filled .p-inputtext:enabled:focus {
+  background-color: #ffffff;
+}
+
+.p-inputtext-sm .p-inputtext {
+  font-size: 0.875rem;
+  padding: 0.4375rem 0.4375rem;
+}
+
+.p-inputtext-lg .p-inputtext {
+  font-size: 1.25rem;
+  padding: 0.625rem 0.625rem;
 }
