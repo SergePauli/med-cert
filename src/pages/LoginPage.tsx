@@ -50,7 +50,7 @@ const LoginPage: FC = () => {
         <div className="login-panel">
           <img src={logo} className='logo' alt="logo"></img>
           <div className="login-form">
-            <h2>Вход</h2>
+            <h2>Авторизация</h2>
             <p>Нет учетной записи? <Link to="/registration">Подать заявку</Link></p>
             <Form onSubmit={onSubmit} initialValues={{email: '', password: '' }} 
               validate={validate} 
