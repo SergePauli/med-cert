@@ -9,7 +9,7 @@ import { FC } from 'react'
 import { Field, Form } from 'react-final-form'
 import { Context } from '..'
 import logo from "../images/security.png"
-import { IRegisterForm } from '../models/FormsData/IRegisterFiorm'
+import { IRegisterForm } from '../models/FormsData/IRegisterForm'
 import { IRegistration } from '../models/requests/IRegistration'
 import LoginImageDiv from '../static/LoginImageDiv'
 
@@ -38,9 +38,16 @@ export const RegistrationPage: FC = () =>{
      let errors: any = {}        
         if (!data.email) {
             errors.email = 'Поле <Email> обязательно'
+        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(data.email)) {
+            errors.email = 'Неверный email Н.п. example@email.com'
         }
         if (!data.password) {
             errors.password = 'Поле <Пароль> обязательно'
+        } else if (data.password && data.password!=data.password_confirmation) {
+            errors.password_confirmation = 'пароли не совпадают'
+        }
+        if (!data.name || data.name.split(" ").length < 2){
+            errors.name = 'значение <ФИО> некорректно'
         }
         return errors
     }
@@ -49,12 +56,13 @@ export const RegistrationPage: FC = () =>{
     try {
         const names = data.name.split(" ")
         request.person_name_attributes.family= names[0]
-        request.person_name_attributes.given_1= names[1]   
+        request.person_name_attributes.given_1= names[1]
+        if (names.length>2)  request.person_name_attributes.given_2= names[2]  
         request.contacts_attributes.value = data.phone_number
         request.email = data.email
         request.password = data.password
         request.password_confirmation = data.password_confirmation
-        request.organization_id = data.organization_id                
+        request.organization_id = data.organization.id               
         userStore.registration(request)
     } catch {
       setFormData(data)
@@ -73,7 +81,7 @@ export const RegistrationPage: FC = () =>{
           <img src={logo} className="logo_reg" alt="logo"></img>
           <div className="login-form">
             <h2>Регистрация</h2>            
-            <Form onSubmit={onSubmit} initialValues={{email: '', password: '',organization:null }} 
+            <Form onSubmit={onSubmit} initialValues={{name: '', email: '', password: '', organization: {id:'1',name:'выбрать'}, phone_number: ''}} 
               validate={validate} 
               render={({ handleSubmit }) => (
               <form onSubmit={handleSubmit} className="p-fluid">
@@ -109,7 +117,7 @@ export const RegistrationPage: FC = () =>{
                   <Field name="password_confirmation" render={({ input, meta }) => (
                     <div className="p-field">
                       <span className="p-float-label p-input-icon-right">
-                        <Password id="password_confirmation" {...input} toggleMask className={classNames({ 'p-invalid': isFormFieldValid(meta) })}  />
+                        <Password id="password_confirmation" {...input}  toggleMask className={classNames({ 'p-invalid': isFormFieldValid(meta) })}  />
                         <label htmlFor="password_confirmation" className={classNames({ 'p-error': isFormFieldValid(meta) })}>Еще раз пароль*</label>
                       </span>
                       {getFormErrorMessage(meta)}
@@ -118,8 +126,9 @@ export const RegistrationPage: FC = () =>{
                   <Field name="organization" render={({ input }) => (
                     <div className="p-field">
                       <span className="p-float-label">
-                       <Dropdown id="organization" {...input} options={organizations}  optionLabel="name" />
-                       <label htmlFor="organization">Медорганизаия*</label>
+                       <Dropdown id="organization" {...input} options={organizations}
+                        filter optionLabel="name" />
+                       <label htmlFor="organization">Медорганизация*</label>
                       </span>
                     </div>
                   )} />
