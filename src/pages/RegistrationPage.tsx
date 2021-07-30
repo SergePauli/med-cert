@@ -16,19 +16,19 @@ import LoginImageDiv from '../static/LoginImageDiv'
 
 export const RegistrationPage: FC = () =>{ 
   const [organizations, setOrganizations] = useState([{
-    id: 6895109,
+    id: "6895109",
     name: "ГАУЗ АО ГП №1"
   },
   {
-    id: 6895110,
+    id: "6895110",
     name: "ГБУЗ АО \"ГП №2\""
   },
   {
-    id: 6895111,
+    id: "6895111",
     name: "ГАУЗ АО «ГП №3»"
   },
   {
-    id: 6895112,
+    id: "6895112",
     name: "ГАУЗ АО ГП №4"
   }]);
   const {userStore} = useContext(Context)
@@ -70,11 +70,10 @@ export const RegistrationPage: FC = () =>{
     <div className="login-body">
       <div className="login-wrapper">
         <div className="login-panel">
-          <img src={logo} className='logo' alt="logo"></img>
+          <img src={logo} className="logo_reg" alt="logo"></img>
           <div className="login-form">
-            <h2>Заявка на регистрацию</h2>            
-            <Form onSubmit={onSubmit} initialValues={{email: '', password: '',organization:{id: 6895110,
-    name: "ГБУЗ АО \"ГП №2\""} }} 
+            <h2>Регистрация</h2>            
+            <Form onSubmit={onSubmit} initialValues={{email: '', password: '',organization:null }} 
               validate={validate} 
               render={({ handleSubmit }) => (
               <form onSubmit={handleSubmit} className="p-fluid">
@@ -119,7 +118,7 @@ export const RegistrationPage: FC = () =>{
                   <Field name="organization" render={({ input }) => (
                     <div className="p-field">
                       <span className="p-float-label">
-                       <Dropdown id="organization" {...input} options={organizations} optionLabel="name" />
+                       <Dropdown id="organization" {...input} options={organizations}  optionLabel="name" />
                        <label htmlFor="organization">Медорганизаия*</label>
                       </span>
                     </div>
