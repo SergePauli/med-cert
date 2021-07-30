@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
-import React, { useContext } from 'react'
+import React, { useContext} from 'react'
 import { useState } from 'react'
 import { FC } from 'react'
-import { Link} from 'react-router-dom'
+import { Link, Router, useHistory} from 'react-router-dom'
 import { Context } from '..'
 import logo from "../images/security.png"
 import '../styles/login.css'
@@ -12,6 +12,7 @@ import { Button } from 'primereact/button'
 import { Field, Form } from 'react-final-form'
 import { classNames } from 'primereact/utils';
 import LoginImageDiv from '../static/LoginImageDiv'
+import { PassordRecoveryPage } from './PasswordRecoveryPage'
 
 interface IAuth {
   email: string
@@ -20,6 +21,7 @@ interface IAuth {
 const LoginPage: FC = () => { 
   const [ formData, setFormData] = useState<IAuth>({} as IAuth);  
   const {userStore} = useContext(Context)
+  const history = useHistory()
 
   const validate = (data: IAuth) => {
      let errors: any = {}        
@@ -39,6 +41,13 @@ const LoginPage: FC = () => {
       form.restart()
     }          
   }
+  const onPassordRecovery =() => {
+    try {
+      history.push("/message/Вам в почту направлено письмо, со ссылкой на страницу изменения пароля" )
+    } catch (e) {
+      console.log(e)
+    }
+  }
   const isFormFieldValid = (meta: any) => !!(meta.touched && meta.error)
   const getFormErrorMessage = (meta: any) => {
     return (isFormFieldValid(meta) && <small className="p-error">{meta.error}</small>)
@@ -51,7 +60,7 @@ const LoginPage: FC = () => {
           <img src={logo} className='logo' alt="logo"></img>
           <div className="login-form">
             <h2>Авторизация</h2>
-            <p>Нет учетной записи? <Link to="/registration">Подать заявку</Link></p>
+            <p>Нет учетной записи? <Link to="/registration">Регистрация</Link></p>
             <Form onSubmit={onSubmit} initialValues={{email: '', password: '' }} 
               validate={validate} 
               render={({ handleSubmit }) => (
@@ -60,7 +69,7 @@ const LoginPage: FC = () => {
                     <div className="p-field">
                       <span className="p-float-label p-input-icon-right">
                         <i className="pi pi-envelope" />
-                        <InputText id="email" {...input} className={classNames({ 'p-invalid': isFormFieldValid(meta) })} />
+                        <InputText id="email" autoFocus {...input} className={classNames({ 'p-invalid': isFormFieldValid(meta) })} />
                         <label htmlFor="email" 
                         className={classNames({ 'p-error': isFormFieldValid(meta) })}>Email*</label>
                       </span>
@@ -76,7 +85,8 @@ const LoginPage: FC = () => {
                       {getFormErrorMessage(meta)}
                     </div>
                   )} />
-              <Button type="submit" label="ВОЙТИ" />    
+              <Button type="submit" label="ВОЙТИ" style={{marginBottom:"1rem"}}/>   
+              <Button onClick={onPassordRecovery} label="не помню пароль" className="p-button-link"  /> 
             </form>)}/>            
           </div>
         </div>  
