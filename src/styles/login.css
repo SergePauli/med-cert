@@ -46,6 +46,7 @@
   align-items: center;
   -ms-flex-direction: column;
   flex-direction: column;
+  margin: auto;
 }
 
 .login-body .login-wrapper .login-panel .login-form>p {
