@@ -95,6 +95,12 @@
   left: 0;
 }
 
+.p-password-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .p-dropdown-item {
   cursor: pointer;
   font-weight: 400;
