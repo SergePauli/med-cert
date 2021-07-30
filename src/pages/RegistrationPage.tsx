@@ -125,9 +125,10 @@ export const RegistrationPage: FC = () =>{
                   )} />
                   <Field name="phone" render={({ input, meta }) => (
                     <div className="p-field">
-                      <span className="p-float-label">
-                       <InputMask id="phone" {...input} mask="(999) 999-9999" placeholder="(999) 999-9999" className={classNames({ 'p-invalid': isFormFieldValid(meta) })} />
-                        <label htmlFor="phone" className={classNames({ 'p-error': isFormFieldValid(meta) })}>номер тел.</label>
+                      <span className="p-float-label p-input-icon-right">
+                        <i className="pi pi-phone" />
+                       <InputMask id="phone" {...input} mask="(999) 999-9999"  className={classNames({ 'p-invalid': isFormFieldValid(meta) })} />
+                        <label htmlFor="phone" className={classNames({ 'p-error': isFormFieldValid(meta) })}>Контактный номер</label>
                       </span>
                       {getFormErrorMessage(meta)}
                     </div>
