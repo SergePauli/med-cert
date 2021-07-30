@@ -315,22 +315,6 @@ i:last-of-type, .p-input-icon-right>svg:last-of-type, .p-input-icon-right>.p-inp
   display: flex;
 }
 
-.p-hidden-accessible {
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
-}
-
-.p-hidden-accessible input, .p-hidden-accessible select {
-  -webkit-transform: scale(0);
-  transform: scale(0);
-}
-
-.p-fluid .p-dropdown .p-dropdown-label {
-  width: 1%;
+.p-dropdown .p-dropdown-label.p-placeholder {
+  color: #6c757d;
 }
