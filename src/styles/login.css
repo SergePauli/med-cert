@@ -103,6 +103,18 @@
   align-items: center;
 }
 
+@media (min-height: 769px) {
+  .login-body .login-wrapper .login-panel .logo_reg {
+    height: 50px;
+  }
+}
+
+@media (max-height: 768px) {
+  .login-body .login-wrapper .login-panel .logo_reg {
+    display: none;
+  }
+}
+
 @media (min-width: 993px) {
   .login-body .login-wrapper .login-image {
     background-size: cover;
