@@ -22,8 +22,16 @@ $api.interceptors.response.use(
         localStorage.setItem("token", response.data.tokens.access)
         return $api.request(originalRequest)
       } catch (e) {
-        console.log("не авторизован")
+        throw new Error("API error 401, Сеанс не авторизован")
       }
+    } else if (error.response.status === 422) {
+      if (error.response.data && error.response.data.errors) {
+        let message = error.response.data.errors.reduce((result: string, element: string) => {
+          result = `${result}, ${element}`
+          return result
+        }, "API error 422")
+        throw new Error(message)
+      } else throw new Error("API error 422")
     }
     throw error
   }
