@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { FC } from 'react';
 
-type ErrorPageProps = {}
+import { FC } from 'react'
+import { IRouteMatch } from '../models/IRouteMatch'
+import { IRouteProps } from '../models/IRouteProps'
+
+
+interface IMatch extends IRouteMatch {  
+  params: {error: string}
+}
+interface ErrorPageProps extends IRouteProps { 
+    match: IMatch  
+}
 
 export const ErrorPage: FC<ErrorPageProps> = (props: ErrorPageProps) => {
-  const [state, setState] = useState();
-
-  useEffect(() => {}, []);
-
   return (
     <>
-      <h1>ErrorPage React TS FC Component</h1>
-      <div>List</div>
+      <h1>Ошибка!</h1>
+      <div>{props.match.params.error}</div>
     </>
-  );
-};
+  )
+}
