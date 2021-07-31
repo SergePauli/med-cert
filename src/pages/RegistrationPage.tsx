@@ -34,9 +34,7 @@ export const RegistrationPage: FC = () =>{
     id: 6895112,
     name: "ГАУЗ АО ГП №4"
   }]);
-  const {userStore} = useContext(Context)
-  const [showMessage, setShowMessage] = useState(false);
-  const [formData, setFormData] = useState<IRegisterForm>({} as IRegisterForm);
+  const {userStore} = useContext(Context)  
   const validate = (data: IRegisterForm) => {
     let errors: any = {} 
     if (!data.name || (data.name.trim().split(' ').length < 2)){             
@@ -55,25 +53,23 @@ export const RegistrationPage: FC = () =>{
     if (data.organization == null ) {
        errors.organization = 'Поле <Медорганизация> обязательно'       
     }   
-      return errors
-    }
-  const onSubmit = (data: IRegisterForm, form: any) => {
+    return errors
+  }
+    const onSubmit = async (data: IRegisterForm, form: any) => {
     const request:IRegistration  = {} as IRegistration 
     try {
         const names = data.name.trim().split(' ')
         request.person_name_attributes = {family: names[0], given_1: names[1]}         
         if (names.length>2)  request.person_name_attributes.given_2= names[2]  
-        request.contacts_attributes={value: data.phone_number}        
+        if (data.phone_number) request.contacts_attributes={value: data.phone_number}        
         request.email = data.email
         request.password = data.password
         request.password_confirmation = data.password_confirmation
         request.organization_id = data.organization.id                  
-        userStore.registration(request)
-        history.push("/message/Ваша заявка направлена администратору ресурса для активации. Письмо с результатом, будет направлено на Ваш email" )
+        await userStore.registration(request)
+        history.push("/message/Ваша заявка направлена администратору ресурса для активации. Письмо с результатом, будет выслано на Ваш email" )
     } catch (e){
-      console.log(e)
-      setFormData(data)
-      form.restart()
+      history.push("/error/"+e.message)      
     }          
   }
   const isFormFieldValid = (meta: any) => !!(meta.touched && meta.error)
@@ -130,13 +126,14 @@ export const RegistrationPage: FC = () =>{
                       {getFormErrorMessage(meta)}
                     </div>
                   )} />
-                  <Field name="organization" render={({ input }) => (
+                  <Field name="organization" render={({ input, meta }) => (
                     <div className="p-field">
                       <span className="p-float-label">
                        <Dropdown id="organization" {...input} options={organizations}
-                        filter optionLabel="name" />
-                       <label htmlFor="organization">Медорганизация*</label>
-                      </span>
+                        filter optionLabel="name" />  
+                        <label htmlFor="organization" className={classNames({ 'p-error': isFormFieldValid(meta) })}>Медорганизация*</label>                     
+                      </span>  
+                      {getFormErrorMessage(meta)}                    
                     </div>
                   )} />
                   <Field name="phone" render={({ input, meta }) => (
