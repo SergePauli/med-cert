@@ -95,10 +95,9 @@
   left: 0;
 }
 
-.p-password-panel {
-  position: absolute;
-  top: 0;
-  left: 0;
+.p-dropdown-label-empty {
+  overflow: hidden;
+  visibility: hidden;
 }
 
 .p-dropdown-item {
