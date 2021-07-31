@@ -3,6 +3,6 @@ export interface IRegisterForm {
   name: string
   password: string
   password_confirmation: string
-  organization: { id: string; name: string }
+  organization: { id: number; name: string }
   phone_number: string
 }

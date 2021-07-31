@@ -6,6 +6,6 @@ export interface IRegistration {
   person_name_attributes: IPersonName
   password: string
   password_confirmation: string
-  organization_id: string
+  organization_id: number
   contacts_attributes: IContact
 }
