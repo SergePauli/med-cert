@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
-import React, { useContext} from 'react'
+import { useContext} from 'react'
 import { useState } from 'react'
 import { FC } from 'react'
-import { Link, Router, useHistory} from 'react-router-dom'
+import { Link, useHistory} from 'react-router-dom'
 import { Context } from '..'
 import logo from "../images/security.png"
 import '../styles/login.css'
@@ -10,9 +10,8 @@ import { InputText } from 'primereact/inputtext'
 import {Password} from 'primereact/password'
 import { Button } from 'primereact/button'
 import { Field, Form } from 'react-final-form'
-import { classNames } from 'primereact/utils';
+import { classNames } from 'primereact/utils'
 import LoginImageDiv from '../static/LoginImageDiv'
-import { PassordRecoveryPage } from './PasswordRecoveryPage'
 
 interface IAuth {
   email: string
