@@ -47,12 +47,8 @@ export default class UserStore {
       console.log(e.response?.data?.message)
     }
   }
-  async registration(user: IRegistration) {
-    try {
-      await AuthService.registration(user)
-    } catch (e) {
-      console.log(e.response?.data?.message)
-    }
+  registration(user: IRegistration) {
+    return AuthService.registration(user)
   }
   async logout() {
     try {
