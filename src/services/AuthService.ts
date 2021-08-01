@@ -9,6 +9,9 @@ export default class AuthService {
   static async registration(user: IRegistration): Promise<AxiosResponse<AuthResponse>> {
     return $api.post("auth/registration", { user })
   }
+  static async renew_link(email: string): Promise<AxiosResponse<void>> {
+    return $api.post("auth/renew_link", { email })
+  }
   static async logout(): Promise<void> {
     return $api.post("auth/logout")
   }
