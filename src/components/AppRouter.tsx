@@ -2,13 +2,15 @@ import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { useContext } from 'react'
 import { FC } from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, useHistory } from 'react-router-dom'
 import { Context } from '..'
 import { NoMatchPage } from '../pages/NoMatchPage'
 import { AUTH_ROUTES, PUBLIC_ROUTES } from '../routes'
 
 const AppRouter: FC = observer(() => {  
-  const {userStore} = useContext(Context)  
+  const history = useHistory()
+  const {userStore} = useContext(Context) 
+  userStore.setHistory(history) 
   useEffect(()=>{
     if (localStorage.getItem('token')) {
       userStore.checkAuth()
