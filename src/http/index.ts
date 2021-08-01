@@ -24,14 +24,14 @@ $api.interceptors.response.use(
       } catch (e) {
         throw new Error("API error 401, Сеанс не авторизован")
       }
-    } else if (error.response.status === 422) {
+    } else if ([406, 422].includes(error.response.status)) {
       if (error.response.data && error.response.data.errors) {
         let message = error.response.data.errors.reduce((result: string, element: string) => {
           result = `${result}, ${element}`
           return result
-        }, "API error 422")
+        }, `API error ${error.response.status}`)
         throw new Error(message)
-      } else throw new Error("API error 422")
+      } else throw new Error(`API error ${error.response.status}`)
     }
     throw error
   }
