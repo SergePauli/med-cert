@@ -7,7 +7,7 @@ import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 
 
-const App: FC =() => {   
+const App: FC =() => {    
   return (
     <BrowserRouter>
       <AppRouter/>

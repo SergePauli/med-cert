@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useContext} from 'react'
 import { useState } from 'react'
 import { FC } from 'react'
-import { Link, useHistory} from 'react-router-dom'
+import { Link} from 'react-router-dom'
 import { Context } from '..'
 import logo from "../images/security.png"
 import '../styles/login.css'
@@ -18,34 +18,27 @@ interface IAuth {
   password: string
 }
 const LoginPage: FC = () => { 
-  const [ formData, setFormData] = useState<IAuth>({} as IAuth);  
-  const {userStore} = useContext(Context)
-  const history = useHistory()
+  const [ formData, setFormData] = useState<IAuth>({} as IAuth)  
+  const [email, setEmail] = useState<string>('')
+  const {userStore} = useContext(Context)  
 
   const validate = (data: IAuth) => {
-     let errors: any = {}        
+    let errors: any = {}        
         if (!data.email) {
             errors.email = 'Поле <Email> обязательно'
+        } else if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(data.email)){
+          setEmail(data.email)
         }
         if (!data.password) {
             errors.password = 'Поле <Пароль> обязательно'
-        }
+        }        
         return errors
-    }
-  const onSubmit = (data: IAuth, form: any) => {
-    try {
-        userStore.login(data.email, data.password)
-    } catch {
-      setFormData(data)
-      form.restart()
-    }          
   }
-  const onPassordRecovery =() => {
-    try {
-      history.push("/message/Вам в почту направлено письмо, со ссылкой на страницу изменения пароля" )
-    } catch (e) {
-      console.log(e)
-    }
+  const onSubmit = (data: IAuth, form: any) => {          
+    userStore.login(data.email, data.password)        
+  }
+  const onPassordRecovery = async () => {          
+    userStore.renew_link(email)        
   }
   const isFormFieldValid = (meta: any) => !!(meta.touched && meta.error)
   const getFormErrorMessage = (meta: any) => {
@@ -63,7 +56,7 @@ const LoginPage: FC = () => {
             <Form onSubmit={onSubmit} initialValues={{email: '', password: '' }} 
               validate={validate} 
               render={({ handleSubmit }) => (
-              <form onSubmit={handleSubmit} className="p-fluid">
+              <form onSubmit={handleSubmit} autoComplete='off' className="p-fluid">
                 <Field name="email" render={({ input, meta }) => (
                     <div className="p-field">
                       <span className="p-float-label p-input-icon-right">
@@ -85,7 +78,7 @@ const LoginPage: FC = () => {
                     </div>
                   )} />
               <Button type="submit" label="ВОЙТИ" style={{marginBottom:"1rem"}}/>   
-              <Button onClick={onPassordRecovery} label="не помню пароль" className="p-button-link"  /> 
+              <Button type="button" onClick={onPassordRecovery} label="не помню пароль" className="p-button-link"  /> 
             </form>)}/>            
           </div>
         </div>  

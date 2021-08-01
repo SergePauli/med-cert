@@ -66,8 +66,7 @@ export const RegistrationPage: FC = () =>{
         request.password = data.password
         request.password_confirmation = data.password_confirmation
         request.organization_id = data.organization.id                  
-        await userStore.registration(request)
-        history.push("/message/Ваша заявка направлена администратору ресурса для активации. Письмо с результатом, будет выслано на Ваш email" )
+        userStore.registration(request)        
     } catch (e){
       history.push("/error/"+e.message)      
     }          
@@ -87,7 +86,7 @@ export const RegistrationPage: FC = () =>{
             <Form onSubmit={onSubmit} initialValues={{name: '', email: '', password: '', organization: null, phone_number: ''}} 
               validate={validate} 
               render={({ handleSubmit }) => (
-              <form onSubmit={handleSubmit} className="p-fluid">
+              <form onSubmit={handleSubmit} className="p-fluid" >
                 <Field name="name" render={({ input, meta }) => (
                     <div className="p-field">
                       <span className="p-float-label p-input-icon-right">
@@ -140,7 +139,7 @@ export const RegistrationPage: FC = () =>{
                     <div className="p-field">
                       <span className="p-float-label p-input-icon-right">
                         <i className="pi pi-phone" />
-                       <InputMask id="phone" {...input} mask="(999) 999-9999"  className={classNames({ 'p-invalid': isFormFieldValid(meta) })} />
+                       <InputMask id="phone" {...input} mask="+7(999) 999-9999"  className={classNames({ 'p-invalid': isFormFieldValid(meta) })} />
                         <label htmlFor="phone" className={classNames({ 'p-error': isFormFieldValid(meta) })}>Контактный номер</label>
                       </span>
                       {getFormErrorMessage(meta)}
