@@ -28,7 +28,7 @@ export const AUTH_ROUTES = [
 export const PUBLIC_ROUTES = [
   { path: LOGIN_ROUTE, Component: LoginPage },
   { path: REGISTRATION_ROUTE, Component: RegistrationPage },
-  { path: PWD_RECOVERY_ROUTE, Component: PassordRecoveryPage },
+  { path: PWD_RECOVERY_ROUTE + "/:code", Component: PassordRecoveryPage },
   { path: MESSAGE_ROUTE + "/:message", Component: MessagePage },
   { path: ERROR_ROUTE + "/:error", Component: ErrorPage },
   { path: HOME_ROUTE, Component: LoginPage },
