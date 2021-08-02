@@ -2,6 +2,7 @@ import axios from "axios"
 import { makeAutoObservable } from "mobx"
 import { API_URL } from "../http"
 import { IUser } from "../models/IUser"
+import { IPassRenew } from "../models/requests/IPassRenew"
 import { IRegistration } from "../models/requests/IRegistration"
 import { AuthResponse } from "../models/responses/AuthResponse"
 import AuthService from "../services/AuthService"
@@ -59,6 +60,15 @@ export default class UserStore {
       )
     } catch (e) {
       this._history.push("/error/" + e.message)
+    }
+  }
+  async pwd_renew(user: IPassRenew) {
+    try {
+      await AuthService.pwd_renew(user)
+      this._history.push("/message/Пароль был успешно изменен")
+    } catch (e) {
+      this._history.push("/error/" + e.message)
+      return false
     }
   }
   async renew_link(email: string) {
