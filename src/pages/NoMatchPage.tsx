@@ -1,7 +1,7 @@
 
 import { FC } from 'react'
 import '../styles/simplePage.css'
-import '../styles/primereact.css'
+import '../styles/root.css'
 export const NoMatchPage: FC = () => {  
 
   return (
