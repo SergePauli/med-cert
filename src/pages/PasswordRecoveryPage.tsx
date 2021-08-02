@@ -8,6 +8,7 @@ import { IRouteMatch } from '../models/IRouteMatch'
 import { IRouteProps } from '../models/IRouteProps'
 import LoginImageDiv from '../static/LoginImageDiv'
 import logo from '../images/security.png'
+import { IPassRenew } from '../models/requests/IPassRenew'
 interface IParams {code: string}
 interface IMatch extends IRouteMatch {  
   params: IParams
@@ -17,7 +18,7 @@ interface PasswordRecoveryPageProps extends IRouteProps {
 }
 export const PassordRecoveryPage: FC<PasswordRecoveryPageProps> = (props: PasswordRecoveryPageProps) =>{
   const {userStore} = useContext(Context)
-  const validate = (data: any) => {
+  const validate = (data: IPassRenew) => {
     let errors: any = {}        
     if (!data.password) {
        errors.password = 'Поле <Пароль> обязательно'
@@ -30,8 +31,8 @@ export const PassordRecoveryPage: FC<PasswordRecoveryPageProps> = (props: Passwo
   const getFormErrorMessage = (meta: any) => {
     return (isFormFieldValid(meta) && <small className="p-error">{meta.error}</small>)
   }
-  const onSubmit = (data: any, form: any) => {          
-            
+  const onSubmit = (data: IPassRenew, form: any) => {          
+     userStore.pwd_renew(data)       
   }   
   return (
   <>    
@@ -41,7 +42,7 @@ export const PassordRecoveryPage: FC<PasswordRecoveryPageProps> = (props: Passwo
           <img src={logo} className='logo' alt="logo"></img>
           <div  className="login-form" >
             <h2>Восстановить пароль</h2>            
-            <Form onSubmit={onSubmit} initialValues={{ password: '', password_confirmation: '' }} 
+            <Form onSubmit={onSubmit} initialValues={{ activation_link: props.match.params.code,password: '', password_confirmation: '' }} 
               validate={validate} 
               render={({ handleSubmit }) => (
               <form  onSubmit={handleSubmit}  className="p-fluid">                
