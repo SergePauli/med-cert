@@ -83,7 +83,7 @@ export const RegistrationPage: FC = () =>{
           <img src={logo} className="logo_reg" alt="logo"></img>
           <div className="login-form">
             <h2>Регистрация</h2>            
-            <Form onSubmit={onSubmit} initialValues={{name: '', email: '', password: '', organization: null, phone_number: ''}} 
+            <Form onSubmit={onSubmit} initialValues={{name: '', email: '', password: '', password_confirmation: '', organization: null, phone_number: ''}} 
               validate={validate} 
               render={({ handleSubmit }) => (
               <form onSubmit={handleSubmit} className="p-fluid" >
