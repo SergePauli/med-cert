@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useContext} from 'react'
+import { useContext, useEffect} from 'react'
 import { useState } from 'react'
 import { FC } from 'react'
 import { Link} from 'react-router-dom'
@@ -17,11 +17,10 @@ interface IAuth {
   email: string
   password: string
 }
-const LoginPage: FC = () => { 
-  const [ formData, setFormData] = useState<IAuth>({} as IAuth)  
+const LoginPage: FC = () => {    
   const [email, setEmail] = useState<string>('')
-  const {userStore} = useContext(Context)  
-
+  const {userStore} = useContext(Context)   
+  
   const validate = (data: IAuth) => {
     let errors: any = {}        
         if (!data.email) {
@@ -50,28 +49,28 @@ const LoginPage: FC = () => {
       <div className="login-wrapper">
         <div className="login-panel">
           <img src={logo} className='logo' alt="logo"></img>
-          <div className="login-form">
+          <div id="clickForm" className="login-form" >
             <h2>Авторизация</h2>
             <p>Нет учетной записи? <Link to="/registration">Регистрация</Link></p>
             <Form onSubmit={onSubmit} initialValues={{email: '', password: '' }} 
               validate={validate} 
               render={({ handleSubmit }) => (
-              <form onSubmit={handleSubmit} autoComplete='off' className="p-fluid">
+              <form  onSubmit={handleSubmit}  className="p-fluid">
                 <Field name="email" render={({ input, meta }) => (
                     <div className="p-field">
                       <span className="p-float-label p-input-icon-right">
                         <i className="pi pi-envelope" />
-                        <InputText id="email" autoFocus {...input} className={classNames({ 'p-invalid': isFormFieldValid(meta) })} />
+                        <InputText id="email"  autoFocus {...input} className={classNames({ 'p-invalid': isFormFieldValid(meta) })} />
                         <label htmlFor="email" 
                         className={classNames({ 'p-error': isFormFieldValid(meta) })}>Email*</label>
                       </span>
                       {getFormErrorMessage(meta)}
                     </div>
                   )} />
-                  <Field name="password" render={({ input, meta }) => (
+                  <Field name="password"  render={({ input, meta }) => (
                     <div className="p-field">
                       <span className="p-float-label p-input-icon-right">
-                        <Password id="password" {...input} toggleMask className={classNames({ 'p-invalid': isFormFieldValid(meta) })}  />
+                        <Password id="password" autoComplete='off' {...input} toggleMask className={classNames({ 'p-invalid': isFormFieldValid(meta) })}  />
                         <label htmlFor="password" className={classNames({ 'p-error': isFormFieldValid(meta) })}>Пароль*</label>
                       </span>
                       {getFormErrorMessage(meta)}
