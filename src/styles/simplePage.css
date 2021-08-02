@@ -1,0 +1,48 @@
+.exception-body{
+    background-color: #fbfbfc;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url(../images/404-background-img.jpg);
+    display: flex;
+    height: 100vh;
+}
+
+.nopage-block{
+    margin: 0;
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-right: -50%;
+
+}
+.nopage_h1{
+    font-size: 60px;
+    font-weight: 700;
+    line-height: 1em;
+    margin-top: 60px;
+}
+
+.nopage_text{
+    font-family: "Roboto",Arial,Helvetica,sans-serif;
+    font-size: 17px;
+    line-height: 28px;
+    color: #000;
+    margin-bottom: 12px;
+}
+
+.nopage-button{
+    padding: 0 24px;
+    font-size: 16px;
+    line-height: 56px;
+    height: 56px;
+    color: #565656;
+    border-radius: 4px;
+    border: 1px solid #cdd1d4;
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.nopage-button:hover{
+    background:#dbe2e6;
+}
