@@ -1,17 +1,34 @@
 import avatar from "../images/logo.svg"
-const SideBarLayout = () => {
+import { useContext } from "react"
+import { observer } from "mobx-react-lite"
+import { Context } from "../.."
+import { Sidebar } from 'primereact/sidebar'
+import { PanelMenu } from 'primereact/panelmenu'
+import { Link } from "react-router-dom"
+import { LayoutMenu } from "../customUI/LayoutMenu"
+const SideBarLayout = observer(() => {
+   const {layoutStore} = useContext(Context)
+   const topMenuItems = [
+      { label: "Избранное",      
+        items: [{label:"Главная", icon:"pi pi-fw pi-home", url:"/"}]     
+      }      
+   ]   
   return (
-    <div className='layout-sidebar'>
-        <a className='logo' href='#/'>
+    <Sidebar visible={layoutStore.sideBarVisible()} className='layout-sidebar' position="left" onHide={()=>layoutStore.setSideBarVisible(false)}>      
+        <Link className='logo' to='#/'>
           <img id='app-logo' className='logo-image' src={avatar} alt='diamond layout' />
           <span className='app-name'>МЕДСС</span>
-        </a>
+        </Link>
         <div className='layout-menu-container'>
-          <ul className='layout-menu' role='menu'>
+          <LayoutMenu model={topMenuItems} className='layout-menu'/>
+          <PanelMenu className='layout-menu'/>
+          <LayoutMenu className='layout-menu'/>
+
+          {/* <ul className='layout-menu' role='menu'>
             <li className='layout-root-menuitem' role='menuitem'>
               <button type='button' className='p-ripple p-link'>
                 <i className='layout-menuitem-icon pi pi-fw pi-home'></i>
-                <span className='layout-menuitem-text'>Избранное</span>
+                <span className='layout-menuitem-text'>Главная</span>
                 <i className='pi pi-fw pi-angle-down layout-submenu-toggler'></i>
               </button>
               <div className='layout-root-menuitem'>
@@ -74,9 +91,9 @@ const SideBarLayout = () => {
                 </li>
               </ul>
             </li>
-          </ul>
+          </ul> */}
         </div>
-      </div>      
+      </Sidebar>      
   )
-}
+})
 export default SideBarLayout
