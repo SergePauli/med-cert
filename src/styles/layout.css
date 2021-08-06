@@ -1,0 +1,345 @@
+.layout-content-wrapper {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  min-height: 100vh;
+  transition: margin-left 0.4s cubic-bezier(0.05, 0.74, 0.2, 0.99);
+}
+
+.layout-sidebar {
+  width: 16rem;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 20%), 0 4px 5px 0 rgb(0 0 0 / 14%), 0 1px 10px 0 rgb(0 0 0 / 12%);
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  user-select: none;
+  transition: transform 0.4s cubic-bezier(0.05, 0.74, 0.2, 0.99);
+}
+
+.layout-content {
+  padding: 2rem;
+  flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+}
+
+.layout-sidebar .logo {
+  text-align: center;
+  display: block;
+  outline: 0 none;
+  padding: 1rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.layout-sidebar .logo-image {
+  width: 2rem;
+  height: 2rem;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.layout-sidebar-indigo .layout-sidebar {
+  background: #303F9F;
+  border-right: 0 none;
+  background-image: linear-gradient(180deg, #303F9F 10%, #283593 100%);
+}
+
+.layout-sidebar-indigo .layout-sidebar .logo {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.layout-sidebar-indigo .layout-sidebar .logo:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+}
+
+.layout-sidebar-indigo .layout-sidebar .app-name {
+  color: #ffffff;
+}
+
+.layout-menu-container {
+  overflow: auto;
+  flex: 1;
+  padding: 1rem;
+}
+
+.layout-sidebar-indigo .layout-sidebar .layout-menu .menu-separator {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.layout-sidebar-indigo .layout-sidebar .layout-menu li.active-menuitem>a, .layout-sidebar-indigo .layout-sidebar .layout-menu li.active-menuitem>.p-link {
+  color: #ffffff;
+}
+
+.layout-sidebar-indigo .layout-sidebar .layout-menu li a, .layout-sidebar-indigo .layout-sidebar .layout-menu li .p-link {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.layout-sidebar-indigo .layout-sidebar .layout-menu li a:hover, .layout-sidebar-indigo .layout-sidebar .layout-menu li .p-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.layout-sidebar-indigo .layout-sidebar .layout-menu li a:focus, .layout-sidebar-indigo .layout-sidebar .layout-menu li .p-link:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+}
+
+.layout-sidebar-indigo .layout-sidebar .layout-menu .layout-root-menuitem .layout-menuitem-root-text {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.layout-menu .layout-root-menuitem>.layout-menuitem-root-text {
+  font-size: 0.857rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.5rem 0 1rem 0;
+}
+
+.layout-sidebar-indigo .layout-sidebar .layout-menu .layout-root-menuitem.active-menuitem {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.layout-sidebar-indigo .layout-sidebar .layout-menu .layout-root-menuitem>ul>li.active-menuitem {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@media screen and (min-width: 992px) {
+  .layout-sidebar-indigo.layout-slim .layout-sidebar .layout-menu .layout-root-menuitem>ul {
+    background: #303F9F;
+    background-image: linear-gradient(180deg, #303F9F 10%, #283593 100%);
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .layout-sidebar-indigo .layout-sidebar .layout-menu .layout-root-menuitem.active-menuitem {
+    background: transparent;
+  }
+}
+
+.layout-footer {
+  background: #ffffff;
+  height: 4rem;
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+  padding: 0 2rem;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.layout-footer .footer-logo-container {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.layout-footer .footer-logo-container img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.layout-footer .footer-logo-container .app-name {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+  margin-left: .5rem;
+}
+
+.layout-footer .footer-logo-container .app-profile {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+  margin-left: .5rem;
+  color: #283593;
+}
+
+.layout-footer .copyright {
+  font-size: .875rem;
+  color: #6c757d;
+}
+
+@media screen and (min-width: 992px) {
+  .layout-wrapper.layout-static .layout-content-wrapper {
+    margin-left: 16rem;
+  }
+  .layout-wrapper.layout-static-inactive .layout-topbar .menu-button i:before {
+    content: "\e901";
+  }
+  .layout-wrapper.layout-static-inactive .layout-sidebar {
+    transform: translateX(-100%);
+  }
+  .layout-wrapper.layout-static-inactive .layout-content-wrapper {
+    margin-left: 0;
+  }
+  .layout-wrapper.layout-overlay .layout-topbar .menu-button i:before {
+    content: "\e901";
+  }
+  .layout-wrapper.layout-overlay .layout-content-wrapper {
+    margin-left: 0;
+  }
+  .layout-wrapper.layout-overlay .layout-sidebar {
+    z-index: 999;
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+  .layout-wrapper.layout-overlay.layout-overlay-active .layout-sidebar {
+    transform: translateX(0);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+  }
+}
+
+layout-menu-container {
+  overflow: auto;
+  flex: 1;
+  padding: 1rem;
+}
+
+.layout-menu {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.layout-menu .menu-separator {
+  margin: 1rem 0;
+}
+
+.layout-menu .layout-root-menuitem>.layout-menuitem-root-text {
+  font-size: .857rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: .5rem 0 1rem 0;
+}
+
+.layout-menu .layout-root-menuitem>a, .layout-menu .layout-root-menuitem>.p-link {
+  display: none;
+}
+
+.layout-menu .layout-root-menuitem .layout-menu-tooltip {
+  display: none;
+}
+
+.layout-menu .layout-root-menuitem .layout-menu-enter {
+  max-height: 0;
+}
+
+.layout-menu .layout-root-menuitem .layout-menu-enter-active {
+  overflow: hidden;
+  max-height: 1000px;
+  transition: max-height 1s ease-in-out;
+}
+
+.layout-menu .layout-root-menuitem .layout-menu-enter-done {
+  transform: none;
+}
+
+.layout-menu .layout-root-menuitem .layout-menu-exit {
+  max-height: 1000px;
+}
+
+.layout-menu .layout-root-menuitem .layout-menu-exit-active {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.45s cubic-bezier(0, 1, 0, 1);
+}
+
+.layout-menu ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.layout-menu ul a, .layout-menu ul .p-link {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  position: relative;
+  padding: .5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  outline: 0 none;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.layout-menu ul a .layout-menuitem-icon, .layout-menu ul .p-link .layout-menuitem-icon {
+  margin-right: .5rem;
+}
+
+.layout-menu ul a .layout-submenu-toggler, .layout-menu ul .p-link .layout-submenu-toggler {
+  font-size: 75%;
+  margin-left: auto;
+  transition: transform 0.2s;
+}
+
+.layout-menu ul a.rotated-icon .layout-menuitem-icon, .layout-menu ul .p-link.rotated-icon .layout-menuitem-icon {
+  transform: rotate(90deg);
+}
+
+.layout-menu ul a.active-route, .layout-menu ul .p-link.active-route {
+  font-weight: 700;
+}
+
+.layout-menu ul li.active-menuitem {
+  border-radius: 4px;
+}
+
+.layout-menu ul li.active-menuitem>a .layout-submenu-toggler, .layout-menu ul li.active-menuitem>.p-link .layout-submenu-toggler {
+  transform: rotate(-180deg);
+}
+
+.layout-menu ul li.active-menuitem .layout-menu-enter-from {
+  max-height: 0;
+}
+
+.layout-menu ul li.active-menuitem .layout-menu-enter-to {
+  max-height: 1000px;
+}
+
+.layout-menu ul li.active-menuitem .layout-menu-enter-active {
+  overflow: hidden;
+  transition: max-height 1s ease-in-out;
+}
+
+.layout-menu ul ul {
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.layout-menu ul ul li a, .layout-menu ul ul li .p-link {
+  padding-left: 1.5rem;
+}
+
+.layout-menu ul ul li li a, .layout-menu ul ul li li .p-link {
+  padding-left: 2.5rem;
+}
+
+.layout-menu ul ul li li li a, .layout-menu ul ul li li li .p-link {
+  padding-left: 3.5rem;
+}
+
+.layout-menu ul ul li li li li a, .layout-menu ul ul li li li li .p-link {
+  padding-left: 4.5rem;
+}
+
+.layout-menu ul ul li li li li li a, .layout-menu ul ul li li li li li .p-link {
+  padding-left: 5.5rem;
+}
+
+.layout-menu ul ul li li li li li li a, .layout-menu ul ul li li li li li li .p-link {
+  padding-left: 6.5rem;
+}
