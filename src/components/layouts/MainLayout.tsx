@@ -1,35 +1,38 @@
-import { Button } from 'primereact/button'
-import React, { FC, useContext } from 'react'
+import React, { FC, useContext, useState } from 'react'
 import '../../styles/layout.css'
 import { Context } from '../..'
 import FooterLayout from './FooterLayout'
 import SideBarLayout from './SideBarLayout'
+import { TopBarLayout } from './TopBarLayout'
+import { classNames } from 'primereact/utils'
+import { observer } from 'mobx-react-lite'
+import RightSideBarLayout  from './RightSideBarLayout'
 
-export type MainLayoutProps = { 
-  isLayoutStaticInactive:boolean, 
-  isTabletOrMobile:boolean,
+
+type MainLayoutProps = {
+  title: string,
   url:string, 
   content:React.ReactElement }
 
-export const MainLayout:FC<MainLayoutProps>=(props={isLayoutStaticInactive:false, isTabletOrMobile:false, content: (<Button />)} as MainLayoutProps) => { 
+const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => { 
   const {layoutStore} = useContext(Context)
-  const menuHide =()=> {
-    const { isLayoutStaticInactive } = props
-    layoutStore.setSideBarVisible(!isLayoutStaticInactive)
-  }
+  const rightSideBarActive = layoutStore.rightSideBarActive()
+  const layoutStaticInactive = layoutStore.layoutStaticInactive()
+  const wrapperClass = classNames("layout-wrapper layout-static p-ripple layout-sidebar-indigo",{"layout-static-inactive": layoutStaticInactive}, {"layout-mobile-active": layoutStore.tabletOrMobile()})
+  
   return (
-  <div className={ "layout-wrapper layout-static p-ripple layout-sidebar-indigo" +
-          (props.isLayoutStaticInactive ? (props.isTabletOrMobile ? " layout-mobile-active" : " layout-static-inactive") : "")
-        }
-        data-theme='light'
-      >
-        <div className='layout-content-wrapper'>          
-          <div className='layout-content'>{props.content}</div>
-          <FooterLayout />
-        </div>
-        <SideBarLayout activeUrl={props.url} />
-        
-        <div className='layout-mask modal-in' onClick={()=>menuHide()}></div>
-      </div>  
+  <div className={wrapperClass} data-theme='light'>
+    <div className='layout-content-wrapper' onClick={()=>{rightSideBarActive && layoutStore.setRightSideBarActive(false)}}>  
+      <TopBarLayout  title = {props.title} />        
+      <div className='layout-content' >{props.content}</div>
+      <FooterLayout />
+    </div>
+    <SideBarLayout  activeUrl={props.url} /> 
+    <RightSideBarLayout /> 
+    <div className="layout-search"></div>        
+    <div className='layout-mask modal-in' onClick={()=>{layoutStore.setTabletOrMobile(false)}}></div>
+  </div>  
   )
 }
+export default observer(MainLayout)
+
