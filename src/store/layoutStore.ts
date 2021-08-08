@@ -1,12 +1,34 @@
+import { makeAutoObservable } from "mobx"
+
 export default class LayoutStore {
-  private _isSideBarVisible: boolean
+  private _isTabletOrMobile: boolean
+  private _isLayoutStaticInactive: boolean
+  private _isRightSidebarActive: boolean
   constructor() {
-    this._isSideBarVisible = true
+    this._isTabletOrMobile = false
+    this._isLayoutStaticInactive = false
+    this._isRightSidebarActive = false
+    makeAutoObservable(this)
   }
-  setSideBarVisible(visible: boolean) {
-    this._isSideBarVisible = visible
+  setTabletOrMobile(visible: boolean) {
+    this._isTabletOrMobile = visible
   }
-  sideBarVisible() {
-    return this._isSideBarVisible
+  tabletOrMobile() {
+    return this._isTabletOrMobile
+  }
+  sideBarToggle() {
+    this._isLayoutStaticInactive = !this._isLayoutStaticInactive
+  }
+  setLayoutStaticInactive(isLayoutStaticInactive: boolean) {
+    this._isLayoutStaticInactive = isLayoutStaticInactive
+  }
+  layoutStaticInactive() {
+    return this._isLayoutStaticInactive
+  }
+  rightSideBarActive() {
+    return this._isRightSidebarActive
+  }
+  setRightSideBarActive(rightSidebarActive: boolean) {
+    this._isRightSidebarActive = rightSidebarActive
   }
 }
