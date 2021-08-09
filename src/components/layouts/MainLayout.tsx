@@ -19,9 +19,12 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
   const rightSideBarActive = layoutStore.rightSideBarActive()
   const layoutStaticInactive = layoutStore.layoutStaticInactive()
   const profileMenuActive = layoutStore.profileMenuActive()
+  const notificationsMenuActive = layoutStore.notificationsMenuActive()
+  
   const onClickOutside = ()=>{
     if (rightSideBarActive) layoutStore.setRightSideBarActive(false)
-    if (profileMenuActive) layoutStore.setProfileMenuActive(false)
+    else if (profileMenuActive) layoutStore.setProfileMenuActive(false)
+    else if (notificationsMenuActive) layoutStore.setNotificationsMenuActive(false)
   } 
   const wrapperClass = classNames("layout-wrapper layout-static p-ripple layout-sidebar-indigo",{"layout-static-inactive": layoutStaticInactive}, {"layout-mobile-active": layoutStore.tabletOrMobile()})
   
