@@ -1,18 +1,27 @@
 import { observer } from 'mobx-react-lite'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { Context } from '../..'
 import { useMediaQuery } from 'react-responsive'
 import ava from "../../images/ava.png"
+import { classNames } from 'primereact/utils'
+import { MenuItem } from 'primereact/menuitem'
+import { ProfileMenu } from '../menus/ProfileMenu'
 type TopBarLayoutProps = {title: string}
 
 export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
-  const {layoutStore} = useContext(Context)
+  const {layoutStore, userStore} = useContext(Context)
   const isTOM = useMediaQuery({ query: "(max-width: 991px)" })
+  const profileMenuClassName = classNames("profile-item",{"active-menuitem fadeInDown":layoutStore.profileMenuActive()})
   const menuToggle=()=>{    
     if (isTOM && layoutStore.tabletOrMobile()) layoutStore.setTabletOrMobile(false) 
     else if (!layoutStore.tabletOrMobile()) layoutStore.setTabletOrMobile(true)
     else layoutStore.sideBarToggle()          
   } 
+  const items:MenuItem[] = [    
+      {label:"Пользователь", icon:"pi-user", url:"/#"},
+      {label:"Настройки", icon:"pi-cog", url:"/#"},      
+      {label:"Выход", icon:"pi-power-off", command:()=>{userStore.logout()}},       
+   ]   
   return (
     <div className="layout-topbar">
       <div className="topbar-left">
@@ -32,11 +41,12 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
               <span className="topbar-badge">5</span>
             </button>
           </li>
-          <li className="profile-item">
-            <button type="button" className="p-link">
+          <li className={profileMenuClassName}>
+            <button type="button" className="p-link" onClick={()=>layoutStore.setProfileMenuActive(true)}>
               <img src={ava} alt="" className="profile-image"/>
               <span className="profile-name">Amelia Stone</span>
             </button>
+            <ProfileMenu model={items}/>
           </li> 
           <li className="right-sidebar-item">
             <button type="button" className="p-link" onClick={()=>layoutStore.setRightSideBarActive(true)}>
