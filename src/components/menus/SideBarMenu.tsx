@@ -1,16 +1,9 @@
 import React, { FC,  useState } from 'react'
 import { MenuItem } from 'primereact/menuitem'
 import { classNames, UniqueComponentId } from 'primereact/utils'
+import { IMenuProps } from './IMenuProps'
 
-
-type SideBarMenuProps = {
-  id?: string
-  model?: MenuItem[]
-  style?: object
-  className?: string
-}
-
-export const SideBarMenu:FC<SideBarMenuProps> = (props: SideBarMenuProps) =>{  
+export const SideBarMenu:FC<IMenuProps> = (props: IMenuProps) =>{  
   const [activeItem, setActiveItem] = useState<MenuItem>({})
   const onItemClick = (event: React.MouseEvent, item:MenuItem)=> {
         if (item.disabled) {
