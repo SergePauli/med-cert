@@ -6,12 +6,15 @@ import ava from "../../images/ava.png"
 import { classNames } from 'primereact/utils'
 import { MenuItem } from 'primereact/menuitem'
 import { ProfileMenu } from '../menus/ProfileMenu'
+import { ExtMenuItem } from '../menus/IMenuProps'
+import { NotificationsMenu } from '../menus/NotificationsMenu'
 type TopBarLayoutProps = {title: string}
-
+const detail_templ ="detail"
 export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
   const {layoutStore, userStore} = useContext(Context)
   const isTOM = useMediaQuery({ query: "(max-width: 991px)" })
   const profileMenuClassName = classNames("profile-item",{"active-menuitem fadeInDown":layoutStore.profileMenuActive()})
+  const notificationsMenuClassName = classNames("notifications-item", {"active-menuitem":layoutStore.notificationsMenuActive()})
   const menuToggle=()=>{    
     if (isTOM && layoutStore.tabletOrMobile()) layoutStore.setTabletOrMobile(false) 
     else if (!layoutStore.tabletOrMobile()) layoutStore.setTabletOrMobile(true)
@@ -21,7 +24,18 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
       {label:"Пользователь", icon:"pi-user", url:"/#"},
       {label:"Настройки", icon:"pi-cog", url:"/#"},      
       {label:"Выход", icon:"pi-power-off", command:()=>{userStore.logout()}},       
-   ]   
+   ]
+  const notif_items:ExtMenuItem[] = [    
+      {label:`Создано ${detail_templ} свидетельств`, summary:"Новых", className:'p-success', icon:"pi-user", detail:3, url:"/#"},
+      {label:`Заменено ${detail_templ} свидетельств`, summary:"Замены", className:'p-info', icon:"pi-cog", detail:2, url:"/#"},      
+      {label:`Выданы родственникам ${detail_templ} свидетельств`, summary:"Выданно", icon:"pi-cog", detail:5, url:"/#"}, 
+      {label:`С замечаниями ${detail_templ} свидетельств`, className:'p-danger', summary:"Замечаний", icon:"pi-cog", detail:1, url:"/#"},
+      {label:`Проверены ${detail_templ} свидетельств`, summary:"Проверенно",  className:'p-success', icon:"pi-cog", detail:3, url:"/#"},  
+      {label:`Отправлены в ФРМСИ ${detail_templ}`, summary:"Отправлено", className:'p-success', icon:"pi-cog", detail:2, url:"/#"},
+   ]
+   const notif_amount = notif_items.reduce((previtem, item, sum)=>{
+    return sum += item.detail
+   },0)   
   return (
     <div className="layout-topbar">
       <div className="topbar-left">
@@ -35,11 +49,13 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
       </div>
       <div className="topbar-right">
         <ul className="topbar-menu">          
-          <li className="notifications-item">
-            <button type="button" className="p-link">
+          <li className={notificationsMenuClassName}>
+            <button type="button" className="p-link"
+            onClick={()=>layoutStore.setNotificationsMenuActive(true)}>
               <i className="pi pi-bell"></i>
-              <span className="topbar-badge">5</span>
+              <span className="topbar-badge">{notif_amount}</span>
             </button>
+            <NotificationsMenu model={notif_items}/>
           </li>
           <li className={profileMenuClassName}>
             <button type="button" className="p-link" onClick={()=>layoutStore.setProfileMenuActive(true)}>
