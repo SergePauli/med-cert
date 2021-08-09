@@ -1125,3 +1125,19 @@ a {
   color: #6c757d;
   margin-left: .5rem;
 }
+
+.p-success {
+  color: rgb(104, 159, 56);
+}
+
+.p-info {
+  color: rgb(2, 136, 209);
+}
+
+.p-primary {
+  color: rgb(63, 81, 181);
+}
+
+.p-danger {
+  color: rgb(211, 47, 47);
+}
