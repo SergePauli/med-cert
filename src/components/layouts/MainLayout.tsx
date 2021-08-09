@@ -18,11 +18,16 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
   const {layoutStore} = useContext(Context)
   const rightSideBarActive = layoutStore.rightSideBarActive()
   const layoutStaticInactive = layoutStore.layoutStaticInactive()
+  const profileMenuActive = layoutStore.profileMenuActive()
+  const onClickOutside = ()=>{
+    if (rightSideBarActive) layoutStore.setRightSideBarActive(false)
+    if (profileMenuActive) layoutStore.setProfileMenuActive(false)
+  } 
   const wrapperClass = classNames("layout-wrapper layout-static p-ripple layout-sidebar-indigo",{"layout-static-inactive": layoutStaticInactive}, {"layout-mobile-active": layoutStore.tabletOrMobile()})
   
   return (
   <div className={wrapperClass} data-theme='light'>
-    <div className='layout-content-wrapper' onClick={()=>{rightSideBarActive && layoutStore.setRightSideBarActive(false)}}>  
+    <div className='layout-content-wrapper' onClick={()=>onClickOutside()}>  
       <TopBarLayout  title = {props.title} />        
       <div className='layout-content' >{props.content}</div>
       <FooterLayout />
