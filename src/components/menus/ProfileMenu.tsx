@@ -1,9 +1,11 @@
 import { MenuItem } from 'primereact/menuitem'
 import { classNames } from 'primereact/utils'
 import { FC } from 'react'
-import { IMenuprops } from './IMenuProps'
+import { useHistory } from 'react-router-dom'
+import { IMenuProps } from './IMenuProps'
 
-export const ProfileMenu: FC<IMenuprops> = (props: IMenuprops)=> {   
+export const ProfileMenu: FC<IMenuProps> = (props: IMenuProps)=> { 
+  const history = useHistory()  
   const onItemClick = (event: React.MouseEvent, item:MenuItem)=> {
     if (item.disabled) {
       event.preventDefault()
@@ -11,6 +13,8 @@ export const ProfileMenu: FC<IMenuprops> = (props: IMenuprops)=> {
     }
     if (!item.url) {
       event.preventDefault()
+    } else {
+      history.push(item.url)
     }
     if (item.command) item.command({           
       originalEvent: event,
