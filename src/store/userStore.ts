@@ -6,17 +6,20 @@ import { IPassRenew } from "../models/requests/IPassRenew"
 import { IRegistration } from "../models/requests/IRegistration"
 import { AuthResponse } from "../models/responses/AuthResponse"
 import AuthService from "../services/AuthService"
+import { HOME_ROUTE, LOGIN_ROUTE } from "../utils/consts"
 
 export default class UserStore {
   private _isAuth: boolean
   private _user: IUser
   private _isLoding: boolean
   private _history: any
+  private _token: string
 
   constructor() {
     this._user = {} as IUser
     this._isAuth = false
     this._isLoding = false
+    this._token = localStorage.getItem("token") || ""
     makeAutoObservable(this)
   }
 
@@ -42,12 +45,19 @@ export default class UserStore {
     this._history = history
   }
 
+  setToken(access_token: string) {
+    this._token = access_token
+  }
+  token() {
+    return this._token
+  }
   async login(email: string, password: string) {
     try {
       const response = await AuthService.login(email, password)
       localStorage.setItem("token", response.data.tokens.access)
       this.setAuth(true)
       this.setUser(response.data.user)
+      this._history.push(HOME_ROUTE)
     } catch (e) {
       this._history.push("/error/" + e.message)
     }
@@ -85,7 +95,9 @@ export default class UserStore {
       await AuthService.logout()
       this.setAuth(false)
       localStorage.removeItem("token")
+      this._token = ""
       this.setUser({} as IUser)
+      this._history.push(LOGIN_ROUTE)
     } catch (e) {
       this._history.push("/error/" + e.message)
     }
@@ -95,10 +107,12 @@ export default class UserStore {
       this.setLoading(true)
       const response = await axios.get<AuthResponse>(`${API_URL}auth/refresh`, { withCredentials: true })
       localStorage.setItem("token", response.data.tokens.access)
+      this._token = response.data.tokens.access
       this.setAuth(true)
       this.setUser(response.data.user)
     } catch (e) {
-      this._history.push("/error/" + e.message)
+      if (e.message?.includes("401")) this._history.push(LOGIN_ROUTE)
+      else this._history.push("/error/" + e.message)
     } finally {
       this.setLoading(false)
     }
