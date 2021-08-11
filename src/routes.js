@@ -24,12 +24,15 @@ export const AUTH_ROUTES = [
   { path: ADMIN_ROUTE, Component: AdminPage },
   { path: LIST_ROUTE, Component: ListPage },
   { path: CERTIFICATE_ROUTE + "/:id", Component: CertificatePage },
+  { path: LOGIN_ROUTE, Component: MainPage },
 ]
-export const PUBLIC_ROUTES = [
+export const NON_AUTH_ROUTES = [
   { path: LOGIN_ROUTE, Component: LoginPage },
   { path: REGISTRATION_ROUTE, Component: RegistrationPage },
   { path: PWD_RECOVERY_ROUTE + "/:code", Component: PassordRecoveryPage },
+  { path: HOME_ROUTE, Component: LoginPage },
+]
+export const PUBLIC_ROUTES = [
   { path: MESSAGE_ROUTE + "/:message", Component: MessagePage },
   { path: ERROR_ROUTE + "/:error", Component: ErrorPage },
-  { path: HOME_ROUTE, Component: LoginPage },
 ]
