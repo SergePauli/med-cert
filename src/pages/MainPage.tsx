@@ -25,13 +25,13 @@ const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
     content:( 
       <>     
         <div className="p-d-flex p-flex-column p-jc-around p-flex-md-row p-flex-wrap">
-          <Button style={{minWidth:'226px'}} className="p-mr-2 p-mb-2 p-shadow-3" label="Ввод свидетельства"  title="Форма ввода свидетельства" />
-            <Button style={{minWidth:'226px'}} className="p-button-secondary p-mr-2 p-mb-2 p-shadow-3" label="Настройки" title="Настройки учетной записи пользователя"/>
-            <Button style={{minWidth:'226px'}} className="p-button-secondary p-mr-2 p-mb-2 p-shadow-3" id="reports" label="Отчеты" title="Формирование отчетов" />
-            <Button style={{minWidth:'226px'}} className="p-mr-2 p-mb-2 p-shadow-3" label="Перинатальное свидетельство" /> 
+          <Button style={{minWidth:'243px'}} className="p-mr-2 p-mb-2 p-shadow-3" label="Ввод свидетельства"  title="Форма ввода свидетельства" />
+            <Button style={{minWidth:'243px'}} className="p-button-secondary p-mr-2 p-mb-2 p-shadow-3" label="Настройки" title="Настройки учетной записи пользователя"/>
+            <Button style={{minWidth:'243px'}} className="p-button-secondary p-mr-2 p-mb-2 p-shadow-3" id="reports" label="Отчеты" title="Формирование отчетов" />
+            <Button style={{minWidth:'243px'}} className="p-mr-2 p-mb-2 p-shadow-3" label="Перинатальное свидетельство" /> 
             <Button className="p-button-secondary p-mr-2 p-mb-2 p-shadow-3" 
-            id="repBt" style={{minWidth:'226px'}} label="ЖУРНАЛ" title="Журнал выданных свидетельств и копий" />                     
-            <Button style={{minWidth:'226px'}} className="p-button-success p-mr-2 p-mb-2 p-shadow-3" label="Список свидетельств" title="Список введеных свидетельств" />
+            id="repBt" style={{minWidth:'243px'}} label="ЖУРНАЛ" title="Журнал выданных свидетельств и копий" />                     
+            <Button style={{minWidth:'243px'}} className="p-button-success p-mr-2 p-mb-2 p-shadow-3" label="Список свидетельств" title="Список введеных свидетельств" />
             
         </div> 
         <Divider />
