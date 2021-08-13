@@ -6,6 +6,7 @@ import { IPassRenew } from "../models/requests/IPassRenew"
 import { IRegistration } from "../models/requests/IRegistration"
 import { AuthResponse } from "../models/responses/AuthResponse"
 import AuthService from "../services/AuthService"
+import UsersService from "../services/UsersService"
 import { HOME_ROUTE, LOGIN_ROUTE } from "../utils/consts"
 
 export default class UserStore {
@@ -111,8 +112,25 @@ export default class UserStore {
       this.setAuth(true)
       this.setUser(response.data.user)
     } catch (e) {
-      if (e.message?.includes("401")) this._history.push(LOGIN_ROUTE)
-      else this._history.push("/error/" + e.message)
+      if (e.message?.includes("401")) {
+        this._isAuth = false
+        this._token = ""
+        localStorage.removeItem("token")
+        this._user = {} as IUser
+        this._history.push(LOGIN_ROUTE)
+      } else this._history.push("/error/" + e.message)
+    } finally {
+      this.setLoading(false)
+    }
+  }
+  async getUserInfo(id: number) {
+    if (id === undefined) return false
+    try {
+      this.setLoading(true)
+      const response = await UsersService.getUser(id + "")
+      return response.data
+    } catch (e) {
+      this._history.push("/error/" + e.message)
     } finally {
       this.setLoading(false)
     }
