@@ -5,6 +5,8 @@ import { Password } from 'primereact/password'
 import { Dropdown } from 'primereact/dropdown'
 import { InputMask } from 'primereact/inputmask'
 import { classNames } from 'primereact/utils'
+import  '../styles/components/Dropdown.css'
+import  '../styles/components/Inputtext.css'
 import React, { useContext, useState } from 'react'
 import { FC } from 'react'
 import { Field, Form } from 'react-final-form'
@@ -13,27 +15,14 @@ import logo from "../images/security.png"
 import { IRegisterForm } from '../models/FormsData/IRegisterForm'
 import { IRegistration } from '../models/requests/IRegistration'
 import LoginImageDiv from '../static/LoginImageDiv'
-
-
+import OrganizationService from '../services/OrganizationService'
+import { useEffect } from 'react'
+import { IReference } from '../models/IReference'
 
 export const RegistrationPage: FC = () =>{ 
-  const history = useHistory()
-  const [organizations, setOrganizations] = useState([{
-    id: 6895109,
-    name: "ГАУЗ АО ГП №1"
-  },
-  {
-    id: 6895110,
-    name: "ГБУЗ АО \"ГП №2\""
-  },
-  {
-    id: 6895111,
-    name: "ГАУЗ АО «ГП №3»"
-  },
-  {
-    id: 6895112,
-    name: "ГАУЗ АО ГП №4"
-  }]);
+  const history = useHistory()  
+  const [organizations, setOrganizations] = useState([] as IReference[]);
+  useEffect(()=>{OrganizationService.getOrganizations().then(response=>{setOrganizations(response.data.organizations);console.log(response)})},[])
   const {userStore} = useContext(Context)  
   const validate = (data: IRegisterForm) => {
     let errors: any = {} 
@@ -129,7 +118,7 @@ export const RegistrationPage: FC = () =>{
                     <div className="p-field">
                       <span className="p-float-label">
                        <Dropdown id="organization" {...input} options={organizations}
-                        filter optionLabel="name" />  
+                        filter showClear optionLabel="name" className="p-inputwrapper p-inputwrapper-filled"/>  
                         <label htmlFor="organization" className={classNames({ 'p-error': isFormFieldValid(meta) })}>Медорганизация*</label>                     
                       </span>  
                       {getFormErrorMessage(meta)}                    

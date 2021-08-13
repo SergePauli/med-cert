@@ -5,6 +5,7 @@ import { Link} from 'react-router-dom'
 import { Context } from '..'
 import logo from "../images/security.png"
 import '../styles/login.css'
+import  '../styles/components/Inputtext.css'
 import { InputText } from 'primereact/inputtext'
 import {Password} from 'primereact/password'
 import { Button } from 'primereact/button'

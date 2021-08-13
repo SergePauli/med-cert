@@ -1,7 +1,6 @@
 export interface IUser {
-  id: string
+  id: number
   email: string
-  roles: string
   organization_id: string
   activated: boolean
 }
