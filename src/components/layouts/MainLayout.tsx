@@ -1,4 +1,4 @@
-import React, { FC, useContext, useState } from 'react'
+import React, { FC, useContext, useEffect, useState } from 'react'
 import '../../styles/layout.css'
 import { Context } from '../..'
 import FooterLayout from './FooterLayout'
@@ -7,6 +7,7 @@ import { TopBarLayout } from './TopBarLayout'
 import { classNames } from 'primereact/utils'
 import { observer } from 'mobx-react-lite'
 import RightSideBarLayout  from './RightSideBarLayout'
+import { IUserInfo } from '../../models/responses/IUserInfo'
 
 
 type MainLayoutProps = {
@@ -15,7 +16,7 @@ type MainLayoutProps = {
   content:React.ReactElement }
 
 const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => { 
-  const {layoutStore} = useContext(Context)
+  const {layoutStore, userStore} = useContext(Context)
   const rightSideBarActive = layoutStore.rightSideBarActive()
   const layoutStaticInactive = layoutStore.layoutStaticInactive()
   const profileMenuActive = layoutStore.profileMenuActive()
@@ -27,13 +28,15 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
     else if (notificationsMenuActive) layoutStore.setNotificationsMenuActive(false)
   } 
   const wrapperClass = classNames("layout-wrapper layout-static p-ripple layout-sidebar-indigo",{"layout-static-inactive": layoutStaticInactive}, {"layout-mobile-active": layoutStore.tabletOrMobile()})
-  
+  const [userInfo, setUserInfo] = useState({} as IUserInfo)   
+   const userId = userStore.user().id   
+   useEffect(()=>{ userStore.getUserInfo(userId).then(data=>{ if (data) setUserInfo(data)})},[userId, userStore])
   return (
   <div className={wrapperClass} data-theme='light'>
     <div className='layout-content-wrapper' onClick={()=>onClickOutside()}>  
-      <TopBarLayout  title = {props.title} />        
+      <TopBarLayout  title = {props.title}  userInfo= {userInfo} />        
       <div className='layout-content' >{props.content}</div>
-      <FooterLayout />
+      <FooterLayout userInfo= {userInfo} />
     </div>
     <SideBarLayout  activeUrl={props.url} /> 
     <RightSideBarLayout /> 

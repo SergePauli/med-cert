@@ -8,7 +8,8 @@ import { MenuItem } from 'primereact/menuitem'
 import { ProfileMenu } from '../menus/ProfileMenu'
 import { ExtMenuItem } from '../menus/IMenuProps'
 import { NotificationsMenu } from '../menus/NotificationsMenu'
-type TopBarLayoutProps = {title: string}
+import { IUserInfo } from '../../models/responses/IUserInfo'
+type TopBarLayoutProps = {title: string,  userInfo: IUserInfo }
 const detail_templ ="detail"
 export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
   const {layoutStore, userStore} = useContext(Context)
@@ -35,7 +36,11 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
    ]
    const notif_amount = notif_items.reduce((previtem, item, sum)=>{
     return sum += item.detail
-   },0)   
+   },0)
+   
+   const userName = props.userInfo ? 
+   `${props.userInfo.person_name?.family} ${props.userInfo.person_name?.given_1[0]} ${props.userInfo.person_name?.given_2?.charAt(0) ||''}` : '' 
+     
   return (
     <div className="layout-topbar">
       <div className="topbar-left">
@@ -60,7 +65,7 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
           <li className={profileMenuClassName}>
             <button type="button" className="p-link" onClick={()=>layoutStore.setProfileMenuActive(true)}>
               <img src={ava} alt="" className="profile-image"/>
-              <span className="profile-name">Amelia Stone</span>
+              <span className="profile-name">{userName}</span>
             </button>
             <ProfileMenu model={items}/>
           </li> 
