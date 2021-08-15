@@ -1,0 +1,20 @@
+.p-button-action {
+  min-width: 125px;
+}
+
+.p-suggestion {
+  max-width: 350px;
+}
+
+.layout-static-inactive .p-suggestion {
+  max-width: 500px;
+}
+
+.p-suggestion .p-datatable.p-datatable-sm .p-datatable-tbody>tr>td {
+  padding: 0.5rem 0.2rem;
+  font-size: smaller;
+}
+
+.p-suggestion-actual {
+  color: rgb(204, 0, 0) !important;
+}
