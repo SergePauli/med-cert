@@ -23,7 +23,7 @@ export const AUTH_ROUTES = [
   { path: HOME_ROUTE, Component: MainPage },
   { path: ADMIN_ROUTE, Component: AdminPage },
   { path: LIST_ROUTE, Component: ListPage },
-  { path: CERTIFICATE_ROUTE + "/:id", Component: CertificatePage },
+  { path: CERTIFICATE_ROUTE, Component: CertificatePage },
   { path: LOGIN_ROUTE, Component: MainPage },
 ]
 export const NON_AUTH_ROUTES = [

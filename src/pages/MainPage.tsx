@@ -1,21 +1,18 @@
 import { observer } from 'mobx-react-lite'
-import { useContext, useEffect, useState } from 'react'
-import { FC } from 'react'
-import { Context } from '..'
+import { FC, useContext } from 'react'
 import MainLayout from '../components/layouts/MainLayout'
-import { HOME_ROUTE } from '../utils/consts'
+import { CERTIFICATE_ROUTE, HOME_ROUTE } from '../utils/consts'
 import { Button } from 'primereact/button'
 import { Card } from 'primereact/card'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Divider } from 'primereact/divider'
+import { Context } from '..'
 
 type MainPageProps = {}
 
 const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
-  const [state, setState] = useState()
-  const {userStore, layoutStore} = useContext(Context)  
-  useEffect(() => {}, [])
+  const {userStore} = useContext(Context)
   const news =[{version:"3.00",record:"с учетом требований CDA_R2 уровня 3"},
   {version:"2.10",record:"Добавлена возможность 'грязной' выборки в ОТЧЕТНОМ БЛОКЕ"},
   {version:"2.09",record:"Добавлена возможность ввода периода времени в п.19II"}]
@@ -25,7 +22,7 @@ const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
     content:( 
       <>     
         <div className="p-d-flex p-flex-column p-jc-around p-flex-md-row p-flex-wrap">
-          <Button style={{minWidth:'243px'}} className="p-mr-2 p-mb-2 p-shadow-3" label="Ввод свидетельства"  title="Форма ввода свидетельства" />
+          <Button style={{minWidth:'243px'}} className="p-mr-2 p-mb-2 p-shadow-3" label="Ввод свидетельства"  title="Форма ввода свидетельства" onClick={(e)=>{userStore.history().push(CERTIFICATE_ROUTE)}}/>
             <Button style={{minWidth:'243px'}} className="p-button-secondary p-mr-2 p-mb-2 p-shadow-3" label="Настройки" title="Настройки учетной записи пользователя"/>
             <Button style={{minWidth:'243px'}} className="p-button-secondary p-mr-2 p-mb-2 p-shadow-3" id="reports" label="Отчеты" title="Формирование отчетов" />
             <Button style={{minWidth:'243px'}} className="p-mr-2 p-mb-2 p-shadow-3" label="Перинатальное свидетельство" /> 
