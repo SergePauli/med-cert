@@ -641,7 +641,7 @@ a {
 .layout-menu .layout-root-menuitem>.layout-menuitem-root-text {
   font-size: .857rem;
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 600;
   padding: .5rem 0 1rem 0;
 }
 
@@ -876,7 +876,7 @@ a {
 }
 
 .layout-content {
-  padding: 2rem;
+  padding: 1rem;
   flex: 1 1 auto;
   -ms-flex: 1 1 auto;
 }
