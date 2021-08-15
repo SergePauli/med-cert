@@ -1,4 +1,4 @@
-import avatar from "../../images/logo.svg"
+import avatar from "../../images/favicon.png"
 import { useContext } from "react"
 import { observer } from "mobx-react-lite"
 import { Context } from "../.."
@@ -22,7 +22,7 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
   const findActive = (items: MenuItem[])=>{
     let rez:MenuItem = {} 
     items.forEach((item)=>{        
-     if (item.url == url) rez = item
+     if (item.url === url) rez = item
        if (item.items){
         let active = findActive(item.items)
         if (active.label) rez = active
@@ -36,8 +36,8 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
   return (
     <div className='layout-sidebar'>      
         <Link className='logo' to='#/'>
-          <img id='app-logo' className='logo-image' src={avatar} alt='diamond layout' />
-          <span className='app-name'>МЕДСС</span>
+          <img id='app-logo' className='logo-image' src={avatar} alt='РРМСС V3.0' />
+          <span className='app-name'>МедСС</span>
         </Link>       
         <SideBarMenu model={items} />  
     </div>      
