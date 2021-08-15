@@ -135,4 +135,7 @@ export default class UserStore {
       this.setLoading(false)
     }
   }
+  history() {
+    return this._history
+  }
 }
