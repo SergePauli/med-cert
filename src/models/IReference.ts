@@ -1,4 +1,4 @@
 export interface IReference {
-  id: string
+  code: string
   name: string
 }
