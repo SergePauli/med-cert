@@ -17,7 +17,7 @@ export const ROLES: IObjectKeys = {
   ADMIN: "АДМИНИСТРАТОР",
   STATS: "СТАТИСТИК",
 }
-export const CERT_KIND = [
+export const CERT_TYPE = [
   { code: "1", name: "окончательное" },
   { code: "2", name: "предварительное" },
   { code: "3", name: "взамен предварительного" },
