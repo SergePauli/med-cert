@@ -808,5 +808,6 @@ i:last-of-type, .p-input-icon-right>svg:last-of-type, .p-input-icon-right>.p-inp
   -ms-flex-pack: justify;
   justify-content: space-between;
   padding: 1rem 1rem 0;
+  font-weight: 600;
   font-size: larger;
 }
