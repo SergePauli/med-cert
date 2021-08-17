@@ -8,10 +8,14 @@ import { SideBarMenu } from "../menus/SideBarMenu"
 import { MenuItem } from "primereact/menuitem"
 type SideBarLayoutProps = {activeUrl: string}
 const SideBarLayout = observer((props: SideBarLayoutProps) => {
-   const {userStore} = useContext(Context)
+   const {userStore, certificateStore} = useContext(Context)
+   const cert_id = certificateStore.id() 
    const items:MenuItem[] = [    
       { label: "Свидетельство", className: "layout-root-menuitem",     
-        items:[{label:"Форма", icon:"pi-file", items:[{label:"Ввод", icon:"pi-pencil", url:CERTIFICATE_ROUTE}, {label:"Заменить", icon:"pi-refresh", url:"/#"},{label:"Удалить", icon:"pi-trash", url:"/#"}, {label:"Сохранить", icon:"pi-save", disabled:true, url:"/#"},{label:"Отменить", icon:"pi-times", disabled:true, url:"/#"}]},
+        items:[{label:"Секции", icon:"pi-file", items:[
+          {label:"Сведения о документе", 
+          url:`${CERTIFICATE_ROUTE}/${cert_id}?q=0`}, 
+          {label:"п.1-4", url:`${CERTIFICATE_ROUTE}/${cert_id}?q=1`},{label:"ДУЛ", url:"/#"},{label:"п.5-6", url:"/#"}, {label:"п.7-9",  url:"/#"},{label:"п.10-14", url:"/#"}]},
         { label: "Списки",  icon:"pi-list", items: [{label:"Свидетельства", icon:"pi-id-card", url:LIST_ROUTE},{label:"Журнал", icon:"pi-align-left", url:"/#"}]},]}, 
       {separator: true},
       { label: "Сеанс", className: "layout-root-menuitem",      
@@ -25,7 +29,10 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
      if (item.url === url) rez = item
        if (item.items){
         let active = findActive(item.items)
-        if (active.label) rez = active
+        if (active.label) {
+          item.className = 'active-menuitem'
+          rez = active
+        }  
        } 
       })      
       return rez
