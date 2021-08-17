@@ -2,6 +2,15 @@
   min-width: 125px;
 }
 
+.c-section {
+  min-width: 400px;
+  max-width: 500px;
+}
+
+.layout-static-inactive .c-section {
+  max-width: 600px;
+}
+
 .p-suggestion {
   max-width: 350px;
 }

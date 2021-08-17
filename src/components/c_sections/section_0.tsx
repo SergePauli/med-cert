@@ -7,14 +7,14 @@ import { Calendar } from 'primereact/calendar'
 import { Divider } from 'primereact/divider'
 import { CERT_TYPE } from '../../utils/consts'
 import { Card } from 'primereact/card'
-
+import '../../styles/pages/CertificatePage.css'
  const Section0: FC = () => {
    const { certificateStore } = useContext(Context)   
    const header = () => {
       return <span>Сведения о документе</span>
     }
   return (<>    
-      <Card className="p-mr-2 p-mb-2" header={header} style={{maxWidth:'500px'}}>
+      <Card className="c-section p-mr-2 p-mb-2" header={header}>
         <div className="p-fluid p-formgrid p-grid">
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="firstname6">Серия</label>
