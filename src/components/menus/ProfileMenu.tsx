@@ -2,6 +2,7 @@ import { MenuItem } from 'primereact/menuitem'
 import { classNames } from 'primereact/utils'
 import { FC } from 'react'
 import { useHistory } from 'react-router-dom'
+import { HOME_ROUTE } from '../../utils/consts'
 import { IMenuProps } from './IMenuProps'
 
 export const ProfileMenu: FC<IMenuProps> = (props: IMenuProps)=> { 
@@ -13,7 +14,7 @@ export const ProfileMenu: FC<IMenuProps> = (props: IMenuProps)=> {
     }
     if (!item.url) {
       event.preventDefault()
-    } else {
+    } else if (item.url.startsWith(HOME_ROUTE)) {
       history.push(item.url)
     }
     if (item.command) item.command({           

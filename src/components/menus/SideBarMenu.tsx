@@ -1,9 +1,13 @@
-import React, { FC,  useState } from 'react'
+import React, { FC,  useContext,  useState } from 'react'
 import { MenuItem } from 'primereact/menuitem'
 import { classNames, UniqueComponentId } from 'primereact/utils'
 import { IMenuProps } from './IMenuProps'
+import { HOME_ROUTE } from '../../utils/consts'
+import { Context } from '../..'
 
-export const SideBarMenu:FC<IMenuProps> = (props: IMenuProps) =>{  
+
+export const SideBarMenu:FC<IMenuProps> = (props: IMenuProps) =>{ 
+  const { userStore } = useContext(Context)
   const [activeItem, setActiveItem] = useState<MenuItem>({})
   const onItemClick = (event: React.MouseEvent, item:MenuItem)=> {
         if (item.disabled) {
@@ -12,6 +16,8 @@ export const SideBarMenu:FC<IMenuProps> = (props: IMenuProps) =>{
         }
         if (!item.url) {
            event.preventDefault()
+        } else if (item.url.startsWith(HOME_ROUTE)) {
+           userStore.history().push(item.url)           
         }
         if (item.command) item.command({           
               originalEvent: event,
@@ -36,7 +42,7 @@ export const SideBarMenu:FC<IMenuProps> = (props: IMenuProps) =>{
           const renderMenuItem =(item:MenuItem, index:number) => {
           const submenuIconClassName = "pi pi-fw pi-angle-down layout-submenu-toggler"
           const iconClassName = classNames("layout-menuitem-icon pi pi-fw", item.icon)
-          const linkClassName = classNames("p-ripple", { "p-link": item.url == undefined }, 
+          const linkClassName = classNames("p-ripple", { "p-link": item.url === undefined }, 
           { "p-disabled": item.disabled })
           const submenuIcon = item.items && <span className={submenuIconClassName}></span>
           const icon = item.icon && <span className={iconClassName}></span>

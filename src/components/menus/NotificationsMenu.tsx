@@ -2,6 +2,7 @@
 import { classNames } from 'primereact/utils'
 import { FC } from 'react'
 import { useHistory } from 'react-router-dom'
+import { HOME_ROUTE } from '../../utils/consts'
 import { ExtMenuItem, INotificationMenuProps } from './IMenuProps'
 
 export const NotificationsMenu: FC<INotificationMenuProps> = (props: INotificationMenuProps)=> {
@@ -13,7 +14,7 @@ export const NotificationsMenu: FC<INotificationMenuProps> = (props: INotificati
     }
     if (!item.url) {
       event.preventDefault()
-    } else {
+    } else if (item.url.startsWith(HOME_ROUTE)) {
       history.push(item.url)
     }
     if (item.command) item.command({           
