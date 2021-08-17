@@ -17,7 +17,8 @@ export const SideBarMenu:FC<IMenuProps> = (props: IMenuProps) =>{
         if (!item.url) {
            event.preventDefault()
         } else if (item.url.startsWith(HOME_ROUTE)) {
-           userStore.history().push(item.url)           
+           userStore.history().push(item.url) 
+           event.preventDefault()          
         }
         if (item.command) item.command({           
               originalEvent: event,

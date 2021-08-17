@@ -16,6 +16,7 @@ export const NotificationsMenu: FC<INotificationMenuProps> = (props: INotificati
       event.preventDefault()
     } else if (item.url.startsWith(HOME_ROUTE)) {
       history.push(item.url)
+      event.preventDefault()
     }
     if (item.command) item.command({           
       originalEvent: event,
