@@ -24,22 +24,24 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
    ]   
   const url = props.activeUrl
   const findActive = (items: MenuItem[])=>{
-    let rez:MenuItem = {} 
+    let isActive = false    
     items.forEach((item)=>{        
-     if (item.url === url) rez = item
-       if (item.items){
-        let active = findActive(item.items)
-        if (active.label) {
-          item.className = 'active-menuitem'
-          rez = active
+      if (item.url === url)  { 
+        item.className='active-menuitem' 
+        isActive = true 
+      }
+      if (isActive) return true
+      if (item.items) {         
+        if (findActive(item.items)) { 
+          item.className = item.className || 'active-menuitem'
+          isActive = true  
         }  
-       } 
-      })      
-      return rez
-    }
-  const active =  findActive(items) 
+      } 
+    })      
+    return isActive
+  }
+  findActive(items)
   
-  if (active.label) active.className='active-menuitem'
   return (
     <div className='layout-sidebar'>      
         <Link className='logo' to='#/'>
