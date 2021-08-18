@@ -1,5 +1,5 @@
 import { AdminPage } from "./pages/AdminPage"
-import { CertificatePage } from "./pages/CertificatePage"
+import CertificatePage from "./pages/CertificatePage"
 import { ErrorPage } from "./pages/ErrorPage"
 import { ListPage } from "./pages/ListPage"
 import LoginPage from "./pages/LoginPage"

@@ -13,11 +13,15 @@ import { CERTIFICATE_ROUTE } from '../utils/consts'
 import { Divider } from 'primereact/divider'
 import { Button } from 'primereact/button'
 import { Avatar } from 'primereact/avatar'
+import { Badge } from 'primereact/badge'
 import { IRouteMatch } from '../models/IRouteMatch'
 import { IRouteProps } from '../models/IRouteProps'
 import Section0 from '../components/c_sections/section_0'
 import Section1 from '../components/c_sections/section_1'
 import { Context } from '..'
+import { useState } from 'react'
+import { useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
 
 interface IMatch extends IRouteMatch {  
   params: {id: number}
@@ -25,11 +29,19 @@ interface IMatch extends IRouteMatch {
 interface CertificatePageProps extends IRouteProps { 
     match: IMatch  
 }
-
-export const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
-  const { certificateStore, userStore } = useContext(Context)   
-   const cert_number = certificateStore.series()
-   console.log(cert_number, userStore.isAuth())
+interface ISuggestions{
+  code: string
+  suggestion: string
+  done: boolean
+}
+const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
+  const { certificateStore } = useContext(Context)   
+  const [suggestions, setSuggestions] = useState<ISuggestions[]>([])
+  const isCert_type = certificateStore.isCert_type()
+   useEffect(()=>{setSuggestions([
+     {code:"У3-3", suggestion:"Необходимо выбрать тип свидетельства", done:isCert_type}
+   ])},[isCert_type, certificateStore]) 
+  
   const secton_router = ()=>{
     switch (props.location.search) {
       case "?q=0": return <Section0 />
@@ -37,9 +49,7 @@ export const CertificatePage: FC<CertificatePageProps> = (props: CertificatePage
       default: return <Section0 /> 
     } 
   }
-  const suggestions = [
-    {code:"У3-3", suggestion:"Необходимо выбрать тип свидетельства", done:true }
-  ] 
+    
   const doneBodyTemplate = (rowData:any) => {
         return rowData.done ? <Avatar icon="pi pi-check" shape="circle" style={{ color: 'rgb(104 159 56)'}}/>
         : ''
@@ -50,8 +60,8 @@ export const CertificatePage: FC<CertificatePageProps> = (props: CertificatePage
     }
   }  
   const suggestionHeader = () => {
-    return <><span>Контроль формы</span>
-      <Avatar icon="pi pi-check" shape="circle" style={{ backgroundColor: 'rgb(104 159 56)', color: 'white'}}/></>
+    const avatar = isCert_type ? <Avatar icon="pi pi-check" shape="circle" style={{ height:'1.5rem', width: '1.5rem',backgroundColor: 'rgb(104 159 56)', color: 'white'}}/> : <Badge value="1"  style={{ backgroundColor: 'rgb(204, 0, 0)', color: 'white'}}/>
+    return <><span>Контроль формы</span>{avatar}</>
   }
   const layoutParams = {
     title: 'Медицинское свидетельство о смерти',     
@@ -82,3 +92,4 @@ export const CertificatePage: FC<CertificatePageProps> = (props: CertificatePage
     </>
   )
 }
+export default observer(CertificatePage) 
