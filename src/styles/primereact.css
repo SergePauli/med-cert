@@ -564,3 +564,15 @@
   width: 1px;
   word-wrap: normal !important
 }
+
+.p-badge-dot, .p-badge-no-gutter {
+  border-radius: 50%;
+  padding: 0;
+}
+
+.p-badge {
+  display: inline-block;
+  border-radius: 10px;
+  text-align: center;
+  padding: 0 .5rem;
+}

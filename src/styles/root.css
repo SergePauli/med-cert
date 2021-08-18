@@ -182,7 +182,6 @@ i:last-of-type, .p-input-icon-right>svg:last-of-type, .p-input-icon-right>.p-inp
 
 .pi {
   font-family: "primeicons";
-  speak: none;
   font-style: normal;
   font-weight: 400;
   -webkit-font-feature-settings: normal;
@@ -210,6 +209,16 @@ i:last-of-type, .p-input-icon-right>svg:last-of-type, .p-input-icon-right>.p-inp
   background: rgb(57, 73, 163);
   color: rgb(255, 255, 255);
   border-color: rgb(57, 73, 163);
+}
+
+.p-badge {
+  background: #3F51B5;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
 }
 
 .p-button:enabled:active {
