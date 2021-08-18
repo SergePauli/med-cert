@@ -36,7 +36,7 @@ export const RegistrationPage: FC = () =>{
     }
     if (!data.password) {
        errors.password = 'Поле <Пароль> обязательно'
-    } else if (data.password && data.password!=data.password_confirmation) {
+    } else if (data.password && data.password!==data.password_confirmation) {
        errors.password_confirmation = 'пароли не совпадают'
     }     
     if (data.organization == null ) {

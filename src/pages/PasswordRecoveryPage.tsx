@@ -22,7 +22,7 @@ export const PassordRecoveryPage: FC<PasswordRecoveryPageProps> = (props: Passwo
     let errors: any = {}        
     if (!data.password) {
        errors.password = 'Поле <Пароль> обязательно'
-    } else if (data.password && data.password!=data.password_confirmation) {
+    } else if (data.password && data.password!==data.password_confirmation) {
        errors.password_confirmation = 'пароли не совпадают'
     }      
     return errors
