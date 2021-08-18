@@ -60,4 +60,7 @@ export default class CertificateStore {
   cert_type() {
     return this._cert.cert_type
   }
+  isCert_type() {
+    return this._cert.cert_type?.code ? true : false
+  }
 }
