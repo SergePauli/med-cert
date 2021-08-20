@@ -1,13 +1,16 @@
 import { makeAutoObservable } from "mobx"
 import { IReference } from "../models/IReference"
+import { ISuggestions } from "../models/ISuggestions"
 import { ICertificateResponse } from "../models/responses/ICertificateResponse"
+import { DEFAULT_CERT_SUGGESTIONS } from "../utils/defaults"
 
 export default class CertificateStore {
   private _cert: ICertificateResponse
-
+  private _suggestions: ISuggestions[]
   constructor() {
     this._cert = {} as ICertificateResponse
     this._cert.eff_time = new Date()
+    this._suggestions = DEFAULT_CERT_SUGGESTIONS
     makeAutoObservable(this)
   }
 
@@ -56,11 +59,28 @@ export default class CertificateStore {
   }
   setCert_type(cert_type: IReference) {
     this._cert.cert_type = cert_type
+    if (!this._suggestions[0].done) {
+      const newValue = [...this._suggestions]
+      newValue[0].done = true
+      this.setSuggestions(newValue)
+    }
   }
   cert_type() {
     return this._cert.cert_type
   }
   isCert_type() {
     return this._cert.cert_type?.code ? true : false
+  }
+  setSuggestions(suggestions: ISuggestions[]) {
+    this._suggestions = suggestions
+  }
+  suggestions() {
+    return this._suggestions
+  }
+  redSuggestionsCount() {
+    return this._suggestions.reduce((result, item) => {
+      if (!item.done) ++result
+      return result
+    }, 0)
   }
 }
