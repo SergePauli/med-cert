@@ -77,3 +77,7 @@
   display: block;
   width: 100%;
 }
+
+.p-inputtext.p-invalid.p-component {
+  border-color: #f44336;
+}
