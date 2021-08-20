@@ -28,7 +28,7 @@ import '../../styles/pages/CertificatePage.css'
             <label htmlFor="state">Вид свидетельства</label>
             <Dropdown inputId="state"  placeholder="Выбрать" autoFocus 
               options={CERT_TYPE.filter((item)=>"1 2".includes(item.code))} optionLabel="name"
-              value={certificateStore.cert_type()}                  onChange={(e) =>certificateStore.setCert_type(e.value)}/>
+              value={certificateStore.cert_type()}                  onChange={(e) =>certificateStore.setCert_type(e.value)} required/>
           </div>
           <div className="p-field p-col-12 p-md-6">                    
             <label htmlFor="icon">Дата</label>
