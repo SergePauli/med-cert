@@ -19,9 +19,9 @@ import { IRouteProps } from '../models/IRouteProps'
 import Section0 from '../components/c_sections/section_0'
 import Section1 from '../components/c_sections/section_1'
 import { Context } from '..'
-import { useState } from 'react'
-import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
+import { ISuggestions } from '../models/ISuggestions'
+
 
 interface IMatch extends IRouteMatch {  
   params: {id: number}
@@ -29,18 +29,10 @@ interface IMatch extends IRouteMatch {
 interface CertificatePageProps extends IRouteProps { 
     match: IMatch  
 }
-interface ISuggestions{
-  code: string
-  suggestion: string
-  done: boolean
-}
+
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
   const { certificateStore } = useContext(Context)   
-  const [suggestions, setSuggestions] = useState<ISuggestions[]>([])
-  const isCert_type = certificateStore.isCert_type()
-   useEffect(()=>{setSuggestions([
-     {code:"У3-3", suggestion:"Необходимо выбрать тип свидетельства", done:isCert_type}
-   ])},[isCert_type, certificateStore]) 
+   
   
   const secton_router = ()=>{
     switch (props.location.search) {
@@ -48,8 +40,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       case "?q=1": return <Section1 />
       default: return <Section0 /> 
     } 
-  }
-    
+  }    
   const doneBodyTemplate = (rowData:any) => {
         return rowData.done ? <Avatar icon="pi pi-check" shape="circle" style={{ color: 'rgb(104 159 56)'}}/>
         : ''
@@ -60,9 +51,14 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
     }
   }  
   const suggestionHeader = () => {
-    const avatar = isCert_type ? <Avatar icon="pi pi-check" shape="circle" style={{ height:'1.5rem', width: '1.5rem',backgroundColor: 'rgb(104 159 56)', color: 'white'}}/> : <Badge value="1"  style={{ backgroundColor: 'rgb(204, 0, 0)', color: 'white'}}/>
-    return <><span>Контроль формы</span>{avatar}</>
+    const sugCount = certificateStore.redSuggestionsCount()
+    const avatar = sugCount === 0 ? <Avatar icon="pi pi-check" shape="circle" style={{ height:'1.5rem', width: '1.5rem',backgroundColor: 'rgb(104 159 56)', color: 'white'}}/> : <Badge value={sugCount}  style={{ backgroundColor: 'rgb(204, 0, 0)', color: 'white'}}/>
+    return <><span>Контроль заполнения</span>{avatar}</>
   }
+  const suggestions = certificateStore.suggestions()
+    .filter((item:ISuggestions) =>
+    item.section === props.location.search.slice(-1))
+  
   const layoutParams = {
     title: 'Медицинское свидетельство о смерти',     
     url: `${CERTIFICATE_ROUTE}/${props.match.params.id}${props.location.search}`,
@@ -70,7 +66,8 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       <div className="p-d-flex p-jc-center">
         {secton_router()}
         <Card className="p-mr-2 p-mb-2 p-suggestion" header={suggestionHeader}>            
-            <DataTable className="p-datatable-sm" rowClassName={rowClass} value={suggestions}>
+            <DataTable className="p-datatable-sm" rowClassName={rowClass} 
+            value={suggestions}>
               <Column field="code" header="Код"></Column>
               <Column field="suggestion" header="Проверка"></Column>
               <Column body={doneBodyTemplate}></Column>
