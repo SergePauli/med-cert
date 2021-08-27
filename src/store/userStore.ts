@@ -96,7 +96,7 @@ export default class UserStore {
       await AuthService.logout()
       this.setAuth(false)
       localStorage.removeItem("token")
-      this._token = ""
+      this.setToken("")
       this.setUser({} as IUser)
       this._history.push(LOGIN_ROUTE)
     } catch (e) {
@@ -108,7 +108,7 @@ export default class UserStore {
       this.setLoading(true)
       const response = await axios.get<AuthResponse>(`${API_URL}auth/refresh`, { withCredentials: true })
       localStorage.setItem("token", response.data.tokens.access)
-      this._token = response.data.tokens.access
+      this.setToken(response.data.tokens.access)
       this.setAuth(true)
       this.setUser(response.data.user)
     } catch (e) {
