@@ -4,8 +4,8 @@ import { IPerson } from "./IPerson"
 export interface IPatient extends INullFlavorable {
   id?: string
   person: IPerson
-  gender: number
-  birth_date: Date
+  gender: number | undefined
+  birth_date: Date | Date[] | undefined
   birth_year: number
   birth_month: number
   provider_organization: string
