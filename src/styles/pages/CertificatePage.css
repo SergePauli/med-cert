@@ -4,7 +4,7 @@
 
 .c-section {
   min-width: 400px;
-  max-width: 500px;
+  max-width: 476px;
 }
 
 .layout-static-inactive .c-section {
@@ -28,40 +28,33 @@
   color: rgb(204, 0, 0) !important;
 }
 
-.p-mr-1.paragraph {
+.p-d-flex .paragraph {
   color: #d28819;
   font-weight: 600;
   margin-left: 0.5rem;
-}
-
-.noParagraph .p-field-checkbox, .p-formgroup-inline .p-field-radiobutton {
-  margin-bottom: 0.5rem;
-}
-
-.noParagraph .p-field-checkbox>label, .noParagraph .p-field-radiobutton>label {
-  margin-left: 0;
+  margin-top: 0.1rem;
 }
 
 .p-checkbox-right.p-field-checkbox>label {
   margin-left: 0;
 }
 
+.p-d-flex.p-ai-center .p-field-checkbox, .p-field-radiobutton {
+  margin-bottom: 0;
+}
+
 .p-checkbox-right.p-field-checkbox, .p-checkbox-right.p-field-radiobutton {
   margin-bottom: 0.5rem;
 }
 
-.p-grid.paragraph {
-  padding: 0.5rem 0;
-}
-
-.paragraph .p-grid .p-field-checkbox, .paragraph .p-grid .p-field-radiobutton {
-  margin-bottom: 0;
-}
-
-.p-grid.paragraph .p-grid {
-  margin-top: 0.5rem;
-}
-
 .p-paragraph-field {
   margin-bottom: 0.75rem;
+}
+
+.p-d-flex .p-fluid .p-calendar .p-inputtext {
+  width: 7.5rem;
+}
+
+.p-d-flex .p-calendar .p-inputtext {
+  flex: inherit;
 }
