@@ -9,7 +9,7 @@ import { MenuItem } from "primereact/menuitem"
 type SideBarLayoutProps = {activeUrl: string}
 const SideBarLayout = observer((props: SideBarLayoutProps) => {
    const {userStore, certificateStore} = useContext(Context)
-   const cert_id = certificateStore.id() 
+   const cert_id =  certificateStore.cert.id 
    const items:MenuItem[] = [    
       { label: "Свидетельство", className: "layout-root-menuitem",     
         items:[{label:"Секции", icon:"pi-file", items:[

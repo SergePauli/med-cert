@@ -55,7 +55,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
     const avatar = sugCount === 0 ? <Avatar icon="pi pi-check" shape="circle" style={{ height:'1.5rem', width: '1.5rem',backgroundColor: 'rgb(104 159 56)', color: 'white'}}/> : <Badge value={sugCount}  style={{ backgroundColor: 'rgb(204, 0, 0)', color: 'white'}}/>
     return <><span>Контроль заполнения</span>{avatar}</>
   }
-  const suggestions = certificateStore.suggestions()
+  const suggestions = certificateStore.suggestions
     .filter((item:ISuggestions) =>
     item.section === props.location.search.slice(-1))
   

@@ -13,8 +13,7 @@ type MainPageProps = {}
 
 const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
   const {userStore, certificateStore} = useContext(Context)
-  const cert_id = certificateStore.id()
-  certificateStore.setSeries('test')
+  const cert_id = certificateStore.cert.id
   const news =[{version:"3.00",record:"с учетом требований CDA_R2 уровня 3"},
   {version:"2.10",record:"Добавлена возможность 'грязной' выборки в ОТЧЕТНОМ БЛОКЕ"},
   {version:"2.09",record:"Добавлена возможность ввода периода времени в п.19II"}]

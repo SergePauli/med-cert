@@ -9,7 +9,8 @@ import { CERT_TYPE } from '../../utils/consts'
 import { Card } from 'primereact/card'
 import '../../styles/pages/CertificatePage.css'
  const Section0: FC = () => {
-   const { certificateStore } = useContext(Context)   
+   const { certificateStore } = useContext(Context)
+   const cert =  certificateStore.cert  
    const header = () => {
       return <span>Сведения о документе</span>
     }
@@ -18,21 +19,21 @@ import '../../styles/pages/CertificatePage.css'
         <div className="p-fluid p-formgrid p-grid">
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="firstname6">Серия</label>
-            <InputText id="firstname6" value={certificateStore.series()} disabled type="text" placeholder='Заполняется автоматически' />
+            <InputText id="firstname6" value={cert.series} disabled type="text" placeholder='Заполняется автоматически' />
           </div>
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="lastname6">Номер</label>
-            <InputText id="lastname6" value={certificateStore.number()} disabled type="text" placeholder='Заполняется автоматически'/>
+            <InputText id="lastname6" value={cert.number} disabled type="text" placeholder='Заполняется автоматически'/>
           </div>
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="state">Вид свидетельства</label>
             <Dropdown inputId="state"  placeholder="Выбрать" autoFocus 
               options={CERT_TYPE.filter((item)=>"1 2".includes(item.code))} optionLabel="name"
-              value={certificateStore.cert_type()}                  onChange={(e) =>certificateStore.setCert_type(e.value)} required/>
+              value={cert.cert_type} onChange={(e) =>certificateStore.setCert_type(e.value)} required/>
           </div>
           <div className="p-field p-col-12 p-md-6">                    
             <label htmlFor="icon">Дата</label>
-            <Calendar id="icon"  dateFormat="dd/mm/yy" value={certificateStore.eff_time()} disabled showIcon />
+            <Calendar id="icon"  dateFormat="dd/mm/yy" value={cert.eff_time} disabled showIcon />
           </div>
         </div>
         <Divider/>
