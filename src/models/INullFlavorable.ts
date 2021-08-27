@@ -1,5 +1,5 @@
 import { INullFlavor } from "./INullFlavor"
 
 export interface INullFlavorable {
-  nullFlavors: INullFlavor[]
+  nullFlavors: INullFlavor[] | undefined
 }

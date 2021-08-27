@@ -12,9 +12,9 @@ export interface ICertificateResponse extends INullFlavorable {
   number_prev: string
   eff_time_prev: Date
   patient: IPatient
-  death_datetime: Date
+  death_datetime: Date | Date[] | undefined
   death_year: number
   death_month: number
   death_day: number
-  guid: number
+  guid: string
 }
