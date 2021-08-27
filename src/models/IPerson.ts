@@ -5,4 +5,5 @@ export interface IPerson extends INullFlavorable {
   id?: string
   fio: IPersonName
   SNILS?: string
+  guid: string
 }
