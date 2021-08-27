@@ -1,47 +1,75 @@
 import React, {FC} from 'react'
 import { IReference } from '../models/IReference'
-import { Checkbox } from "primereact/checkbox"
-import { Dropdown } from "primereact/dropdown"
+import { Checkbox, CheckboxChangeParams } from "primereact/checkbox"
+import { Dropdown, DropdownChangeParams } from "primereact/dropdown"
+import { useState } from 'react'
+import { NULL_FLAVORS } from '../utils/defaults'
+import { INullFlavor } from '../models/INullFlavor'
 
 type NullFlavorWrapperProps = {
   paraNum?: string,  
   label: React.ReactElement,  
-  checked: boolean, 
-  setCheck: Function, 
+  checked?: boolean, 
+  setCheck?: ((e: CheckboxChangeParams, nullFlavors?: INullFlavor[]) => void), 
   disabled?: boolean,
   field: React.ReactElement,
+  field_name?: string,
   options: IReference[],
-  value: IReference, 
-  setValue: Function,
+  nullFlavors?: INullFlavor[], 
+  value?: number, 
+  onChange?: ((e: IReference) => void),
+  lincked?: boolean
 }
 
 const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperProps) => { 
+  const [value, setValue] = useState<IReference | null>(props.value? NULL_FLAVORS[props.value] : null)
+  const [checked, setChecked] = useState<boolean>(props.checked || false) 
+  const [nullFlavors, setNullFlavors] = useState<INullFlavor[]>(props.nullFlavors || [])  
   const paragraph = props.paraNum && <span className='paragraph'>{props.paraNum}.</span>
+  const checkbox  = !props.lincked && <Checkbox        
+        style={{ marginLeft: "0.4rem" }}
+        checked={checked}
+        disabled={props.disabled} 
+        onChange={(e)=>{
+            setChecked(e.checked)
+            if (nullFlavors) {
+              if (e.checked) setNullFlavors(nullFlavors.filter((element)=>element.parent_attr!==props.field_name))
+              else nullFlavors.push({ parent_attr: props.field_name, value: props.value} as INullFlavor)
+              if (props.setCheck) props.setCheck(e, nullFlavors)
+            } else if (props.setCheck) props.setCheck(e)
+          }
+        }        
+      />  
+       
+  const style =  props.lincked ? {marginTop:'0.4rem'} : {}  
   const checkboxLabel = (
-    <div className='p-checkbox-right p-field-checkbox' key={`nf_${props.checked}_${props.paraNum}`}>
+    <div className='p-checkbox-right p-field-checkbox'
+     key={`nf_${props.checked}_${props.paraNum}`} style={style}>
       {paragraph}      
       {props.label}     
-      <Checkbox        
-        style={{ marginLeft: "0.4rem" }}
-        checked={props.checked}
-        disabled={props.disabled}
-        onChange={(e) =>{props.setCheck(e.checked)        
-        }}
-      />
-    </div>
+      {checkbox}
+     </div>
   )
-  const canNullFlavor = props.checked ? (
-    props.field
-  ) : (
-    <Dropdown       
+  const dropdown = !props.lincked && <Dropdown       
       id={"p" + props.paraNum}
-      key={`dd_${props.paraNum}_${props.value?.code}`}
-      value={props.value}      
+      key={`dd_${props.paraNum}_${props.field_name}_${props.checked}`}
+      value={value}      
       options={props.options}
-      onChange={(e) => props.setValue(e.value)}
+      onChange={(e: DropdownChangeParams)=>{   
+        setValue(e.value)       
+        if (nullFlavors) {          
+          const prev = nullFlavors.find((element)=>element.parent_attr===props.field_name)
+          if (prev) prev.value = NULL_FLAVORS.findIndex((element)=>element.code===e.value.code)
+        }
+        if (props.onChange) props.onChange(e.value)                      
+      }}
       optionLabel='name'      
       placeholder='Причина отсутствия'
-    />
+    />    
+  const canNullFlavor = checked ? (
+    props.field
+  ) : (
+    dropdown
   )
   return (<>{checkboxLabel}{canNullFlavor}</>)
 }
