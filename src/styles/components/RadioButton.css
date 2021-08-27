@@ -59,3 +59,8 @@
   background: #324191;
   color: #ffffff;
 }
+
+.p-radiobutton .p-radiobutton-box.p-highlight {
+  border-color: #324191;
+  background: #324191;
+}
