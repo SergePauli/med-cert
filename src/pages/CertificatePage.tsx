@@ -18,6 +18,7 @@ import { IRouteMatch } from '../models/IRouteMatch'
 import { IRouteProps } from '../models/IRouteProps'
 import Section0 from '../components/c_sections/section_0'
 import Section1 from '../components/c_sections/section_1'
+import Section2 from '../components/c_sections/section_2'
 import { Context } from '..'
 import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
@@ -38,6 +39,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
     switch (props.location.search) {
       case "?q=0": return <Section0 />
       case "?q=1": return <Section1 />
+      case "?q=2": return <Section2 />
       default: return <Section0 /> 
     } 
   }    

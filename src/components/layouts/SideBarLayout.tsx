@@ -15,7 +15,7 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
         items:[{label:"Секции", icon:"pi-file", items:[
           {label:"Сведения о документе", 
           url:`${CERTIFICATE_ROUTE}/${cert_id}?q=0`}, 
-          {label:"п.1-4", url:`${CERTIFICATE_ROUTE}/${cert_id}?q=1`},{label:"ДУЛ", url:"/#"},{label:"п.5-6", url:"/#"}, {label:"п.7-9",  url:"/#"},{label:"п.10-14", url:"/#"}]},
+          {label:"Начало(п.1-3,7)", url:`${CERTIFICATE_ROUTE}/${cert_id}?q=1`},{label:"Документы(п.4-6)", url:`${CERTIFICATE_ROUTE}/${cert_id}?q=2`},{label:"Место жит.(8-9)", url:"/#"}, {label:"Место смер.(п.10-11)",  url:"/#"},{label:"п.12-17", url:"/#"},{label:"п.18-21", url:"/#"},{label:"Причины (п.22 I)", url:"/#"},{label:"Прочие (п.22 II)", url:"/#"},{label:"п.23-26", url:"/#"}]},
         { label: "Списки",  icon:"pi-list", items: [{label:"Свидетельства", icon:"pi-id-card", url:LIST_ROUTE},{label:"Журнал", icon:"pi-align-left", url:"/#"}]},]}, 
       {separator: true},
       { label: "Сеанс", className: "layout-root-menuitem",      
