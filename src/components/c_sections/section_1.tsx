@@ -18,10 +18,10 @@ import { IPersonName } from '../../models/IPersonName'
 
  const Section1: FC = () => {
    const { certificateStore } = useContext(Context)   
-   const [notIdentified, setNotIdentified] = useState<boolean>(false)
    const [fromRelatives, setFromRelatives] = useState<boolean>(false)    
    const [yearBTChecked, setYearBTChecked] = useState<boolean>(false)   
    const [yearDTChecked, setYearDTChecked] = useState<boolean>(false) 
+   const identified = certificateStore.identified
    
    const fioChecked = true
   const header = () => {
@@ -35,13 +35,8 @@ import { IPersonName } from '../../models/IPersonName'
       <Card className="c-section p-mr-2 p-mb-2" header={header}>        
           <div className="p-fluid p-formgrid p-grid">
             <div className="p-field-checkbox p-col-12 p-lg-6">              
-              <Checkbox inputId="notIdentified" checked={notIdentified} onChange={e =>{
-                if (e.checked) 
-                   person.nullFlavors().push({parent_attr:"person_name", value: ASKU}) 
-                else  person.setNullFlavors(person.nullFlavors()
-                  .filter((element:INullFlavor)=>element.parent_attr!=='person_name')) 
-                setNotIdentified(e.checked)  
-                certificateStore.checkFio()            
+              <Checkbox inputId="notIdentified" checked={!identified} onChange={e =>{                
+                certificateStore.identified = !e.checked                            
                 }} />
               <label htmlFor="notIdentified">Умерший не идентифицирован</label>
             </div>
@@ -51,13 +46,13 @@ import { IPersonName } from '../../models/IPersonName'
             </div>
             <div className="p-field p-d-flex p-flex-wrap p-jc-start">
               <div className='paragraph p-mr-1'> 1. </div>
-              <div className='p-paragraph-field p-mr-2 p-mb-2' key={`pdiv1_${notIdentified}`}>
+              <div className='p-paragraph-field p-mr-2 p-mb-2' key={`pdiv1_${identified}`}>
                 <NullFlavorWrapper 
                   disabled               
-                  checked={!notIdentified} 
+                  checked={identified} 
                   label={<label htmlFor="family">Фамилия</label>}
                   field={<InputText  id="family" value={person.fio.family} 
-                  autoFocus type="text" disabled={notIdentified} 
+                  autoFocus type="text" disabled={!identified} 
                   onChange={(e)=>{                    
                     fio.family = e.target.value
                     person.fio = fio
@@ -67,13 +62,13 @@ import { IPersonName } from '../../models/IPersonName'
                   value={ASKU}                                    
                 />             
               </div>
-              <div className="p-paragraph-field p-mr-2 p-mb-2" key={`pdiv2_${notIdentified}`}>
+              <div className="p-paragraph-field p-mr-2 p-mb-2" key={`pdiv2_${identified}`}>
                 <NullFlavorWrapper                   
                   label={<label htmlFor="given_1">Имя</label>}
-                  checked={!notIdentified}                   
+                  checked={identified}                   
                   field={
                     <InputText id="given_1" value={patient.person.fio.given_1} 
-                    type="text" disabled={notIdentified}
+                    type="text" disabled={!identified}
                     onChange={(e)=>{
                       fio.given_1 = e.target.value
                       person.fio = fio                    
@@ -83,11 +78,11 @@ import { IPersonName } from '../../models/IPersonName'
                   lincked                                    
                 />  
               </div>
-              <div className="p-paragraph-field" style={{marginLeft:'1.5rem'}} key={`pdiv3_${notIdentified}`}>
+              <div className="p-paragraph-field" style={{marginLeft:'1.5rem'}} key={`pdiv3_${identified}`}>
                   <NullFlavorWrapper 
-                    disabled={notIdentified}
+                    disabled={!identified}
                     label={<label htmlFor="given_2">Отчество</label>}
-                    checked={!notIdentified && fioChecked} 
+                    checked={identified && fioChecked} 
                     setCheck={(e:CheckboxChangeParams)=>{                      
                       const fi = {family: fio.family, given_1: fio.given_1} as IPersonName
                       if (e.checked)  fi.given_2='' 
@@ -98,7 +93,7 @@ import { IPersonName } from '../../models/IPersonName'
                     field={               
                       <InputText id="given_2" type="text" 
                         value={fio.given_2} 
-                        disabled={notIdentified} 
+                        disabled={!identified} 
                         onChange={(e)=>{ 
                           fio.given_2 = e.target.value                         
                           person.fio = fio                    
@@ -106,7 +101,7 @@ import { IPersonName } from '../../models/IPersonName'
                       />
                     }
                     options={NULL_FLAVORS.filter((item:IReference)=>"ASKU NA".includes(item.code))} 
-                    value={notIdentified ? ASKU : NA}                                       
+                    value={identified ? NA : ASKU}                                       
                   />
               </div>              
             </div>
@@ -180,7 +175,7 @@ import { IPersonName } from '../../models/IPersonName'
               </div>              
             </div>
             <div className="p-field p-d-flex p-jc-center">
-              <div className='paragraph p-mr-1'> 4. </div>
+              <div className='paragraph p-mr-1'> 7. </div>
               <div className='p-paragraph-field p-mr-3 p-mb-2'>
                 <NullFlavorWrapper                    
                   label={<label htmlFor="dateDeath">Дата смерти</label>}
@@ -218,9 +213,9 @@ import { IPersonName } from '../../models/IPersonName'
                   label={<label htmlFor="timeDeath">Время смерти</label>}
                   checked={true}  
                   field={ <Calendar id="timeDeath"  
-                        timeOnly hourFormat="24"             
-                        value={certificate.death_datetime} 
-                        showIcon />}
+                    timeOnly hourFormat="24"             
+                    value={certificate.death_datetime} 
+                    showIcon />}
                   options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
                   value={UNK}
                   field_name="death_time"
