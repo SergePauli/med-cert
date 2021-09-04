@@ -20,6 +20,7 @@ export default class Certificate {
   private _death_month?: number
   private _death_day?: number
   private _guid: string
+  private _policyOMS: string | undefined
   private _nullFlavors: INullFlavor[]
   constructor(props: ICertificateResponse) {
     this._guid = props.guid || uuidv4()
@@ -33,6 +34,7 @@ export default class Certificate {
     if (props.death_year) this._death_year = props.death_year
     if (props.number_prev) this._number_prev = props.number_prev
     if (props.series_prev) this._series_prev = props.series_prev
+    if (props.policyOMS) this._policyOMS = props.policyOMS
     makeAutoObservable(this)
   }
   get id() {
@@ -106,5 +108,13 @@ export default class Certificate {
   }
   set death_year(death_year: number | undefined) {
     this._death_year = death_year
+  }
+
+  get policyOMS() {
+    return this._policyOMS || ""
+  }
+
+  set policyOMS(policyOMS: string) {
+    this._policyOMS = policyOMS
   }
 }
