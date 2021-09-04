@@ -6,6 +6,7 @@ import { IReference } from "../models/IReference"
 import { ISuggestions } from "../models/ISuggestions"
 import { ICertificateResponse } from "../models/responses/ICertificateResponse"
 import {
+  ASKU,
   CERT_DEATH_THIME_SUG,
   CERT_TYPE_SUG,
   DEFAULT_CERT_SUGGESTIONS,
@@ -18,12 +19,27 @@ import {
 export default class CertificateStore {
   private _cert: Certificate
   private _suggestions: ISuggestions[]
+  private _identified: boolean
   constructor() {
+    this._identified = true
     this._cert = new Certificate({
       patient: { person: { fio: { family: "", given_1: "", given_2: "" } } } as IPatient,
     } as ICertificateResponse)
     this._suggestions = DEFAULT_CERT_SUGGESTIONS
     makeAutoObservable(this)
+  }
+
+  get identified() {
+    return this._identified
+  }
+  set identified(identified: boolean) {
+    this._identified = identified
+    if (identified)
+      this._cert.patient.person.setNullFlavors(
+        this._cert.patient.person.nullFlavors().filter((element: INullFlavor) => element.parent_attr !== "person_name")
+      )
+    else this._cert.patient.person.nullFlavors().push({ parent_attr: "person_name", value: ASKU })
+    this.checkFio()
   }
 
   get cert() {
