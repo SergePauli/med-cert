@@ -10,9 +10,19 @@ import {
   CERT_DEATH_THIME_SUG,
   CERT_TYPE_SUG,
   DEFAULT_CERT_SUGGESTIONS,
+  IDNUMBER_SUG,
+  IDSERIES_SUG,
+  ID_CARD_TYPES,
+  IORGCODE_SUG,
+  IORGDATE_SUG,
+  IORGNAME_SUG,
+  NA,
+  OMS_SUG,
+  PASSPORT_RF,
   PATIENT_BIRTHDAY_SUG,
   PATIENT_GENDER_SUG,
   PERSON_NAME_SUG,
+  SNILS_SUG,
   UNK,
 } from "../utils/defaults"
 
@@ -20,26 +30,20 @@ export default class CertificateStore {
   private _cert: Certificate
   private _suggestions: ISuggestions[]
   private _identified: boolean
+  private _fromRelatives: boolean
   constructor() {
     this._identified = true
+    this._fromRelatives = false
     this._cert = new Certificate({
-      patient: { person: { fio: { family: "", given_1: "", given_2: "" } } } as IPatient,
+      patient: {
+        identity: {
+          identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,
+        },
+        person: { fio: { family: "", given_1: "", given_2: "" } },
+      } as IPatient,
     } as ICertificateResponse)
     this._suggestions = DEFAULT_CERT_SUGGESTIONS
     makeAutoObservable(this)
-  }
-
-  get identified() {
-    return this._identified
-  }
-  set identified(identified: boolean) {
-    this._identified = identified
-    if (identified)
-      this._cert.patient.person.setNullFlavors(
-        this._cert.patient.person.nullFlavors().filter((element: INullFlavor) => element.parent_attr !== "person_name")
-      )
-    else this._cert.patient.person.nullFlavors().push({ parent_attr: "person_name", value: ASKU })
-    this.checkFio()
   }
 
   get cert() {
@@ -49,6 +53,36 @@ export default class CertificateStore {
     this._cert.cert_type = cert_type
     this.changeSuggestionsEntry(CERT_TYPE_SUG, false)
   }
+  get identified() {
+    return this._identified
+  }
+  set identified(identified: boolean) {
+    const nullFlavors = [] as INullFlavor[]
+    this._identified = identified
+    if (identified)
+      this._cert.patient.person.setNullFlavors(
+        nullFlavors.concat(
+          this._cert.patient.person
+            .nullFlavors()
+            .filter((element: INullFlavor) => element.parent_attr !== "person_name")
+        )
+      )
+    else {
+      this._cert.patient.person.nullFlavors().push({ parent_attr: "person_name", value: NA })
+      this.fromRelatives = false
+    }
+    this.checkFio()
+  }
+
+  get fromRelatives() {
+    return this._fromRelatives
+  }
+
+  set fromRelatives(value: boolean) {
+    this._fromRelatives = value
+    if (value) this.identified = true
+  }
+
   setGender(gender: number | undefined) {
     this._cert.patient.gender = gender
     const isGenderSug = this._cert.patient.gender === undefined
@@ -57,10 +91,10 @@ export default class CertificateStore {
   checkFio() {
     const fio = this._cert.patient.person.fio
     const isPersonNameSug =
+      fio !== undefined &&
       (fio.family.trim().length === 0 ||
         fio.given_1.trim().length === 0 ||
-        (fio.given_2 !== undefined && fio.given_2.trim().length === 0)) &&
-      this._cert.patient.person.nullFlavors().findIndex((element) => element.parent_attr === "person_names") === -1
+        (fio.given_2 !== undefined && fio.given_2.trim().length === 0))
     this.changeSuggestionsEntry(PERSON_NAME_SUG, isPersonNameSug)
   }
   checkBirthDay() {
@@ -75,12 +109,13 @@ export default class CertificateStore {
     if (value && !isYear) {
       patient.birth_date = value
       patient.birth_year = undefined
+      patient.setNullFlavors(patient.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
       this.changeSuggestionsEntry(PATIENT_BIRTHDAY_SUG, false)
     } else if (value && isYear) {
       patient.birth_date = value
       patient.birth_year = (patient.birth_date as Date).getFullYear()
       if (patient.nullFlavors().findIndex((element) => element.parent_attr === "birth_date") === -1) {
-        patient.nullFlavors().push({ parent_attr: "birth_date", value: UNK } as INullFlavor)
+        patient.nullFlavors().push({ parent_attr: "birth_date", value: this.fromRelatives ? ASKU : UNK } as INullFlavor)
       }
       this.changeSuggestionsEntry(PATIENT_BIRTHDAY_SUG, false)
     } else {
@@ -114,6 +149,98 @@ export default class CertificateStore {
       cert.death_year = undefined
       this.checkDeathDay()
     }
+  }
+
+  checkSNILS() {
+    const person = this._cert.patient.person
+    const isSNILS =
+      (person.SNILS === undefined || person.SNILS.length < 14) &&
+      person.nullFlavors().findIndex((element) => element.parent_attr === "SNILS") === -1
+    this.changeSuggestionsEntry(SNILS_SUG, isSNILS)
+  }
+  setSNILS(snils: string | undefined) {
+    const person = this._cert.patient.person
+    person.SNILS = snils
+    this.checkSNILS()
+  }
+  checkOMS() {
+    const oms = this._cert.policyOMS
+    const isOMS =
+      (oms === undefined || oms.length < 7) &&
+      this._cert.nullFlavors().findIndex((element) => element.parent_attr === "policy_OMS") === -1
+    this.changeSuggestionsEntry(OMS_SUG, isOMS)
+  }
+  setPolicyOMS(oms: string | undefined) {
+    this._cert.policyOMS = oms
+    this.checkOMS()
+  }
+  setIORGCODE(code: string | undefined) {
+    const identity = this._cert.patient.identity
+    if (identity) identity.issueOrgCode = code
+    this.checkIORGCODE()
+  }
+  checkIORGCODE() {
+    const code = this._cert.patient.identity?.issueOrgCode
+    const isCODE =
+      (code === undefined || code.length < 1) &&
+      this._cert.nullFlavors().findIndex((element) => element.parent_attr === "policy_OMS") === -1
+    this.changeSuggestionsEntry(IORGCODE_SUG, isCODE)
+  }
+
+  checkIdentity() {
+    this.checkIORGDate()
+    this.checkIORGCODE()
+    this.checkIORGNAME()
+    this.checkIDNumber()
+    this.checkIDSeries()
+  }
+  checkIORGDate() {
+    const patient = this._cert.patient
+    const isIORGDate =
+      patient.identity?.issueOrgDate === undefined &&
+      patient.nullFlavors().findIndex((element) => element.parent_attr === "identity") === -1
+    this.changeSuggestionsEntry(IORGDATE_SUG, isIORGDate)
+  }
+  setIORGDate(date: Date | undefined) {
+    const identity = this._cert.patient.identity
+    if (identity) identity.issueOrgDate = date
+    this.checkIORGDate()
+  }
+  checkIORGNAME() {
+    const patient = this._cert.patient
+    const isIORGName =
+      (patient.identity?.issueOrgName === undefined || patient.identity?.issueOrgName.length < 15) &&
+      patient.nullFlavors().findIndex((element) => element.parent_attr === "identity") === -1
+    this.changeSuggestionsEntry(IORGNAME_SUG, isIORGName)
+  }
+  setIORGNAME(name: string | undefined) {
+    const identity = this._cert.patient.identity
+    if (identity) identity.issueOrgName = name
+    this.checkIORGNAME()
+  }
+  checkIDSeries() {
+    const patient = this._cert.patient
+    const isIDSeries =
+      (patient.identity?.series === undefined || patient.identity?.series.length < 1) &&
+      patient.nullFlavors().findIndex((element) => element.parent_attr === "identity") === -1
+    this.changeSuggestionsEntry(IDSERIES_SUG, isIDSeries)
+  }
+  setIDSeries(series: string | undefined) {
+    const identity = this._cert.patient.identity
+    if (identity) identity.series = series
+    this.checkIDSeries()
+  }
+  checkIDNumber() {
+    const patient = this._cert.patient
+    const isIDNumber =
+      (patient.identity?.number === undefined || patient.identity?.number.length < 1) &&
+      patient.nullFlavors().findIndex((element) => element.parent_attr === "identity") === -1
+    this.changeSuggestionsEntry(IDNUMBER_SUG, isIDNumber)
+  }
+  setIDNumber(number: string | undefined) {
+    const identity = this._cert.patient.identity
+    if (identity) identity.number = number
+    this.checkIDNumber()
   }
 
   get suggestions() {
