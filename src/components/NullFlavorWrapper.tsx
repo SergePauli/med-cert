@@ -24,7 +24,7 @@ type NullFlavorWrapperProps = {
 const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperProps) => { 
   const [value, setValue] = useState<IReference | null>(props.value? NULL_FLAVORS[props.value] : null)
   const [checked, setChecked] = useState<boolean>(props.checked || false) 
-  const [nullFlavors, setNullFlavors] = useState<INullFlavor[]>(props.nullFlavors || [])  
+  const nullFlavors = (props.nullFlavors && props.field_name ) ? props.nullFlavors.filter((element)=>element.parent_attr!==props.field_name) : []
   const paragraph = props.paraNum && <span className='paragraph'>{props.paraNum}.</span>
   const checkbox  = !props.lincked && <Checkbox        
         style={{ marginLeft: "0.4rem" }}
@@ -32,17 +32,19 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
         disabled={props.disabled} 
         onChange={(e)=>{
             setChecked(e.checked)
-            if (nullFlavors) {
-              if (e.checked) setNullFlavors(nullFlavors.filter((element)=>element.parent_attr!==props.field_name))
-              else nullFlavors.push({ parent_attr: props.field_name, value: props.value} as INullFlavor)
-              if (props.setCheck) props.setCheck(e, nullFlavors)
-            } else if (props.setCheck) props.setCheck(e)
+            if (props.nullFlavors) {
+              if (props.setCheck && e.checked ) props.setCheck(e, nullFlavors)
+              else if (props.setCheck && props.value && props.field_name) {
+                nullFlavors.push({parent_attr: props.field_name, value: props.value })  
+                props.setCheck(e, nullFlavors.concat(props.nullFlavors))
+              }              
+            } else if (props.setCheck) props.setCheck(e)            
           }
         }        
       />  
        
   const style =  props.lincked ? {marginTop:'0.4rem'} : {}  
-  const checkboxLabel = (
+  const checkboxLabel = props.lincked && !props.checked ? (<></>) : (
     <div className='p-checkbox-right p-field-checkbox'
      key={`nf_${props.checked}_${props.paraNum}`} style={style}>
       {paragraph}      
