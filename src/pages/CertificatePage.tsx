@@ -34,7 +34,7 @@ interface CertificatePageProps extends IRouteProps {
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
   const { certificateStore } = useContext(Context)   
    
-  
+  console.log('Cert', certificateStore.cert)
   const secton_router = ()=>{
     switch (props.location.search) {
       case "?q=0": return <Section0 />
@@ -54,7 +54,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
   }  
   const suggestionHeader = () => {
     const sugCount = certificateStore.redSuggestionsCount()
-    const avatar = sugCount === 0 ? <Avatar icon="pi pi-check" shape="circle" style={{ height:'1.5rem', width: '1.5rem',backgroundColor: 'rgb(104 159 56)', color: 'white'}}/> : <Badge value={sugCount}  style={{ backgroundColor: 'rgb(204, 0, 0)', color: 'white'}}/>
+    const avatar = sugCount === 0 ? <Avatar icon="pi pi-check" shape="circle" style={{ height:'1.5rem', width: '1.5rem',backgroundColor: 'rgb(104 159 56)', color: 'white'}}/> : <Badge value={sugCount}  style={{ backgroundColor: 'rgb(204, 0, 0)', color: 'white', marginLeft: '4px'}}/>
     return <><span>Контроль заполнения</span>{avatar}</>
   }
   const suggestions = certificateStore.suggestions
