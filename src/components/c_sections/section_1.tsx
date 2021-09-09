@@ -17,11 +17,9 @@ import { IPersonName } from '../../models/IPersonName'
 
 
  const Section1: FC = () => {
-   const { certificateStore } = useContext(Context)   
-   const [fromRelatives, setFromRelatives] = useState<boolean>(false)    
-   const [yearBTChecked, setYearBTChecked] = useState<boolean>(false)   
-   const [yearDTChecked, setYearDTChecked] = useState<boolean>(false) 
-   const identified = certificateStore.identified
+   const { certificateStore } = useContext(Context)      
+   const [yearBTChecked, setYearBTChecked] = useState<boolean>(!certificateStore.identified)   
+   const [yearDTChecked, setYearDTChecked] = useState<boolean>(certificateStore.cert.death_year!==undefined)   
    
    const fioChecked = true
   const header = () => {
@@ -30,36 +28,65 @@ import { IPersonName } from '../../models/IPersonName'
   const certificate = certificateStore.cert   
   const patient = certificate.patient
   const person =  patient.person  
-  const fio = {...person.fio}  
+  const identified = certificateStore.identified && person.fio !== undefined
+  const fio = person.fio ? {...person.fio} : {family:'', given_1:'', given_2:''}  
+  const optionCode = certificateStore.fromRelatives ? 'ASKU' : 'NA'
+  const isDeathTime = certificateStore.cert.death_datetime!==undefined
   return (<>    
       <Card className="c-section p-mr-2 p-mb-2" header={header}>        
           <div className="p-fluid p-formgrid p-grid">
             <div className="p-field-checkbox p-col-12 p-lg-6">              
-              <Checkbox inputId="notIdentified" checked={!identified} onChange={e =>{                
-                certificateStore.identified = !e.checked                            
+              <Checkbox inputId="notIdentified" checked={!certificateStore.identified} onChange={e =>{                
+                if (e.checked) person.fio = undefined
+                else { 
+                  person.fio = fio
+                  if (yearBTChecked) { setYearBTChecked(false) 
+                    certificateStore.setBirthDay(patient.birth_date as Date | undefined, false)
+                  }      
+                }                
+                certificateStore.identified = !e.checked  
                 }} />
               <label htmlFor="notIdentified">Умерший не идентифицирован</label>
             </div>
             <div className="p-field-checkbox p-col-12 p-lg-6">              
-              <Checkbox inputId="fromRelatives" checked={fromRelatives} onChange={e => setFromRelatives(e.checked)} />
+              <Checkbox inputId="fromRelatives" checked={certificateStore.fromRelatives} 
+              onChange={e =>{       
+                certificateStore.fromRelatives = e.checked
+                if (e.checked) { 
+                  person.fio = fio                  
+                  certificateStore.checkFio()
+                  if (yearBTChecked) { 
+                    setYearBTChecked(false) 
+                    certificateStore.setBirthDay(patient.birth_date as Date | undefined, false)
+                  }  
+                }}}/>
               <label htmlFor="fromRelatives">Внесено со слов родственников</label>
             </div>
             <div className="p-field p-d-flex p-flex-wrap p-jc-start">
               <div className='paragraph p-mr-1'> 1. </div>
               <div className='p-paragraph-field p-mr-2 p-mb-2' key={`pdiv1_${identified}`}>
                 <NullFlavorWrapper 
-                  disabled               
+                  disabled={!certificateStore.fromRelatives}               
                   checked={identified} 
+                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
+                    { 
+                      if (e.checked)  person.fio = fio
+                      else person.fio = undefined 
+                      if (nullFlavors) person.setNullFlavors(nullFlavors)    
+                      certificateStore.checkFio()
+                    }}                 
                   label={<label htmlFor="family">Фамилия</label>}
-                  field={<InputText  id="family" value={person.fio.family} 
-                  autoFocus type="text" disabled={!identified} 
+                  field={<InputText  id="family" value={fio.family} 
+                  autoFocus type="text" 
                   onChange={(e)=>{                    
                     fio.family = e.target.value
                     person.fio = fio
                     certificateStore.checkFio()
                   }}/>}                  
-                  options={NULL_FLAVORS.filter((item:IReference)=>"ASKU".includes(item.code))} 
-                  value={ASKU}                                    
+                  options={NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))} 
+                  value={certificateStore.fromRelatives ? ASKU : NA} 
+                  nullFlavors={person.nullFlavors()}  
+                  field_name="person_name"                                 
                 />             
               </div>
               <div className="p-paragraph-field p-mr-2 p-mb-2" key={`pdiv2_${identified}`}>
@@ -67,14 +94,14 @@ import { IPersonName } from '../../models/IPersonName'
                   label={<label htmlFor="given_1">Имя</label>}
                   checked={identified}                   
                   field={
-                    <InputText id="given_1" value={patient.person.fio.given_1} 
-                    type="text" disabled={!identified}
+                    <InputText id="given_1" value={fio.given_1} 
+                    type="text" 
                     onChange={(e)=>{
                       fio.given_1 = e.target.value
                       person.fio = fio                    
                       certificateStore.checkFio()                   
                   }}/>}
-                  options={NULL_FLAVORS.filter((item:IReference)=>"ASKU".includes(item.code))}                   
+                  options={NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))}                   
                   lincked                                    
                 />  
               </div>
@@ -92,16 +119,16 @@ import { IPersonName } from '../../models/IPersonName'
                     } 
                     field={               
                       <InputText id="given_2" type="text" 
-                        value={fio.given_2} 
-                        disabled={!identified} 
+                        value={fio.given_2}                         
                         onChange={(e)=>{ 
                           fio.given_2 = e.target.value                         
                           person.fio = fio                    
                           certificateStore.checkFio()}}
                       />
                     }
-                    options={NULL_FLAVORS.filter((item:IReference)=>"ASKU NA".includes(item.code))} 
-                    value={identified ? NA : ASKU}                                       
+                    options={[NULL_FLAVORS[identified ? NA : ASKU]]} 
+                    value={identified ? NA : ASKU} 
+                    lincked={!identified}                                      
                   />
               </div>              
             </div>
@@ -142,7 +169,7 @@ import { IPersonName } from '../../models/IPersonName'
             </div>
             <div className="p-field p-d-flex p-jc-center">
               <div className='paragraph p-mr-1'> 3. </div>
-              <div className='p-paragraph-field'>                    
+              <div className='p-paragraph-field' key={`pdiv5_${identified}`}>                    
                 <NullFlavorWrapper                     
                     label={<label htmlFor="dateBirth">Дата рождения</label>}
                     checked={true} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{                      
@@ -162,13 +189,13 @@ import { IPersonName } from '../../models/IPersonName'
                         showIcon />
                       <div className="p-field-checkbox">              
                         <Checkbox checked={yearBTChecked} 
-                          inputId="bd_year" 
+                          inputId="bd_year" disabled={certificateStore.identified}
                           onChange={e=>setYearBTChecked(e.checked)}/>
                         <label htmlFor="bd_year">Только год</label>
                       </div>
                     </div>}
                     options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
-                    value={UNK}
+                    value={certificateStore.fromRelatives ? ASKU : UNK}
                     field_name="birth_date"
                     nullFlavors={patient.nullFlavors()}
                 />                               
@@ -179,12 +206,12 @@ import { IPersonName } from '../../models/IPersonName'
               <div className='p-paragraph-field p-mr-3 p-mb-2'>
                 <NullFlavorWrapper                    
                   label={<label htmlFor="dateDeath">Дата смерти</label>}
-                  checked={true} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{                      
-                      if (!e.checked){                        
-                        certificate.death_datetime = undefined
-                        certificate.death_year = undefined 
-                      } 
-                      if (nullFlavors) certificate.setNullFlavors(nullFlavors)    
+                  checked={isDeathTime} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{                   
+                    if (!e.checked){                        
+                      certificate.death_datetime = undefined
+                      certificate.death_year = undefined                      
+                    } 
+                    if (nullFlavors) certificate.setNullFlavors(nullFlavors)    
                       certificateStore.checkDeathDay()
                     }} 
                   field={<div className="p-d-flex p-jc-start p-ai-center">              
@@ -208,10 +235,14 @@ import { IPersonName } from '../../models/IPersonName'
                     nullFlavors={certificate.nullFlavors()}
                  />
               </div>     
-              <div className='p-paragraph-field'>                
+              <div className='p-paragraph-field' key={`pdivdt_${yearDTChecked}_${isDeathTime}`}>                
                 <NullFlavorWrapper                    
                   label={<label htmlFor="timeDeath">Время смерти</label>}
-                  checked={true}  
+                  checked={isDeathTime && !yearDTChecked} 
+                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{                   
+                    if (nullFlavors) certificate.setNullFlavors(nullFlavors)    
+                    certificateStore.checkDeathDay()
+                  }} 
                   field={ <Calendar id="timeDeath"  
                     timeOnly hourFormat="24"             
                     value={certificate.death_datetime} 
