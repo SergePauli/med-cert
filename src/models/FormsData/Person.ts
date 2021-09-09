@@ -6,13 +6,13 @@ import { IPersonName } from "../IPersonName"
 
 export default class Person {
   private _id?: string | undefined
-  private _fio: IPersonName
+  private _fio?: IPersonName | undefined
   private _SNILS?: string | undefined
   private _nullFlavors: INullFlavor[]
   private _guid: string
   constructor(props: IPerson) {
     this._guid = props.guid || uuidv4()
-    this._fio = props.fio
+    if (props.fio) this._fio = props.fio
     if (props.SNILS) this._SNILS = props.SNILS
     if (props.id) this._id = props.id
     this._nullFlavors = props.nullFlavors || []
@@ -22,7 +22,7 @@ export default class Person {
     return this._fio
   }
 
-  set fio(fio: IPersonName) {
+  set fio(fio: IPersonName | undefined) {
     this._fio = fio
   }
 
@@ -35,6 +35,11 @@ export default class Person {
   get SNILS() {
     return this._SNILS
   }
+
+  set SNILS(snils: string | undefined) {
+    this._SNILS = snils
+  }
+
   get id() {
     return this._id
   }

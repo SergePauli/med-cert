@@ -114,7 +114,7 @@ export default class Certificate {
     return this._policyOMS || ""
   }
 
-  set policyOMS(policyOMS: string) {
+  set policyOMS(policyOMS: string | undefined) {
     this._policyOMS = policyOMS
   }
 }

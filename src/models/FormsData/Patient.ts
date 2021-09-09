@@ -2,6 +2,7 @@ import { makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
 import { INullFlavor } from "../INullFlavor"
 import { IPatient } from "../IPatient"
+import Identity from "./Identity"
 import Person from "./Person"
 
 export default class Patient {
@@ -10,10 +11,10 @@ export default class Patient {
   private _gender: number | undefined
   private _birth_date: Date | Date[] | undefined
   private _birth_year?: number
-  private _birth_month?: number
   private _provider_organization?: string
   private _addr_type?: number
   private _guid?: string
+  private _identity?: Identity
   private _nullFlavors: INullFlavor[]
   constructor(props: IPatient) {
     this._guid = props.guid || uuidv4()
@@ -23,7 +24,10 @@ export default class Patient {
     if (props.birth_date) this._birth_date = props.birth_date
     if (props.id) this._id = props.id
     if (props.birth_year) this._birth_year = props.birth_year
-    if (props.birth_month) this._birth_month = props.birth_month
+    if (props.identity) {
+      props.identity.parentGUID = props.identity.parentGUID || this._guid
+      this._identity = new Identity(props.identity)
+    }
     this._nullFlavors = props.nullFlavors || []
     makeAutoObservable(this)
   }
@@ -77,5 +81,12 @@ export default class Patient {
   }
   set birth_year(birth_year: number | undefined) {
     this._birth_year = birth_year
+  }
+  get identity() {
+    return this._identity
+  }
+
+  set identity(identity: Identity | undefined) {
+    this._identity = identity
   }
 }
