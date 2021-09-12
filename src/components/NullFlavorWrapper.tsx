@@ -5,6 +5,7 @@ import { Dropdown, DropdownChangeParams } from "primereact/dropdown"
 import { useState } from 'react'
 import { NULL_FLAVORS } from '../utils/defaults'
 import { INullFlavor } from '../models/INullFlavor'
+import { useEffect } from 'react'
 
 type NullFlavorWrapperProps = {
   paraNum?: string,  
@@ -17,14 +18,23 @@ type NullFlavorWrapperProps = {
   options: IReference[],
   nullFlavors?: INullFlavor[], 
   value?: number, 
-  onChange?: ((e: IReference) => void),
+  onChange?: ((e: IReference, nullFlavors: INullFlavor[] | undefined) => void),
   lincked?: boolean
 }
 
-const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperProps) => { 
+const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperProps) => {   
   const [value, setValue] = useState<IReference | null>(props.value? NULL_FLAVORS[props.value] : null)
   const [checked, setChecked] = useState<boolean>(props.checked || false) 
   const nullFlavors = (props.nullFlavors && props.field_name ) ? props.nullFlavors.filter((element)=>element.parent_attr!==props.field_name) : []
+  useEffect(()=>{   
+    if (props.nullFlavors) {
+      const nullFlavor = props.nullFlavors.find(item=>item.parent_attr===props.field_name)
+      if (nullFlavor) {
+        setValue(NULL_FLAVORS[nullFlavor.value])
+        setChecked(false)
+      }
+    }
+  },[props.nullFlavors, props.field_name])   
   const paragraph = props.paraNum && <span className='paragraph'>{props.paraNum}.</span>
   const checkbox  = !props.lincked && <Checkbox        
         style={{ marginLeft: "0.4rem" }}
@@ -36,7 +46,8 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
               if (props.setCheck && e.checked ) props.setCheck(e, nullFlavors)
               else if (props.setCheck && props.value && props.field_name) {
                 nullFlavors.push({parent_attr: props.field_name, value: props.value })  
-                props.setCheck(e, nullFlavors.concat(props.nullFlavors))
+                props.setCheck(e, nullFlavors)
+                nullFlavors.pop()
               }              
             } else if (props.setCheck) props.setCheck(e)            
           }
@@ -58,12 +69,11 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
       value={value}      
       options={props.options}
       onChange={(e: DropdownChangeParams)=>{   
-        setValue(e.value)       
-        if (nullFlavors) {          
-          const prev = nullFlavors.find((element)=>element.parent_attr===props.field_name)
-          if (prev) prev.value = NULL_FLAVORS.findIndex((element)=>element.code===e.value.code)
-        }
-        if (props.onChange) props.onChange(e.value)                      
+        setValue(e.value)  
+        const nullFlavor = {parent_attr: props.field_name, value: NULL_FLAVORS.findIndex((element)=>element.code===e.value.code)}
+        nullFlavors.push(nullFlavor as INullFlavor)
+        if (props.onChange) props.onChange(e.value, nullFlavors) 
+        nullFlavors.pop()                            
       }}
       optionLabel='name'      
       placeholder='Причина отсутствия'
