@@ -10,8 +10,6 @@ import '../styles/pages/CertificatePage.css'
 import { useContext, FC } from 'react'
 import MainLayout from '../components/layouts/MainLayout'
 import { CERTIFICATE_ROUTE } from '../utils/consts'
-import { Divider } from 'primereact/divider'
-import { Button } from 'primereact/button'
 import { Avatar } from 'primereact/avatar'
 import { Badge } from 'primereact/badge'
 import { IRouteMatch } from '../models/IRouteMatch'
@@ -32,9 +30,7 @@ interface CertificatePageProps extends IRouteProps {
 }
 
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
-  const { certificateStore } = useContext(Context)   
-   
-  console.log('Cert', certificateStore.cert)
+  const { certificateStore } = useContext(Context)
   const secton_router = ()=>{
     switch (props.location.search) {
       case "?q=0": return <Section0 />
@@ -75,14 +71,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
               <Column body={doneBodyTemplate}></Column>
             </DataTable> 
         </Card>
-      </div>
-      <Divider style={{paddingTop:'1rem',marginBottom:'0.4rem'}}/>
-      <div className="p-d-flex p-jc-center">
-        <Button icon="pi pi-ban" className="p-button-danger p-button-action p-mr-4 p-mb-2 p-shadow-3"
-         label="Отменить" disabled />
-        <Button icon="pi pi-save" className="p-button-secondary p-button-action p-mr-4 p-mb-2 p-shadow-3" label="Сохранить" disabled />
-        <Button icon="pi pi-angle-right" iconPos="right" className="p-button-action p-mr-4 p-mb-2 p-shadow-3"  label="Далее"  />  
-      </div>
+      </div>      
     </>)
   }  
   return (
