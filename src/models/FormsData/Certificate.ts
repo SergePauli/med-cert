@@ -20,7 +20,7 @@ export default class Certificate {
   private _death_month?: number
   private _death_day?: number
   private _guid: string
-  private _policyOMS: string | undefined
+  private _policyOMS?: string | undefined
   private _nullFlavors: INullFlavor[]
   constructor(props: ICertificateResponse) {
     this._guid = props.guid || uuidv4()

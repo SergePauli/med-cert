@@ -8,7 +8,7 @@ import Person from "./Person"
 export default class Patient {
   private _id?: string | undefined
   private _person: Person
-  private _gender: number | undefined
+  private _gender?: number | undefined
   private _birth_date: Date | Date[] | undefined
   private _birth_year?: number
   private _provider_organization?: string
