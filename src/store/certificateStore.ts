@@ -32,8 +32,6 @@ export default class CertificateStore {
   private _identified: boolean
   private _fromRelatives: boolean
   constructor() {
-    this._identified = true
-    this._fromRelatives = false
     this._cert = new Certificate({
       patient: {
         identity: {
@@ -42,6 +40,8 @@ export default class CertificateStore {
         person: { fio: { family: "", given_1: "", given_2: "" } },
       } as IPatient,
     } as ICertificateResponse)
+    this._identified = this._cert.patient.person.fio !== undefined
+    this._fromRelatives = this._identified && this._cert.patient.identity === undefined
     this._suggestions = DEFAULT_CERT_SUGGESTIONS
     makeAutoObservable(this)
   }
@@ -107,16 +107,16 @@ export default class CertificateStore {
   setBirthDay(value: Date | undefined, isYear: boolean) {
     const patient = this._cert.patient
     if (value && !isYear) {
+      if (patient.birth_date === undefined)
+        patient.setNullFlavors(patient.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
       patient.birth_date = value
       patient.birth_year = undefined
-      patient.setNullFlavors(patient.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
       this.changeSuggestionsEntry(PATIENT_BIRTHDAY_SUG, false)
     } else if (value && isYear) {
+      if (patient.birth_date === undefined)
+        patient.setNullFlavors(patient.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
       patient.birth_date = value
       patient.birth_year = (patient.birth_date as Date).getFullYear()
-      if (patient.nullFlavors().findIndex((element) => element.parent_attr === "birth_date") === -1) {
-        patient.nullFlavors().push({ parent_attr: "birth_date", value: this.fromRelatives ? ASKU : UNK } as INullFlavor)
-      }
       this.changeSuggestionsEntry(PATIENT_BIRTHDAY_SUG, false)
     } else {
       this._cert.patient.birth_date = undefined
@@ -140,9 +140,6 @@ export default class CertificateStore {
     } else if (value && isYear) {
       cert.death_datetime = value
       cert.death_year = (cert.death_datetime as Date).getFullYear()
-      if (cert.nullFlavors().findIndex((element) => element.parent_attr === "death_datetime") === -1) {
-        cert.nullFlavors().push({ parent_attr: "death_datetime", value: UNK } as INullFlavor)
-      }
       this.changeSuggestionsEntry(CERT_DEATH_THIME_SUG, false)
     } else {
       cert.death_datetime = undefined
