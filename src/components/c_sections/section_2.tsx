@@ -28,9 +28,10 @@ import IIdentity from '../../models/IIdentity'
   const certificate = certificateStore.cert   
   const patient = certificate.patient
   const identity = patient.identity 
-  const docChecked = identified && identity!==undefined  
+  const docChecked = identity !== undefined   
   const dul_value = ID_CARD_TYPES.find((item)=>item.code === identity?.identityCardType)
   const person =  patient.person   
+  const nullFlavorOption =  docChecked ? "UNK" : "ASKU" 
   const seriesProps = {type:"text", id:"series", value:identity?.series,                  
       onChange:(e:any)=>{if (identity) certificateStore.setIDSeries(e.target.value) }}  
   const seriesField = dul_value?.s_mask ? <InputMask {...{mask:dul_value?.s_mask,...seriesProps} as InputMaskProps }/>
@@ -50,7 +51,7 @@ import IIdentity from '../../models/IIdentity'
               <div className='paragraph p-mr-1'> 4. </div>
               <div className='p-paragraph-field p-mr-2 p-mb-2' key={`pdiv1_${docChecked}`}>
                 <NullFlavorWrapper 
-                  disabled={!identified}                                
+                  disabled                               
                   checked={docChecked} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
                     { if (e.checked) patient.identity = new Identity({
                         identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,          
@@ -66,8 +67,8 @@ import IIdentity from '../../models/IIdentity'
                   autoFocus options={ID_CARD_TYPES} optionLabel='name'
                   onChange={(e)=>{if (identity) identity.identityCardType = e.value.code}}
                   />}                  
-                  options={NULL_FLAVORS.filter((item:IReference)=>"ASKU".includes(item.code))} 
-                  value={ASKU}                                    
+                  options={NULL_FLAVORS.filter((item:IReference)=>nullFlavorOption.includes(item.code))} 
+                  value={docChecked ? UNK : ASKU}                                    
                 />             
               </div>
               <div className="p-paragraph-field p-mr-2 p-mb-2" key={`pdiv2_${docChecked}_${dul_value?.s_mask}`} 
@@ -92,13 +93,13 @@ import IIdentity from '../../models/IIdentity'
                   lincked                                      
                 />                    
               </div>
-              <div className="p-paragraph-field p-mr-2 p-mb-2" style={{marginLeft:'1.5rem'}} key={`pdiv4_${docChecked}`}>
+              <div className="p-paragraph-field p-mr-3 p-mb-2" style={{marginLeft:'1.5rem'}} key={`pdiv4_${docChecked}`}>
                 <NullFlavorWrapper                   
                   label={<label htmlFor="issueOrgName">Кем выдан</label>}
                   checked={docChecked}                   
                   field={
                     <InputTextarea id="issueOrgName" value={identity?.issueOrgName} 
-                    cols={70} rows={2}   disabled={!identified}
+                    cols={65} rows={2}   disabled={!identified}
                     onChange={(e)=>{if (identity) certificateStore.setIORGNAME(e.target.value) }}/>}
                   options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
                   value={identified ? UNK : ASKU} 
@@ -136,15 +137,20 @@ import IIdentity from '../../models/IIdentity'
               <div className='p-paragraph-field'>                    
                 <NullFlavorWrapper                     
                     label={<label htmlFor="snils">СНИЛС</label>}
-                    checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{}} 
+                    checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+                      if (nullFlavors) person.setNullFlavors(nullFlavors)
+                      if (!e.checked) person.SNILS = undefined
+                      certificateStore.checkSNILS()
+                    }} 
+                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) person.setNullFlavors(nullFlavors)}}
                     field={<InputMask id="snils"  
                       type="text" mask="999-999-999 99"
                       value={person.SNILS} 
                       onChange={(e)=>{certificateStore.setSNILS(e.target.value)}}/>            
                     }
                     options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK NA".includes(item.code))} 
-                    value={identified ? UNK : ASKU}
-                    field_name="snils"
+                    value={docChecked ? UNK : ASKU}
+                    field_name="SNILS"
                     nullFlavors={person.nullFlavors()}
                 />                               
               </div>              
@@ -154,15 +160,20 @@ import IIdentity from '../../models/IIdentity'
               <div className='p-paragraph-field p-mr-3 p-mb-2'>
                 <NullFlavorWrapper                     
                     label={<label htmlFor="policyOMS">Серия и номер полиса ОМС</label>}
-                    checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{}} 
+                    checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+                      if (nullFlavors) certificate.setNullFlavors(nullFlavors)
+                      if (!e.checked) certificate.policyOMS = undefined
+                      certificateStore.checkOMS()
+                    }} 
+                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.setNullFlavors(nullFlavors)}}
                     field={<InputText id="policyOMS"  
                       type="text" 
                       value={certificate.policyOMS} 
                       onChange={(e)=>{certificateStore.setPolicyOMS(e.target.value)}}/>            
                     }
                     options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK NA".includes(item.code))} 
-                    value={identified ? UNK : ASKU}
-                    field_name="policyOMS"
+                    value={docChecked ? UNK : ASKU}
+                    field_name="policy_OMS"
                     nullFlavors={certificate.nullFlavors()}
                 />
               </div>     
