@@ -17,6 +17,7 @@ import { IRouteProps } from '../models/IRouteProps'
 import Section0 from '../components/c_sections/section_0'
 import Section1 from '../components/c_sections/section_1'
 import Section2 from '../components/c_sections/section_2'
+import Section3 from '../components/c_sections/section_3'
 import { Context } from '..'
 import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
@@ -36,6 +37,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       case "?q=0": return <Section0 />
       case "?q=1": return <Section1 />
       case "?q=2": return <Section2 />
+      case "?q=3": return <Section3 />
       default: return <Section0 /> 
     } 
   }    
