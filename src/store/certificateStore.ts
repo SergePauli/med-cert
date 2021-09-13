@@ -6,7 +6,6 @@ import { IReference } from "../models/IReference"
 import { ISuggestions } from "../models/ISuggestions"
 import { ICertificateResponse } from "../models/responses/ICertificateResponse"
 import {
-  ASKU,
   CERT_DEATH_THIME_SUG,
   CERT_TYPE_SUG,
   DEFAULT_CERT_SUGGESTIONS,
@@ -16,6 +15,7 @@ import {
   IORGCODE_SUG,
   IORGDATE_SUG,
   IORGNAME_SUG,
+  LIFE_AREA_SUG,
   NA,
   OMS_SUG,
   PASSPORT_RF,
@@ -238,6 +238,12 @@ export default class CertificateStore {
     const identity = this._cert.patient.identity
     if (identity) identity.number = number
     this.checkIDNumber()
+  }
+  checkLifeAreaType() {
+    const isLifeAreaType =
+      this._cert.lifeAreaType === undefined &&
+      this._cert.nullFlavors().findIndex((element) => element.parent_attr === "life_area_type") === -1
+    this.changeSuggestionsEntry(LIFE_AREA_SUG, isLifeAreaType)
   }
 
   get suggestions() {
