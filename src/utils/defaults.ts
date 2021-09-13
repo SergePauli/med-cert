@@ -58,7 +58,13 @@ export const DEFAULT_CERT_SUGGESTIONS = [
   {
     section: "2",
     code: "п.6",
-    suggestion: "Указание полиса ОМС умершего или причины его отсутствия - обязательно для заполнения",
+    suggestion: "Указание полиса ОМС или причины его отсутствия - обязательно для заполнения",
+    done: false,
+  },
+  {
+    section: "3",
+    code: "п.9",
+    suggestion: "Вида места жительства или причины его отсутствия - обязательно для заполнения",
     done: false,
   },
 ]
@@ -74,6 +80,7 @@ export const IORGDATE_SUG = 8
 export const IORGCODE_SUG = 9
 export const SNILS_SUG = 10
 export const OMS_SUG = 11
+export const LIFE_AREA_SUG = 12
 export const changeSuggestion = (code: string, suggestions: any[], done: boolean) => {
   const suggestion = suggestions.find((item) => item.code === code)
   if (suggestion) suggestion.done = done
@@ -103,6 +110,9 @@ export const UNK = 9
 export const MALE = 1
 export const FEMALE = 2
 export const NOGENDER = 4
+
+export const URBAN_AREA_TYPE = 1
+export const VILAGE_AREA_TYPE = 2
 
 export const ID_CARD_TYPES = [
   { code: "1", name: "Паспорт гр. РФ", s_mask: "99 99", n_mask: "999999", c_mask: "999-999" },
