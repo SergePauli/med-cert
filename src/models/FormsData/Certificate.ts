@@ -15,6 +15,8 @@ export default class Certificate {
   private _number_prev?: string
   private _eff_time_prev?: Date
   private _patient: Patient
+  private _lifeAreaType?: number
+  private _deathAreaType?: number
   private _death_datetime: Date | Date[] | undefined
   private _death_year?: number
   private _death_month?: number
@@ -35,6 +37,8 @@ export default class Certificate {
     if (props.number_prev) this._number_prev = props.number_prev
     if (props.series_prev) this._series_prev = props.series_prev
     if (props.policyOMS) this._policyOMS = props.policyOMS
+    if (props.lifeAreaType) this._lifeAreaType = props.lifeAreaType
+    if (props.deathAreaType) this._deathAreaType = props.deathAreaType
     makeAutoObservable(this)
   }
   get id() {
@@ -116,5 +120,19 @@ export default class Certificate {
 
   set policyOMS(policyOMS: string | undefined) {
     this._policyOMS = policyOMS
+  }
+
+  get lifeAreaType() {
+    return this._lifeAreaType
+  }
+  set lifeAreaType(lat: number | undefined) {
+    this._lifeAreaType = lat
+  }
+
+  get deathAreaType() {
+    return this._deathAreaType
+  }
+  set deathAreaType(dat: number | undefined) {
+    this._deathAreaType = dat
   }
 }

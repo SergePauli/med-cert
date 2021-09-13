@@ -13,6 +13,8 @@ export interface ICertificateResponse extends INullFlavorable {
   eff_time_prev: Date
   policyOMS?: string
   patient: IPatient
+  lifeAreaType?: number
+  deathAreaType?: number
   death_datetime: Date | Date[] | undefined
   death_year: number
   death_month: number
