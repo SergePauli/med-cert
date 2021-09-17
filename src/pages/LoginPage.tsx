@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite'
-import { useContext, useEffect} from 'react'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { FC } from 'react'
 import { Link} from 'react-router-dom'
 import { Context } from '..'
 import logo from "../images/security.png"
 import '../styles/login.css'
+import  '../styles/components/Inputtext.css'
 import { InputText } from 'primereact/inputtext'
 import {Password} from 'primereact/password'
 import { Button } from 'primereact/button'
