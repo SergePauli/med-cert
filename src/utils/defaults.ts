@@ -130,3 +130,4 @@ export const ID_CARD_TYPES = [
   { code: "38", name: "Охотничий билет" },
 ]
 export const PASSPORT_RF = 0
+export const REGION = { code: "28", name: "Амурская область" }

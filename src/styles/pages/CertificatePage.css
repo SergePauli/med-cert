@@ -4,15 +4,16 @@
 
 .c-section {
   min-width: 400px;
-  max-width: 476px;
+  max-width: 676px;
 }
 
 .layout-static-inactive .c-section {
-  max-width: 600px;
+  max-width: 676px;
 }
 
 .p-suggestion {
-  max-width: 350px;
+  min-width: 300px;
+  max-width: 500px;
 }
 
 .layout-static-inactive .p-suggestion {

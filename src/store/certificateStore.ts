@@ -23,7 +23,6 @@ import {
   PATIENT_GENDER_SUG,
   PERSON_NAME_SUG,
   SNILS_SUG,
-  UNK,
 } from "../utils/defaults"
 
 export default class CertificateStore {
