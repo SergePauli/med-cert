@@ -4,6 +4,9 @@ export interface IFiasItem {
   code?: string
   name: string
   streetAddressLine: string
+  housenum?: string
+  buildnum?: string
+  strucnum?: string
   shortname?: string
   rustype?: string
   level: string
