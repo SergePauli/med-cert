@@ -12,24 +12,49 @@ export default class AddressStore {
 
   constructor() {
     this._isLoding = false
-    this.fetchRegionOptions()
     this._address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
   }
   fetchRegionOptions() {
-    FiasService.getRegions().then((response) => {
-      this._regionsOptions = response.data.data.map((item) => {
-        return { code: item.code, name: item.streetAddressLine } as IReference
+    FiasService.getRegions()
+      .then((response) => {
+        this._regionsOptions = response.data.data.map((item) => {
+          return { code: item.code?.substr(0, 2), name: item.streetAddressLine } as IReference
+        })
+        this.defaultRegion()
       })
-    })
+      .finally(() => (this._isLoding = false))
   }
-  searchBar(query: string) {
-    FiasService.searchBar(query).then((response) => {
-      this._fiasOptions = response.data.data
-    })
+
+  async searchBar(query: string, regionID = HOME_REGION_CODE as string) {
+    this._isLoding = true
+    try {
+      const response = await FiasService.searchBar(query, regionID)
+      if (response.data.data) this._fiasOptions = response.data.data
+      return this._fiasOptions
+    } catch (e) {
+      console.log(e)
+      return []
+    } finally {
+      this._isLoding = false
+    }
   }
   defaultRegion() {
-    return this._regionsOptions?.find((item) => item.code.startsWith(HOME_REGION_CODE))
+    return this._regionsOptions?.find((item) => item.code === HOME_REGION_CODE)
   }
+  async getChildItems(parent: string, level: string, query = "") {
+    this._isLoding = true
+    try {
+      const response = await FiasService.getChildItems(parent, level, query)
+      if (response.data.data) this._fiasOptions = response.data.data
+      return this._fiasOptions
+    } catch (e) {
+      console.log(e)
+      return []
+    } finally {
+      this._isLoding = false
+    }
+  }
+
   set history(history: any) {
     this._history = history
   }
@@ -54,5 +79,18 @@ export default class AddressStore {
   }
   get fiasOptions() {
     return this._fiasOptions
+  }
+  clear() {
+    this._address.postalCode = undefined
+    this._address.district = undefined
+    this._address.city = undefined
+    this._address.houseGUID = undefined
+    this._address.aoGUID = undefined
+    this._address.street = undefined
+    this._address.town = undefined
+    this._address.housenum = undefined
+    this._address.buildnum = undefined
+    this._address.strucnum = undefined
+    this._address.streetAddressLine = this._address.state?.name + ", " || ""
   }
 }
