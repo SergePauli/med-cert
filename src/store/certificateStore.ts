@@ -16,6 +16,7 @@ import {
   IORGDATE_SUG,
   IORGNAME_SUG,
   LIFE_AREA_SUG,
+  LIFE_PLACE_SUG,
   NA,
   OMS_SUG,
   PASSPORT_RF,
@@ -243,6 +244,15 @@ export default class CertificateStore {
       this._cert.lifeAreaType === undefined &&
       this._cert.nullFlavors().findIndex((element) => element.parent_attr === "life_area_type") === -1
     this.changeSuggestionsEntry(LIFE_AREA_SUG, isLifeAreaType)
+  }
+  checkLifeArea() {
+    const isLifeArea =
+      (this._cert.patient.address === undefined ||
+        this._cert.patient.address.aoGUID === undefined ||
+        this._cert.patient.address.postalCode === undefined ||
+        this._cert.patient.address.housenum === undefined) &&
+      this._cert.nullFlavors().findIndex((element) => element.parent_attr === "addr") === -1
+    this.changeSuggestionsEntry(LIFE_PLACE_SUG, isLifeArea)
   }
 
   get suggestions() {
