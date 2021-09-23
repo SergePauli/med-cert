@@ -23,7 +23,7 @@ export default class Address {
   constructor(props: IAddress, region = undefined as IReference | undefined) {
     this._id = props.id || uuidv4()
     this._nullFlavors = props.nullFlavors || []
-    this._state = region || ({ code: props.state, name: props.addressPrints?.region } as IReference)
+    this._state = region
     this._streetAddressLine = props.streetAddressLine
     this._aoGUID = props.aoGUID
     this._houseGUID = props.houseGUID
@@ -53,7 +53,7 @@ export default class Address {
     return this._state
   }
   set state(value: IReference | undefined) {
-    if (value) this._state = value
+    this._state = value
   }
   get flat() {
     return this._flat
@@ -74,6 +74,19 @@ export default class Address {
   set housenum(value: string | undefined) {
     this._housenum = value
   }
+  get buildnum() {
+    return this._buildnum
+  }
+  set buildnum(value: string | undefined) {
+    this._buildnum = value
+  }
+  get strucnum() {
+    return this._strucnum
+  }
+  set strucnum(value: string | undefined) {
+    this._strucnum = value
+  }
+
   set street(value: IReference | undefined) {
     this._street = value
   }
@@ -96,7 +109,7 @@ export default class Address {
     this._houseGUID = value
   }
   get houseGUID() {
-    return this._aoGUID
+    return this._houseGUID
   }
   set district(value: IReference | undefined) {
     this._district = value
