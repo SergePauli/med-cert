@@ -1,9 +1,7 @@
 import { makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
-import { REGION } from "../../utils/defaults"
 import { INullFlavor } from "../INullFlavor"
 import { IPatient } from "../IPatient"
-import { IAddress } from "../responses/IAddress"
 import Address from "./Address"
 import Identity from "./Identity"
 import Person from "./Person"
@@ -33,8 +31,7 @@ export default class Patient {
       this._identity = new Identity(props.identity)
     }
     this._nullFlavors = props.nullFlavors || []
-    if (props.address) this._address = new Address(props.address, REGION)
-    else this._address = new Address({} as IAddress, REGION)
+    if (props.address) this._address = new Address(props.address)
     makeAutoObservable(this)
   }
   get id() {
