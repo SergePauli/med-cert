@@ -15,6 +15,7 @@ const userStore = new UserStore()
 const layoutStore = new LayoutStore()
 const certificateStore = new CertificateStore()
 const addressStore = new AddressStore()
+addressStore.fetchRegionOptions()
 export const Context = createContext<IState>({userStore, layoutStore, addressStore, certificateStore}) 
 ReactDOM.render(  
   <Context.Provider value={{userStore, layoutStore, addressStore, certificateStore}} >
