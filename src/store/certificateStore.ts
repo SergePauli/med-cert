@@ -8,6 +8,8 @@ import { ICertificateResponse } from "../models/responses/ICertificateResponse"
 import {
   CERT_DEATH_THIME_SUG,
   CERT_TYPE_SUG,
+  DEATH_AREA_SUG,
+  DEATH_PLACE_SUG,
   DEFAULT_CERT_SUGGESTIONS,
   IDNUMBER_SUG,
   IDSERIES_SUG,
@@ -245,14 +247,32 @@ export default class CertificateStore {
       this._cert.nullFlavors().findIndex((element) => element.parent_attr === "life_area_type") === -1
     this.changeSuggestionsEntry(LIFE_AREA_SUG, isLifeAreaType)
   }
+
   checkLifeArea() {
     const isLifeArea =
       (this._cert.patient.address === undefined ||
         this._cert.patient.address.aoGUID === undefined ||
         this._cert.patient.address.postalCode === undefined ||
         this._cert.patient.address.housenum === undefined) &&
-      this._cert.nullFlavors().findIndex((element) => element.parent_attr === "addr") === -1
+      this._cert.patient.nullFlavors().findIndex((element) => element.parent_attr === "addr") === -1
     this.changeSuggestionsEntry(LIFE_PLACE_SUG, isLifeArea)
+  }
+
+  checkDeathAreaType() {
+    const isDeathAreaType =
+      this._cert.deathAreaType === undefined &&
+      this._cert.nullFlavors().findIndex((element) => element.parent_attr === "death_area_type") === -1
+    this.changeSuggestionsEntry(DEATH_AREA_SUG, isDeathAreaType)
+  }
+
+  checkDeathArea() {
+    const isDeathArea =
+      (this._cert.death_addr === undefined ||
+        this._cert.death_addr.aoGUID === undefined ||
+        this._cert.death_addr.postalCode === undefined ||
+        this._cert.death_addr.housenum === undefined) &&
+      this._cert.nullFlavors().findIndex((element) => element.parent_attr === "death_addr") === -1
+    this.changeSuggestionsEntry(DEATH_PLACE_SUG, isDeathArea)
   }
 
   get suggestions() {

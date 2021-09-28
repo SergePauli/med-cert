@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid"
 import { INullFlavor } from "../INullFlavor"
 import { IReference } from "../IReference"
 import { ICertificateResponse } from "../responses/ICertificateResponse"
+import Address from "./Address"
 import Patient from "./Patient"
 
 export default class Certificate {
@@ -21,6 +22,7 @@ export default class Certificate {
   private _death_year?: number
   private _death_month?: number
   private _death_day?: number
+  private _death_addr?: Address
   private _guid: string
   private _policyOMS?: string | undefined
   private _nullFlavors: INullFlavor[]
@@ -39,6 +41,7 @@ export default class Certificate {
     if (props.policyOMS) this._policyOMS = props.policyOMS
     if (props.lifeAreaType) this._lifeAreaType = props.lifeAreaType
     if (props.deathAreaType) this._deathAreaType = props.deathAreaType
+    if (props.death_addr) this._death_addr = new Address(props.death_addr)
     makeAutoObservable(this)
   }
   get id() {
@@ -134,5 +137,12 @@ export default class Certificate {
   }
   set deathAreaType(dat: number | undefined) {
     this._deathAreaType = dat
+  }
+
+  get death_addr() {
+    return this._death_addr
+  }
+  set death_addr(value: Address | undefined) {
+    this._death_addr = value
   }
 }
