@@ -11,7 +11,7 @@ type AreaTypeProps = {
 export const AreaType = (props: AreaTypeProps) =>{ 
   const [value, setValue] = useState<number | undefined>(props.value)
   return (  
-  <div className="p-formgroup-inline">              
+  <div className="p-formgroup-inline" style={{marginLeft: '-0.76rem'}}>              
       <div className='p-field-radiobutton'>                  
         <RadioButton name='urban' checked={value === URBAN_AREA_TYPE}
           onChange={(e)=>{

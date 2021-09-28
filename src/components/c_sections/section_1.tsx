@@ -73,10 +73,12 @@ import Identity from '../../models/FormsData/Identity'
             </div>
             <div className="p-field p-d-flex p-flex-wrap p-jc-start">
               <div className='paragraph p-mr-1'> 1. </div>
-              <div className='p-paragraph-field p-mr-2 p-mb-2' key={`pdiv1_${identified}`}>
+              <div className='p-paragraph-field p-mr-2 p-mb-2' 
+                key={`pdiv1_${identified}`} >
                 <NullFlavorWrapper 
                   disabled={!certificateStore.fromRelatives}               
                   checked={identified} 
+                  paraNum
                   setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
                     { 
                       if (e.checked)  person.fio = fio
@@ -98,7 +100,8 @@ import Identity from '../../models/FormsData/Identity'
                   field_name="person_name"                                 
                 />             
               </div>
-              <div className="p-paragraph-field p-mr-2 p-mb-2" key={`pdiv2_${identified}`}>
+              <div className="p-paragraph-field p-mr-2 p-mb-2" 
+              key={`pdiv2_${identified}`} style={{marginLeft:'1.5rem'}}>
                 <NullFlavorWrapper                   
                   label={<label htmlFor="given_1">Имя</label>}
                   checked={identified}                   
@@ -179,7 +182,7 @@ import Identity from '../../models/FormsData/Identity'
             <div className="p-field p-d-flex p-jc-center">
               <div className='paragraph p-mr-1'> 3. </div>
               <div className='p-paragraph-field' key={`pdiv5_${identified}`}>                    
-                <NullFlavorWrapper
+                <NullFlavorWrapper paraNum
                     disabled={certificateStore.identified}                    
                     label={<label htmlFor="dateBirth">Дата рождения</label>}
                     checked={certificateStore.identified || yearBTChecked } setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{                      
@@ -217,8 +220,8 @@ import Identity from '../../models/FormsData/Identity'
             <div className="p-field p-d-flex p-jc-center">
               <div className='paragraph p-mr-1'> 7. </div>
               <div className='p-paragraph-field p-mr-3 p-mb-2'>
-                <NullFlavorWrapper                    
-                  label={<label htmlFor="dateDeath">Дата смерти</label>}
+                <NullFlavorWrapper paraNum                   
+                  label={<label htmlFor="dateDeath">Дата смерти</label>}                  
                   checked={certificate.death_datetime!==undefined} setCheck={(e:CheckboxChangeParams, nullFlavors:      INullFlavor[] | undefined)=>{                   
                     if (!e.checked) certificateStore
                           .setDeathDay(undefined, false)                      
