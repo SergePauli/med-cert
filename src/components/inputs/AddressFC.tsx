@@ -326,7 +326,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
         />
       </div>
       <div className="p-paragraph-field  p-mb-2" 
-            style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
+            style={{marginLeft:'1.5rem', maxWidth:'9rem'}}>
         <NullFlavorWrapper  checked={checked} key={`flat_${checked}`}                
           label={<label htmlFor="flat">квартира(офис)</label>}
           field={

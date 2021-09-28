@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite"
+import { Button } from "primereact/button"
 import { Card } from "primereact/card"
 import { CheckboxChangeParams } from "primereact/checkbox"
 import { FC, useContext, useEffect } from "react"
@@ -26,13 +27,37 @@ const Section4: FC = () => {
     },[addressStore, address, checked])
   
   const header = () => {
-    return (<span>Адрес места смерти</span>)
+    return (<><span>Адрес места смерти</span><Button type="button" onClick={onAddressCopy} label="совпадает с адресом проживания" className="p-button-raised p-button-success"  /></>)
   }
-
+  const onAddressCopy = () => {
+    certificate.deathAreaType = certificate.lifeAreaType
+    const lAddress = certificate.patient.address 
+    if (lAddress === undefined) {
+      certificate.death_addr = undefined
+      if (addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
+    } else {
+      if (certificate.death_addr === undefined ) certificate.death_addr = addressStore.address
+      certificate.death_addr.streetAddressLine = lAddress.streetAddressLine
+      certificate.death_addr.aoGUID = lAddress.aoGUID      
+      certificate.death_addr.buildnum = lAddress.buildnum
+      certificate.death_addr.city = lAddress.city
+      certificate.death_addr.district = lAddress.district
+      certificate.death_addr.flat = lAddress.flat
+      certificate.death_addr.houseGUID = lAddress.houseGUID
+      certificate.death_addr.housenum = lAddress.housenum
+      certificate.death_addr.postalCode = lAddress.postalCode
+      certificate.death_addr.state = lAddress.state
+      certificate.death_addr.street = lAddress.street
+      certificate.death_addr.strucnum = lAddress.strucnum
+      certificate.death_addr.town = lAddress.town      
+    }
+    certificateStore.checkDeathArea()
+    certificateStore.checkDeathAreaType()
+  }
   return (<>    
     <Card className="c-section p-mr-2 p-mb-2" header={header}>        
       <div className="p-fluid p-formgrid p-grid">
-        <div className="p-field p-d-flex p-flex-wrap p-jc-start" style={{width: '98%'}}>
+        <div className="p-field p-d-flex p-flex-wrap p-jc-start" style={{width: '98%'}}>          
           <div className='paragraph p-mr-1'>10.</div>
           <AddressFC key={`p10_${address?.id}_${address?.streetAddressLine}`}
              label="Место смерти" checked={checked}  
@@ -52,10 +77,11 @@ const Section4: FC = () => {
         </div>
         <div className="p-d-flex p-jc-center">          
           <div className='paragraph p-mr-1'>11.</div>          
-          <div className='p-paragraph-field'>
+          <div className='p-paragraph-field' key={`dArea_${certificate.deathAreaType}`}>
             <NullFlavorWrapper                     
               label={<label htmlFor="urban">Местность</label>}
-              checked={identified || certificate.death_addr!==undefined}  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+              checked={identified || certificate.death_addr!==undefined}  
+              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) certificate.setNullFlavors(nullFlavors)
                 if (!e.checked) certificate.deathAreaType = undefined
                 certificateStore.checkDeathAreaType()
