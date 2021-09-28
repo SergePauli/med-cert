@@ -48,10 +48,10 @@ import IIdentity from '../../models/IIdentity'
       <Card className="c-section p-mr-2 p-mb-2" header={header}>        
           <div className="p-fluid p-formgrid p-grid">            
             <div className="p-field p-d-flex p-flex-wrap p-jc-start">
-              <div className='paragraph p-mr-1'> 4. </div>
+              <div className='paragraph p-mr-1'>4. </div>
               <div className='p-paragraph-field p-mr-2 p-mb-2' key={`pdiv1_${docChecked}`}>
                 <NullFlavorWrapper 
-                  disabled                               
+                  disabled paraNum                              
                   checked={docChecked} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
                     { if (e.checked) patient.identity = new Identity({
                         identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,          
@@ -135,7 +135,7 @@ import IIdentity from '../../models/IIdentity'
             <div className="p-field p-d-flex p-jc-center">
               <div className='paragraph p-mr-1'> 5. </div>
               <div className='p-paragraph-field'>                    
-                <NullFlavorWrapper                     
+                <NullFlavorWrapper paraNum                    
                     label={<label htmlFor="snils">СНИЛС</label>}
                     checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                       if (nullFlavors) person.setNullFlavors(nullFlavors)
@@ -158,7 +158,7 @@ import IIdentity from '../../models/IIdentity'
             <div className="p-field p-d-flex p-jc-center">
               <div className='paragraph p-mr-1'> 6. </div>
               <div className='p-paragraph-field p-mr-3 p-mb-2'>
-                <NullFlavorWrapper                     
+                <NullFlavorWrapper  paraNum                   
                     label={<label htmlFor="policyOMS">Серия и номер полиса ОМС</label>}
                     checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                       if (nullFlavors) certificate.setNullFlavors(nullFlavors)
