@@ -33,7 +33,7 @@ const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
             <Button style={{minWidth:'243px'}} className="p-button-success p-mr-2 p-mb-2 p-shadow-3" label="Список свидетельств" title="Список введеных свидетельств" />
             
         </div> 
-        <Divider />
+        <Divider style={{marginTop:'1rem', marginBottom:'1rem'}}/>
         <div className="p-d-flex p-flex-column p-jc-around p-flex-md-row p-flex-wrap">
           <Card className="p-mr-2 p-mb-2" title="Последние изменения" >
             <DataTable className="p-datatable-sm" value={news}>
