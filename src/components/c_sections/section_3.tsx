@@ -16,30 +16,28 @@ const Section3: FC = () => {
   const { addressStore, certificateStore } = useContext(Context)
   const certificate = certificateStore.cert  
   const patient = certificate.patient
-  const address = addressStore.address 
+  const address = patient.address 
   const identified = certificateStore.identified
+  const checked = address !== undefined || patient.nullFlavors().findIndex((item)=>item.parent_attr==='addr')===-1 
   const fromRelatives = certificateStore.fromRelatives
-  useEffect(()=>{
-    if (patient.address === undefined) {
-      addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] }, addressStore.defaultRegion())
-    } else {
-     if (addressStore.address!==patient.address)  addressStore.address = patient.address
-    }
-  },[addressStore, patient])
+  useEffect(()=>{ 
+    if (checked && address) addressStore.address = address
+    else if (checked && addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })     
+    },[addressStore, address, checked])
   const header = () => {
-    return <span>Место жительства</span>
+    return <span>Адрес места жительства</span>
   }
   return (<>    
     <Card className="c-section p-mr-2 p-mb-2" header={header}>        
       <div className="p-fluid p-formgrid p-grid">
-        <div className="p-field p-d-flex p-flex-wrap p-jc-start">
+        <div className="p-field p-d-flex p-flex-wrap p-jc-start" style={{width: '98%'}}>
           <div className='paragraph p-mr-1'>8.</div>
-          <AddressFC key={`p8_${patient.address?.streetAddressLine}`}
+          <AddressFC key={`p8_${address?.id}_${address?.streetAddressLine}`}
              label="Место постоянного жительства(регистрации)"
-             checked={patient.address!==undefined}  
+             checked={checked}  
              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) patient.setNullFlavors(nullFlavors)
-                if (e.checked) patient.address = address  
+                if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
                 else patient.address = undefined
                 certificateStore.checkLifeArea()
               }} 
@@ -47,10 +45,9 @@ const Section3: FC = () => {
              field_name="addr"
              nullFlavors={patient.nullFlavors()}             
              onChange={(value: Address)=>{
-               patient.address=value  
+               if (patient.address !== value) patient.address=value
                certificateStore.checkLifeArea()             
-              }}
-          />
+              }}/>
         </div>
         <div className="p-d-flex p-jc-center">          
           <div className='paragraph p-mr-1'>9.</div>          

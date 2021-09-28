@@ -26,21 +26,31 @@ type AddressProps = {
 }
 const nfOptions = NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK NA".includes(item.code))
 
-const AddressFC: FC<AddressProps> = (props: AddressProps) => {
+const AddressFC: FC<AddressProps> = (props: AddressProps) => {  
   const { addressStore } = useContext(Context)  
   const [checked, setChecked] = useState<boolean>(props.checked || false)
-  const [isLoading] = useState(addressStore.isLoading)
-  const value =addressStore.address  
+  const [isLoading] = useState(addressStore.isLoading)  
+  const value = addressStore.address  
+  const streetAddressLine = value.streetAddressLine
   const regions = addressStore.regionsOptions
-  const [searchStr, setSearchStr] = useState<string>(value.streetAddressLine)
+  const [searchStr, setSearchStr] = useState<string>('') 
+  useEffect(()=>setSearchStr(streetAddressLine)    
+  , [streetAddressLine])  
   const [region, setRegion] = useState<IReference | undefined>(value.state)
-  const defRegion = addressStore.defaultRegion()
-  const [district, setDistrict] = useState<string>(value.district?.name || '')
+  useEffect(()=>setRegion(value.state)    
+  , [value.state])   
+  const [district, setDistrict] = useState<string>('')
+  useEffect(()=>setDistrict(value.district?.name || ''), [value.district?.name])
   const [city, setCity] = useState<string>(value.city?.name || '')
+  useEffect(()=>setCity(value.city?.name || ''), [value.city?.name])
   const [town, setTown] = useState<string>(value.town?.name || '')
+  useEffect(()=>setTown(value.town?.name || ''), [value.town?.name])
   const [street, setStreet] = useState<string>(value.street?.name || '')
+  useEffect(()=>setStreet(value.street?.name || ''), [value.street?.name])
   const [house, setHouse] = useState<string>(value.housenum || '')
-  const [addresses, setAddresses] = useState(addressStore.fiasOptions) 
+  useEffect(()=>setHouse(value.housenum || ''), [value.housenum])
+  const [addresses, setAddresses] = useState(addressStore.fiasOptions)    
+  console.log('v_id',value.id)
   const setAddress = (e:IFiasItem)=>{ 
     if (e === null) return      
     if (e.parent!==undefined) setAddress(e.parent)
@@ -49,17 +59,25 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
     value.houseGUID = e.HouseGUID 
     value.streetAddressLine = e.streetAddressLine
     switch (e.level) {      
-      case 'City': value.city = {code: e.AOGUID, name: `${e.name} ${e.shortname}`}; break
-      case 'District': value.district = {code: e.AOGUID, name: `${e.name} ${e.shortname}`}; break
-      case 'Town': value.town = {code: e.AOGUID, name: `${e.name} ${e.shortname}`}; break
+      case 'City': value.city = {code: e.AOGUID, name: e.name}
+        setCity(e.name) 
+        break
+      case 'District': value.district = {code: e.AOGUID, name: e.name}
+        setDistrict(e.name)
+        break
+      case 'Town': value.town = {code: e.AOGUID, name: e.name}
+        setTown(e.name)
+        break
       case 'building': value.housenum = e.housenum; 
         value.buildnum = e.buildnum;
         value.strucnum = e.strucnum;
       break
-      case 'Street': value.street = {code: e.AOGUID, name: `${e.name} ${e.shortname}`}; break
+      case 'Street': 
+        setStreet(e.name)
+        value.street = {code: e.AOGUID, name: e.name}
+      break
     }         
-  }
-  
+  }  
   useEffect( () => {     
     if (regions ===undefined) {
       addressStore.fetchRegionOptions()          
@@ -69,11 +87,11 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
     } else if (value.state?.code) {
       setRegion(regions?.find((region)=>region.code===value.state?.code))
     }    
-    }, [regions, value, addressStore, region])  
-  return (
-    <>
-      <div className='p-paragraph-field  p-mb-2' style={{ width:'92%'}}>
-        <NullFlavorWrapper checked={checked}
+    }, [regions, value, addressStore, region]) 
+  const linkStyle = {marginLeft:'1.5rem'}  
+  return (<>
+      <div className='p-paragraph-field  p-mb-2' style={{ width:'90%'}}>
+        <NullFlavorWrapper checked={checked} paraNum
           label={<label>{props.label}</label>}  
           setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
                     { setChecked(e.checked)                      
@@ -86,7 +104,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           field={
             <div className='p-inputgroup'>
               <span className='p-inputgroup-addon'>Поиск в ФИАС:</span> 
-              <AutoComplete disabled={isLoading}
+              <AutoComplete disabled={isLoading}  
                 id='searchFIAS' //forceSelection        
                 value={searchStr}
                 suggestions={addresses}
@@ -108,16 +126,15 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                 }}
                 placeholder='Регион, Нас.пункт, Улица, Дом'
               />
-            </div>
-            }        
+          </div>}                   
         />
       </div>
-      <div className="p-paragraph-field p-mr-2 p-mb-2" key={`region_${region?.name}_${defRegion?.code}`}  style={{marginLeft:'1.5rem'}}>
-        <NullFlavorWrapper  checked={checked}                
+      <div className="p-paragraph-field p-mr-2 p-mb-2"  style={linkStyle}>      
+        <NullFlavorWrapper  checked={checked}  key={`region_${checked}`}               
           label={<label htmlFor="region">субъект Российской Федерации</label>}
-          field={
+          field={ 
             <Dropdown 
-              id='region'
+              id='region' 
               value={region}                      
               filter filterBy='name'
               onChange={(e)=>{                
@@ -128,14 +145,14 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
               }}
               options={regions}
               optionLabel='name'                                           
-            />
+            />            
           }
           options={nfOptions}                   
           lincked                                   
-        />  
-      </div>
-      <div className="p-paragraph-field p-mr-2 p-mb-2"  style={{marginLeft:'1.5rem'}}>
-        <NullFlavorWrapper  checked={checked}                 
+       />
+      </div> 
+      <div className="p-paragraph-field p-mr-2 p-mb-2"  style={linkStyle}>
+        <NullFlavorWrapper  checked={checked} key={`district_${checked}`}                
           label={<label htmlFor="district">район</label>}
           field={
             <AutoComplete id='district' key={`district_${value.district?.code}_${isLoading}`}  dropdown              
@@ -145,8 +162,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                 if(e.value && e.value?.AOGUID) { 
                     addressStore.clear()                                        
                     setAddress(e.value)                
-                    if (props.onChange) props.onChange(value)
-                    setDistrict(e.value.name)
+                    if (props.onChange) props.onChange(value)                    
                   } else setDistrict(e.value)
               }}                       
               suggestions={addresses}
@@ -155,14 +171,14 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                   setAddresses(await addressStore.getChildItems(value.state?.code, 'district', e.query))                 
                 }
               } }                                                   
-            />
+            />           
           }
           options={nfOptions}                   
           lincked                                   
-        />  
+        />
       </div>
-      <div className="p-paragraph-field p-mb-2" key={`city_${value.city?.code}`} style={{marginLeft:'1.5rem'}}>
-        <NullFlavorWrapper  checked={checked}                 
+      <div className="p-paragraph-field p-mb-2"  style={linkStyle}>
+        <NullFlavorWrapper  checked={checked}  key={`city_${checked}`}                
           label={<label htmlFor="city">город</label>}
           field={
             <AutoComplete id='city' dropdown              
@@ -172,8 +188,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                 if(e.value && e.value?.AOGUID) { 
                     addressStore.clear()                                        
                     setAddress(e.value)                
-                    if (props.onChange) props.onChange(value)
-                    setCity(e.value.name)
+                    if (props.onChange) props.onChange(value)                    
                 } else setCity(e.value)
               }}                       
               suggestions={addresses}
@@ -182,14 +197,14 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                   setAddresses(await addressStore.getChildItems(value.state?.code, 'city', e.query))                 
                   }
               }                                                   
-            />
+            />            
           }
           options={nfOptions}                   
           lincked                                   
-        />  
+        />
       </div>
-      <div className="p-paragraph-field  p-mb-2" key={`town_${value.town?.code}`} style={{marginLeft:'1.5rem'}}>
-        <NullFlavorWrapper  checked={checked}                 
+      <div className="p-paragraph-field  p-mb-2"  style={linkStyle}>
+        <NullFlavorWrapper  checked={checked}  key={`town_${checked}`}               
           label={<label htmlFor="town">населенный пункт</label>}
           field={
             <AutoComplete id='town' dropdown               
@@ -199,8 +214,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                 if(e.value && e.value?.AOGUID) { 
                     addressStore.clear()                                        
                     setAddress(e.value)                
-                    if (props.onChange) props.onChange(value)
-                    setTown(e.value.name)
+                    if (props.onChange) props.onChange(value)                    
                 } else setTown(e.value)
               }}                       
               suggestions={addresses}
@@ -208,16 +222,16 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                 let parent = value.state?.code               
                 if (value.city?.code) parent = value.city?.code  
                 if (value.district?.code) parent = value.district?.code                
-                if (parent)  setAddresses(await addressStore.getChildItems(parent, 'town', e.query))                 
-                }}                                                   
+                if (parent)  setAddresses(await addressStore.getChildItems(parent, 'town', e.query))                
+              }}                                                   
             />
           }
           options={nfOptions}                   
           lincked                                   
-        />  
+        />
       </div>
-      <div className="p-paragraph-field  p-mb-2" key={`street_${value.street?.code}`} style={{marginLeft:'1.5rem'}}>
-        <NullFlavorWrapper  checked={checked}                 
+      <div className="p-paragraph-field  p-mb-2" style={linkStyle}>
+        <NullFlavorWrapper  checked={checked} key={`street_${checked}`}                 
           label={<label htmlFor="street">улица</label>}
           field={
             <AutoComplete id='street' forceSelection              
@@ -226,8 +240,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                 if(e.value && e.value?.AOGUID) { 
                     addressStore.clear()                                        
                     setAddress(e.value)                
-                    if (props.onChange) props.onChange(value)
-                    setStreet(e.value.name)
+                    if (props.onChange) props.onChange(value)                    
                 } else setStreet(e.value)
               }}                       
               suggestions={addresses}
@@ -238,14 +251,14 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                 if (value.town?.code) parent = value.town?.code               
                 if (parent)  setAddresses(await addressStore.getChildItems(parent, 'street', e.query))                 
                 }}                                                   
-            />
+            />            
           }
           options={nfOptions}                   
           lincked                                   
-        />  
+        />
       </div>
-      <div className="p-paragraph-field  p-mb-2" key={`housenum_${value.housenum}`} style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
-        <NullFlavorWrapper  checked={checked}                 
+      <div className="p-paragraph-field  p-mb-2" style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
+        <NullFlavorWrapper  checked={checked} key={`housenum_${checked}`}                
           label={<label htmlFor="housenum">дом</label>}
           field={
             <AutoComplete id='housenum' dropdown              
@@ -257,7 +270,13 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                     setAddress(e.value)                
                     if (props.onChange) props.onChange(value)
                     setHouse(e.value.name)
-                } else setHouse(e.value)
+                } else {
+                  setHouse(e.value)
+                  if (addresses?.entries.length===0 && e.value.trim().length>0) {
+                    value.housenum = e.value                    
+                    if (props.onChange) props.onChange(value)
+                  }
+                }
               }}                       
               suggestions={addresses}
               completeMethod={async (e) =>{
@@ -272,47 +291,47 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           }
           options={nfOptions}                   
           lincked                                   
-        />  
+        /> 
       </div>
-      <div className="p-paragraph-field p-mb-2" key={`struc_${value.strucnum}`} 
-      style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
-        <NullFlavorWrapper  checked={checked}                 
+      <div className="p-paragraph-field p-mb-2"  
+                  style={{marginLeft:'1.5rem', maxWidth:'7rem'}}> 
+        <NullFlavorWrapper  checked={checked} key={`struc_${checked}`}                
           label={<label htmlFor="strucnum">стр.</label>}
           field={
             <InputText id='strucnum'              
-              value={value.strucnum}                
+              value={value.strucnum || ''}                
               onChange={(e)=>{
-                value.strucnum=e.target.value                
+                if (e.target.value.trim().length>0) value.strucnum=e.target.value                
                 if (props.onChange) props.onChange(value)
               }}/>
           }
           options={nfOptions}                   
           lincked                                   
-        />  
+        />
       </div>
-      <div className="p-paragraph-field  p-mb-2" key={`build_${value.buildnum}`} style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
-        <NullFlavorWrapper  checked={checked}                 
+      <div className="p-paragraph-field  p-mb-2" style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
+        <NullFlavorWrapper  checked={checked} key={`build_${checked}`}                
           label={<label htmlFor="buildnum">корп.</label>}
-          field={
+          field={ 
             <InputText id='buildnum'              
-              value={value.buildnum}                
+              value={value.buildnum || ''}                
               onChange={(e)=>{
-                value.buildnum=e.target.value                
+                if (e.target.value.trim().length>0) value.buildnum=e.target.value                
                 if (props.onChange) props.onChange(value)
               }}                  
             />
           }
           options={nfOptions}                   
           lincked                                   
-        />  
+        />
       </div>
       <div className="p-paragraph-field  p-mb-2" 
-       style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
-        <NullFlavorWrapper  checked={checked}                 
-          label={<label htmlFor="flat">квартира</label>}
+            style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
+        <NullFlavorWrapper  checked={checked} key={`flat_${checked}`}                
+          label={<label htmlFor="flat">квартира(офис)</label>}
           field={
             <InputText id='flat'               
-              value={value.flat}                  
+              value={value.flat || ''}                  
               onChange={(e)=>{
                 value.flat=e.target.value                
                 if (props.onChange) props.onChange(value)
@@ -321,14 +340,14 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           }
           options={nfOptions}                   
           lincked                                   
-        />  
+        />
       </div>
-      <div className="p-paragraph-field  p-mb-2" key={`postalCode_${value.postalCode}`} style={{marginLeft:'1.5rem'}}>
-        <NullFlavorWrapper  checked={checked}                 
+      <div className="p-paragraph-field  p-mb-2"  style={linkStyle}>
+        <NullFlavorWrapper  checked={checked} key={`postalCode_${checked}`}                
           label={<label htmlFor="postalCode">почтовый код</label>}
           field={
             <InputText id='postalCode' disabled={value.aoGUID!==undefined}              
-              value={value.postalCode}                  
+              value={value.postalCode || ""}                  
               onChange={(e)=>{
                 value.postalCode=e.target.value                
                 if (props.onChange) props.onChange(value)
@@ -337,10 +356,8 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           }
           options={nfOptions}                   
           lincked                                   
-        />  
-      </div>
-      
-    </>
-  )
+        />
+      </div>  
+  </>)
 }
 export default observer(AddressFC) 
