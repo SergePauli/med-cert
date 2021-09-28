@@ -30,6 +30,7 @@ export default class AddressStore {
     try {
       const response = await FiasService.searchBar(query, regionID)
       if (response.data.data) this._fiasOptions = response.data.data
+      else this._fiasOptions = []
       return this._fiasOptions
     } catch (e) {
       console.log(e)
@@ -45,7 +46,12 @@ export default class AddressStore {
     this._isLoding = true
     try {
       const response = await FiasService.getChildItems(parent, level, query)
-      if (response.data.data) this._fiasOptions = response.data.data
+      if (response.data.data)
+        this._fiasOptions = response.data.data.map((item) => {
+          if (item.level !== "building" && item.level !== "district") item.name = `${item.name} ${item.shortname}`
+          return item
+        })
+      else this._fiasOptions = []
       return this._fiasOptions
     } catch (e) {
       console.log(e)
@@ -81,6 +87,7 @@ export default class AddressStore {
     return this._fiasOptions
   }
   clear() {
+    if (this._address === undefined) return
     this._address.postalCode = undefined
     this._address.district = undefined
     this._address.city = undefined
