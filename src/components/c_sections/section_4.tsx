@@ -16,7 +16,7 @@ import NullFlavorWrapper from "../NullFlavorWrapper"
 const Section4: FC = () => {
   const { addressStore, certificateStore } = useContext(Context)
   const certificate = certificateStore.cert   
-  const address = certificate.death_addr 
+  const address = certificate.deathAddr 
   const identified = certificateStore.identified
   const checked = address !== undefined || certificate.nullFlavors().findIndex((item)=>item.parent_attr==='death_addr')===-1 
   const fromRelatives = certificateStore.fromRelatives
@@ -33,23 +33,23 @@ const Section4: FC = () => {
     certificate.deathAreaType = certificate.lifeAreaType
     const lAddress = certificate.patient.address 
     if (lAddress === undefined) {
-      certificate.death_addr = undefined
+      certificate.deathAddr = undefined
       if (addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
     } else {
-      if (certificate.death_addr === undefined ) certificate.death_addr = addressStore.address
-      certificate.death_addr.streetAddressLine = lAddress.streetAddressLine
-      certificate.death_addr.aoGUID = lAddress.aoGUID      
-      certificate.death_addr.buildnum = lAddress.buildnum
-      certificate.death_addr.city = lAddress.city
-      certificate.death_addr.district = lAddress.district
-      certificate.death_addr.flat = lAddress.flat
-      certificate.death_addr.houseGUID = lAddress.houseGUID
-      certificate.death_addr.housenum = lAddress.housenum
-      certificate.death_addr.postalCode = lAddress.postalCode
-      certificate.death_addr.state = lAddress.state
-      certificate.death_addr.street = lAddress.street
-      certificate.death_addr.strucnum = lAddress.strucnum
-      certificate.death_addr.town = lAddress.town      
+      if (certificate.deathAddr === undefined ) certificate.deathAddr = addressStore.address
+      certificate.deathAddr.streetAddressLine = lAddress.streetAddressLine
+      certificate.deathAddr.aoGUID = lAddress.aoGUID      
+      certificate.deathAddr.buildnum = lAddress.buildnum
+      certificate.deathAddr.city = lAddress.city
+      certificate.deathAddr.district = lAddress.district
+      certificate.deathAddr.flat = lAddress.flat
+      certificate.deathAddr.houseGUID = lAddress.houseGUID
+      certificate.deathAddr.housenum = lAddress.housenum
+      certificate.deathAddr.postalCode = lAddress.postalCode
+      certificate.deathAddr.state = lAddress.state
+      certificate.deathAddr.street = lAddress.street
+      certificate.deathAddr.strucnum = lAddress.strucnum
+      certificate.deathAddr.town = lAddress.town      
     }
     certificateStore.checkDeathArea()
     certificateStore.checkDeathAreaType()
@@ -64,14 +64,14 @@ const Section4: FC = () => {
              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) certificate.setNullFlavors(nullFlavors)                  
                 if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
-                else certificate.death_addr = undefined
+                else certificate.deathAddr = undefined
                 certificateStore.checkDeathArea()
               }} 
              nfValue={fromRelatives ? ASKU : UNK}
              field_name="death_addr"
              nullFlavors={certificate.nullFlavors()}             
              onChange={(value: Address)=>{
-               if (certificate.death_addr !== value) certificate.death_addr=value  
+               if (certificate.deathAddr !== value) certificate.deathAddr=value  
                certificateStore.checkDeathArea()            
               }}/>
         </div>
@@ -80,7 +80,7 @@ const Section4: FC = () => {
           <div className='p-paragraph-field' key={`dArea_${certificate.deathAreaType}`}>
             <NullFlavorWrapper                     
               label={<label htmlFor="urban">Местность</label>}
-              checked={identified || certificate.death_addr!==undefined}  
+              checked={identified || certificate.deathAddr!==undefined}  
               setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) certificate.setNullFlavors(nullFlavors)
                 if (!e.checked) certificate.deathAreaType = undefined

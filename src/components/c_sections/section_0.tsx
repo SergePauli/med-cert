@@ -29,11 +29,11 @@ import '../../styles/pages/CertificatePage.css'
             <label htmlFor="state">Вид свидетельства</label>
             <Dropdown inputId="state"  placeholder="Выбрать" autoFocus 
               options={CERT_TYPE.filter((item)=>"1 2".includes(item.code))} optionLabel="name"
-              value={cert.cert_type} onChange={(e) =>certificateStore.setCert_type(e.value)} required/>
+              value={cert.certType} onChange={(e) =>certificateStore.setCert_type(e.value)} required/>
           </div>
           <div className="p-field p-col-12 p-md-6">                    
             <label htmlFor="icon">Дата</label>
-            <Calendar id="icon"  dateFormat="dd/mm/yy" value={cert.eff_time} disabled showIcon />
+            <Calendar id="icon"  dateFormat="dd/mm/yy" value={cert.effTime} disabled showIcon />
           </div>
         </div>
         <Divider/>

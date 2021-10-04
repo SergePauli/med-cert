@@ -85,6 +85,30 @@ export const DEFAULT_CERT_SUGGESTIONS = [
     suggestion: "Вид места смерти или причина его отсутствия - обязательны для заполнения",
     done: false,
   },
+  {
+    section: "5",
+    code: "п.12",
+    suggestion: "Выбор места наступления смерти - обязателен для заполнения",
+    done: false,
+  },
+  {
+    section: "5",
+    code: "п.15",
+    suggestion: "Указание семейного положения или причины отсутствия информации - обязателено для заполнения",
+    done: false,
+  },
+  {
+    section: "5",
+    code: "п.16",
+    suggestion: "Указание образования или причины отсутствия информации - обязателено для заполнения",
+    done: false,
+  },
+  {
+    section: "5",
+    code: "п.17",
+    suggestion: "Указание занятости или причины отсутствия информации - обязателено для заполнения",
+    done: false,
+  },
 ]
 export const CERT_TYPE_SUG = 0
 export const PERSON_NAME_SUG = 1
@@ -102,6 +126,11 @@ export const LIFE_AREA_SUG = 13
 export const LIFE_PLACE_SUG = 12
 export const DEATH_AREA_SUG = 15
 export const DEATH_PLACE_SUG = 14
+export const DEATH_PLACE_TYPE_SUG = 16
+export const MARITAL_STATUS_SUG = 17
+export const EDUCATION_LEVEL_SUG = 18
+export const SOCIAL_STATUS_SUG = 19
+
 export const changeSuggestion = (code: string, suggestions: any[], done: boolean) => {
   const suggestion = suggestions.find((item) => item.code === code)
   if (suggestion) suggestion.done = done

@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import React, { FC, useContext, useState } from 'react'
+import { FC, useContext, useState } from 'react'
 import { Context } from '../..'
 import { InputText } from 'primereact/inputtext'
 import { Card } from 'primereact/card'
@@ -24,7 +24,7 @@ import Identity from '../../models/FormsData/Identity'
   const patient = certificate.patient
   const person =  patient.person     
   const [yearBTChecked, setYearBTChecked] = useState<boolean>(patient.birth_year!==undefined)   
-  const [yearDTChecked, setYearDTChecked] = useState<boolean>(certificate.death_year!==undefined) 
+  const [yearDTChecked, setYearDTChecked] = useState<boolean>(certificate.deathYear!==undefined) 
    
   const fioChecked = true
   const header = () => {
@@ -34,7 +34,7 @@ import Identity from '../../models/FormsData/Identity'
   const identified = certificateStore.identified && person.fio !== undefined
   const fio = person.fio ? {...person.fio} : {family:'', given_1:'', given_2:''}  
   const optionCode = certificateStore.fromRelatives ? 'ASKU' : 'NA'
-  const isDeathTime = certificate.death_datetime!==undefined 
+  const isDeathTime = certificate.deathDatetime!==undefined 
         && certificate.nullFlavors().findIndex((item)=>item.parent_attr==="death_time")===-1
   return (<>    
       <Card className="c-section p-mr-2 p-mb-2" header={header}>        
@@ -222,7 +222,7 @@ import Identity from '../../models/FormsData/Identity'
               <div className='p-paragraph-field p-mr-3 p-mb-2'>
                 <NullFlavorWrapper paraNum                   
                   label={<label htmlFor="dateDeath">Дата смерти</label>}                  
-                  checked={certificate.death_datetime!==undefined} setCheck={(e:CheckboxChangeParams, nullFlavors:      INullFlavor[] | undefined)=>{                   
+                  checked={certificate.deathDatetime!==undefined} setCheck={(e:CheckboxChangeParams, nullFlavors:      INullFlavor[] | undefined)=>{                   
                     if (!e.checked) certificateStore
                           .setDeathDay(undefined, false)                      
                     else certificateStore
@@ -233,7 +233,7 @@ import Identity from '../../models/FormsData/Identity'
                   field={<div className="p-d-flex p-jc-start p-ai-center">              
                       <Calendar id="dateDeath" className="p-mr-2" 
                         view={yearDTChecked ? "month" : "date"} dateFormat={yearDTChecked ? "yy" : "dd/mm/yy"} 
-                        value={certificate.death_datetime}
+                        value={certificate.deathDatetime}
                         onChange={(e)=>certificateStore
                           .setDeathDay(e.target.value as Date | undefined, yearDTChecked) 
                         } 
@@ -243,7 +243,7 @@ import Identity from '../../models/FormsData/Identity'
                           inputId="bd_year" 
                           onChange={e=>{ setYearDTChecked(e.checked)
                             certificateStore
-                          .setDeathDay(certificate.death_datetime as Date | undefined, e.checked)}}/>
+                          .setDeathDay(certificate.deathDatetime as Date | undefined, e.checked)}}/>
                         <label htmlFor="bd_year">Только год</label>
                       </div>
                     </div>}
@@ -265,7 +265,7 @@ import Identity from '../../models/FormsData/Identity'
                   onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.setNullFlavors(nullFlavors)}} 
                   field={ <Calendar id="timeDeath"  
                     timeOnly hourFormat="24"             
-                    value={certificate.death_datetime} 
+                    value={certificate.deathDatetime} 
                     showIcon />}
                   options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
                   value={UNK}

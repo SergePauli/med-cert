@@ -52,7 +52,7 @@ export default class CertificateStore {
     return this._cert
   }
   setCert_type(cert_type: IReference) {
-    this._cert.cert_type = cert_type
+    this._cert.certType = cert_type
     this.changeSuggestionsEntry(CERT_TYPE_SUG, false)
   }
   get identified() {
@@ -129,23 +129,23 @@ export default class CertificateStore {
   checkDeathDay() {
     const cert = this._cert
     const isDeathDay =
-      cert.death_datetime === undefined &&
+      cert.deathDatetime === undefined &&
       cert.nullFlavors().findIndex((element) => element.parent_attr === "death_datetime") === -1
     this.changeSuggestionsEntry(CERT_DEATH_THIME_SUG, isDeathDay)
   }
   setDeathDay(value: Date | undefined, isYear: boolean) {
     const cert = this._cert
     if (value && !isYear) {
-      cert.death_datetime = value
-      cert.death_year = undefined
+      cert.deathDatetime = value
+      cert.deathYear = undefined
       this.changeSuggestionsEntry(CERT_DEATH_THIME_SUG, false)
     } else if (value && isYear) {
-      cert.death_datetime = value
-      cert.death_year = (cert.death_datetime as Date).getFullYear()
+      cert.deathDatetime = value
+      cert.deathYear = (cert.deathDatetime as Date).getFullYear()
       this.changeSuggestionsEntry(CERT_DEATH_THIME_SUG, false)
     } else {
-      cert.death_datetime = undefined
-      cert.death_year = undefined
+      cert.deathDatetime = undefined
+      cert.deathYear = undefined
       this.checkDeathDay()
     }
   }
@@ -267,10 +267,10 @@ export default class CertificateStore {
 
   checkDeathArea() {
     const isDeathArea =
-      (this._cert.death_addr === undefined ||
-        this._cert.death_addr.aoGUID === undefined ||
-        this._cert.death_addr.postalCode === undefined ||
-        this._cert.death_addr.housenum === undefined) &&
+      (this._cert.deathAddr === undefined ||
+        this._cert.deathAddr.aoGUID === undefined ||
+        this._cert.deathAddr.postalCode === undefined ||
+        this._cert.deathAddr.housenum === undefined) &&
       this._cert.nullFlavors().findIndex((element) => element.parent_attr === "death_addr") === -1
     this.changeSuggestionsEntry(DEATH_PLACE_SUG, isDeathArea)
   }

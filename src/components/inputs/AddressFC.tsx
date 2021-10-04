@@ -49,8 +49,8 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
   useEffect(()=>setStreet(value.street?.name || ''), [value.street?.name])
   const [house, setHouse] = useState<string>(value.housenum || '')
   useEffect(()=>setHouse(value.housenum || ''), [value.housenum])
-  const [addresses, setAddresses] = useState(addressStore.fiasOptions)    
-  console.log('v_id',value.id)
+  const [addresses, setAddresses] = useState(addressStore.fiasOptions)   
+  
   const setAddress = (e:IFiasItem)=>{ 
     if (e === null) return      
     if (e.parent!==undefined) setAddress(e.parent)

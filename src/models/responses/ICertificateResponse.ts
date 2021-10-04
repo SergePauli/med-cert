@@ -13,7 +13,7 @@ export interface ICertificateResponse extends INullFlavorable {
   number_prev: string
   eff_time_prev: Date
   death_addr?: IAddress
-  policyOMS?: string
+  policy_OMS?: string
   patient: IPatient
   lifeAreaType?: number
   deathAreaType?: number
@@ -21,5 +21,10 @@ export interface ICertificateResponse extends INullFlavorable {
   death_year: number
   death_month: number
   death_day: number
+  death_place: number | undefined
+  marital_status: number | undefined
+  education_level: number | undefined
+  social_status: number | undefined
+  death_kind: number | undefined
   guid: string
 }
