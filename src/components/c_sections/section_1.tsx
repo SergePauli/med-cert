@@ -64,7 +64,7 @@ import Identity from '../../models/FormsData/Identity'
                     certificateStore.setBirthDay(patient.birth_date as Date | undefined, false)
                   }
                   patient.identity = undefined  
-                  patient.nullFlavors().push({parent_attr:'identity', value:ASKU})                 
+                  patient.nullFlavors().push({parent_attr:'identity', code:ASKU})                 
                 } else 
                   patient.identity = new Identity({identityCardType: ID_CARD_TYPES[PASSPORT_RF].code} as IIdentity)
                 certificateStore.checkIdentity() 

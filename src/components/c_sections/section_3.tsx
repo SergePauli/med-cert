@@ -34,7 +34,7 @@ const Section3: FC = () => {
           <div className='paragraph p-mr-1'>8.</div>
           <AddressFC key={`p8_${address?.id}_${address?.streetAddressLine}`}
              label="Место постоянного жительства(регистрации)"
-             checked={checked}  
+             checked={checked} paraNum 
              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) patient.setNullFlavors(nullFlavors)
                 if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })

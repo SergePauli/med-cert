@@ -156,7 +156,7 @@ import IIdentity from '../../models/IIdentity'
               </div>              
             </div>
             <div className="p-field p-d-flex p-jc-center">
-              <div className='paragraph p-mr-1'> 6. </div>
+              <div className='paragraph p-mr-1'>6.* </div>
               <div className='p-paragraph-field p-mr-3 p-mb-2'>
                 <NullFlavorWrapper  paraNum                   
                     label={<label htmlFor="policyOMS">Серия и номер полиса ОМС</label>}
@@ -176,8 +176,11 @@ import IIdentity from '../../models/IIdentity'
                     field_name="policy_OMS"
                     nullFlavors={certificate.nullFlavors()}
                 />
-              </div>     
-            </div>            
+              </div>                   
+            </div>  
+            <div className="p-field p-d-flex p-flex-wrap p-jc-start" style={{width: '98%', paddingLeft:'0.5rem'}} >
+              <em>* В случае смерти ребенка до года заполняется в отношении матери</em>
+            </div>          
           </div>          
       </Card>  
     </>)

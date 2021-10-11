@@ -70,7 +70,7 @@ export default class CertificateStore {
         )
       )
     else {
-      this._cert.patient.person.nullFlavors().push({ parent_attr: "person_name", value: NA })
+      this._cert.patient.person.nullFlavors().push({ parent_attr: "person_name", code: NA })
       this.fromRelatives = false
     }
     this.checkFio()

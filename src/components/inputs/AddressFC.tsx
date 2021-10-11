@@ -23,6 +23,7 @@ type AddressProps = {
   nfValue?:number
   field_name?:string    
   onChange?: ((value: Address)=>void)
+  paraNum?: boolean
 }
 const nfOptions = NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK NA".includes(item.code))
 
@@ -88,10 +89,10 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
       setRegion(regions?.find((region)=>region.code===value.state?.code))
     }    
     }, [regions, value, addressStore, region]) 
-  const linkStyle = {marginLeft:'1.5rem'}  
+  const linkStyle = props.paraNum ? {marginLeft:'1.5rem'} : {} 
   return (<>
       <div className='p-paragraph-field  p-mb-2' style={{ width:'90%'}}>
-        <NullFlavorWrapper checked={checked} paraNum
+        <NullFlavorWrapper checked={checked} paraNum={props.paraNum}
           label={<label>{props.label}</label>}  
           setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
                     { setChecked(e.checked)                      
@@ -129,7 +130,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           </div>}                   
         />
       </div>
-      <div className="p-paragraph-field p-mr-2 p-mb-2"  style={linkStyle}>      
+      <div className="p-paragraph-field p-mr-3 p-mb-2"  style={linkStyle}>      
         <NullFlavorWrapper  checked={checked}  key={`region_${checked}`}               
           label={<label htmlFor="region">субъект Российской Федерации</label>}
           field={ 
@@ -151,7 +152,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           lincked                                   
        />
       </div> 
-      <div className="p-paragraph-field p-mr-2 p-mb-2"  style={linkStyle}>
+      <div className="p-paragraph-field p-mr-3 p-mb-2">
         <NullFlavorWrapper  checked={checked} key={`district_${checked}`}                
           label={<label htmlFor="district">район</label>}
           field={
@@ -177,7 +178,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           lincked                                   
         />
       </div>
-      <div className="p-paragraph-field p-mb-2"  style={linkStyle}>
+      <div className="p-paragraph-field p-mr-3 p-mb-2" style={linkStyle}>
         <NullFlavorWrapper  checked={checked}  key={`city_${checked}`}                
           label={<label htmlFor="city">город</label>}
           field={
@@ -203,7 +204,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           lincked                                   
         />
       </div>
-      <div className="p-paragraph-field  p-mb-2"  style={linkStyle}>
+      <div className="p-paragraph-field p-mr-3 p-mb-2">
         <NullFlavorWrapper  checked={checked}  key={`town_${checked}`}               
           label={<label htmlFor="town">населенный пункт</label>}
           field={
@@ -230,7 +231,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           lincked                                   
         />
       </div>
-      <div className="p-paragraph-field  p-mb-2" style={linkStyle}>
+      <div className="p-paragraph-field p-mr-3 p-mb-2" style={linkStyle}>
         <NullFlavorWrapper  checked={checked} key={`street_${checked}`}                 
           label={<label htmlFor="street">улица</label>}
           field={
@@ -245,9 +246,9 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
               }}                       
               suggestions={addresses}
               completeMethod={async (e) =>{
-                let parent = value.state?.code               
-                if (value.city?.code) parent = value.city?.code  
-                if (value.district?.code) parent = value.district?.code 
+                let parent = value.state?.code 
+                if (value.district?.code) parent = value.district?.code              
+                if (value.city?.code) parent = value.city?.code                 
                 if (value.town?.code) parent = value.town?.code               
                 if (parent)  setAddresses(await addressStore.getChildItems(parent, 'street', e.query))                 
                 }}                                                   
@@ -257,7 +258,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           lincked                                   
         />
       </div>
-      <div className="p-paragraph-field  p-mb-2" style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
+      <div className="p-paragraph-field p-mr-3 p-mb-2" style={{ maxWidth:'7rem'}}>
         <NullFlavorWrapper  checked={checked} key={`housenum_${checked}`}                
           label={<label htmlFor="housenum">дом</label>}
           field={
@@ -280,9 +281,9 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
               }}                       
               suggestions={addresses}
               completeMethod={async (e) =>{
-                let parent = value.state?.code               
-                if (value.city?.code) parent = value.city?.code  
-                if (value.district?.code) parent = value.district?.code 
+                let parent = value.state?.code 
+                if (value.district?.code) parent = value.district?.code              
+                if (value.city?.code) parent = value.city?.code                 
                 if (value.town?.code) parent = value.town?.code
                 if (value.street?.code) parent = value.street?.code               
                 if (parent)  setAddresses(await addressStore.getChildItems(parent, 'building', e.query))                 
@@ -293,8 +294,8 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           lincked                                   
         /> 
       </div>
-      <div className="p-paragraph-field p-mb-2"  
-                  style={{marginLeft:'1.5rem', maxWidth:'7rem'}}> 
+      <div className="p-paragraph-field p-mr-3 p-mb-2"  
+                  style={{ maxWidth:'7rem'}}> 
         <NullFlavorWrapper  checked={checked} key={`struc_${checked}`}                
           label={<label htmlFor="strucnum">стр.</label>}
           field={
@@ -309,7 +310,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           lincked                                   
         />
       </div>
-      <div className="p-paragraph-field  p-mb-2" style={{marginLeft:'1.5rem', maxWidth:'7rem'}}>
+      <div className="p-paragraph-field p-mr-3 p-mb-2" style={{marginLeft: props.paraNum ? '1.5rem': '', maxWidth:'7rem'}}>
         <NullFlavorWrapper  checked={checked} key={`build_${checked}`}                
           label={<label htmlFor="buildnum">корп.</label>}
           field={ 
@@ -325,8 +326,8 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           lincked                                   
         />
       </div>
-      <div className="p-paragraph-field  p-mb-2" 
-            style={{marginLeft:'1.5rem', maxWidth:'9rem'}}>
+      <div className="p-paragraph-field p-mr-3 p-mb-2" 
+            style={{ maxWidth:'9rem'}}>
         <NullFlavorWrapper  checked={checked} key={`flat_${checked}`}                
           label={<label htmlFor="flat">квартира(офис)</label>}
           field={
@@ -342,7 +343,7 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
           lincked                                   
         />
       </div>
-      <div className="p-paragraph-field  p-mb-2"  style={linkStyle}>
+      <div className="p-paragraph-field p-mr-3 p-mb-2">
         <NullFlavorWrapper  checked={checked} key={`postalCode_${checked}`}                
           label={<label htmlFor="postalCode">почтовый код</label>}
           field={

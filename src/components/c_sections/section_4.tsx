@@ -15,9 +15,9 @@ import NullFlavorWrapper from "../NullFlavorWrapper"
 
 const Section4: FC = () => {
   const { addressStore, certificateStore } = useContext(Context)
-  const certificate = certificateStore.cert   
-  const address = certificate.deathAddr 
-  const identified = certificateStore.identified
+  const certificate = certificateStore.cert 
+  const identified = certificateStore.identified  
+  const address = certificate.deathAddr   
   const checked = address !== undefined || certificate.nullFlavors().findIndex((item)=>item.parent_attr==='death_addr')===-1 
   const fromRelatives = certificateStore.fromRelatives
   
@@ -60,7 +60,7 @@ const Section4: FC = () => {
         <div className="p-field p-d-flex p-flex-wrap p-jc-start" style={{width: '98%'}}>          
           <div className='paragraph p-mr-1'>10.</div>
           <AddressFC key={`p10_${address?.id}_${address?.streetAddressLine}`}
-             label="Место смерти" checked={checked}  
+             label="Место смерти" checked={checked} paraNum 
              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) certificate.setNullFlavors(nullFlavors)                  
                 if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })

@@ -20,7 +20,7 @@ $api.interceptors.response.use(
   (config) => config,
   async (error) => {
     const originalRequest = error.config
-    if (error.response.status === 401 && error.config && !error.config._isRetry) {
+    if (error.response?.status === 401 && error.config && !error.config._isRetry) {
       originalRequest._isRetry = true
       try {
         const response = await axios.get<AuthResponse>(`${API_URL}auth/refresh`, { withCredentials: true })
@@ -29,7 +29,7 @@ $api.interceptors.response.use(
       } catch (e) {
         throw new Error("API error 401, Сеанс не авторизован")
       }
-    } else if ([406, 422].includes(error.response.status)) {
+    } else if ([406, 422].includes(error.response?.status)) {
       if (error.response.data && error.response.data.errors) {
         let message = error.response.data.errors.reduce((result: string, element: string) => {
           result = `${result}, ${element}`
