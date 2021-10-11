@@ -1,3 +1,4 @@
+import { IChildInfo } from "../IChildInfo"
 import { INullFlavorable } from "../INullFlavorable"
 import { IPatient } from "../IPatient"
 import { IReference } from "../IReference"
@@ -26,5 +27,6 @@ export interface ICertificateResponse extends INullFlavorable {
   education_level: number | undefined
   social_status: number | undefined
   death_kind: number | undefined
+  child_info?: IChildInfo | undefined
   guid: string
 }
