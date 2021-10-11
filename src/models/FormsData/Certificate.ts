@@ -4,6 +4,7 @@ import { INullFlavor } from "../INullFlavor"
 import { IReference } from "../IReference"
 import { ICertificateResponse } from "../responses/ICertificateResponse"
 import Address from "./Address"
+import { ChildInfo } from "./ChildInfo"
 import Patient from "./Patient"
 
 export default class Certificate {
@@ -30,6 +31,7 @@ export default class Certificate {
   private _deathAddr?: Address
   private _guid: string
   private _policyOMS?: string | undefined
+  private _childInfo?: ChildInfo | undefined
   private _nullFlavors: INullFlavor[]
   constructor(props: ICertificateResponse) {
     this._guid = props.guid || uuidv4()
@@ -52,6 +54,7 @@ export default class Certificate {
     if (props.education_level) this._educationLevel = props.education_level
     if (props.marital_status) this._maritalStatus = props.marital_status
     if (props.social_status) this._socialStatus = props.social_status
+    if (props.child_info) this._childInfo = new ChildInfo(props.child_info)
     makeAutoObservable(this)
   }
   get id() {
@@ -190,5 +193,38 @@ export default class Certificate {
   }
   set deathMonth(value: number | undefined) {
     this._deathMonth = value
+  }
+  get childInfo(): ChildInfo | undefined {
+    return this._childInfo
+  }
+  set childInfo(value: ChildInfo | undefined) {
+    this._childInfo = value
+  }
+  milisecAge() {
+    // Discard the time and time-zone information.
+    const a = this._patient.birth_date as Date
+    if (a === undefined) return false
+    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())
+    const b = this._deathDatetime as Date
+    if (b === undefined) return false
+    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate())
+    return utc2 - utc1
+  }
+  hoursAge() {
+    const _MS_PER_HOUR = 1000 * 60 * 60
+    const ms = this.milisecAge()
+    if (ms) return Math.floor(ms / _MS_PER_HOUR)
+    else return false
+  }
+  daysAge() {
+    const _MS_PER_DAY = 1000 * 60 * 60 * 24
+    const ms = this.milisecAge()
+    if (ms) return Math.floor(ms / _MS_PER_DAY)
+    else return false
+  }
+  yearsAge() {
+    const ms = this.milisecAge()
+    if (ms) return (this._deathDatetime as Date).getFullYear() - (this._patient.birth_date as Date).getFullYear()
+    else return false
   }
 }
