@@ -93,20 +93,57 @@ export const DEFAULT_CERT_SUGGESTIONS = [
   },
   {
     section: "5",
+    code: "п.13",
+    suggestion: "Выбор срока береммености для детей от 168 ч до 1месяца  - обязателен для заполнения",
+    done: true,
+  },
+  {
+    section: "5",
+    code: "п.14.1",
+    suggestion: "Внесение весса для детей от 168 ч до года  - обязателено для заполнения",
+    done: true,
+  },
+  {
+    section: "5",
+    code: "п.14.2",
+    suggestion:
+      "Внесение порядкового номера беременности матери для детей от 168 ч до года  - обязателено для заполнения",
+    done: true,
+  },
+  {
+    section: "5",
+    code: "п.14.3",
+    suggestion: "Внесение ФИО матери для детей от 168 ч до года  - обязателено для заполнения",
+    done: true,
+  },
+  {
+    section: "5",
+    code: "п.14.4",
+    suggestion: "Внесение даты рождения матери для детей от 168 ч до года  - обязателено для заполнения",
+    done: true,
+  },
+  {
+    section: "5",
+    code: "п.14.5",
+    suggestion: "Внесение адреса жительства матери для детей от 168 ч до года  - обязателено для заполнения",
+    done: true,
+  },
+  {
+    section: "5",
     code: "п.15",
-    suggestion: "Указание семейного положения или причины отсутствия информации - обязателено для заполнения",
+    suggestion: "Указание семейного положения - обязателено для заполнения",
     done: false,
   },
   {
     section: "5",
     code: "п.16",
-    suggestion: "Указание образования или причины отсутствия информации - обязателено для заполнения",
+    suggestion: "Указание образования - обязателено для заполнения",
     done: false,
   },
   {
     section: "5",
     code: "п.17",
-    suggestion: "Указание занятости или причины отсутствия информации - обязателено для заполнения",
+    suggestion: "Указание занятости - обязателено для заполнения",
     done: false,
   },
 ]
@@ -124,12 +161,18 @@ export const SNILS_SUG = 10
 export const OMS_SUG = 11
 export const LIFE_AREA_SUG = 13
 export const LIFE_PLACE_SUG = 12
-export const DEATH_AREA_SUG = 15
 export const DEATH_PLACE_SUG = 14
+export const DEATH_AREA_SUG = 15
 export const DEATH_PLACE_TYPE_SUG = 16
-export const MARITAL_STATUS_SUG = 17
-export const EDUCATION_LEVEL_SUG = 18
-export const SOCIAL_STATUS_SUG = 19
+export const TERMS_PREGNANCY_SUG = 17
+export const CHILD_WEIGHT_SUG = 18
+export const NUMBER_PREGNANCY_SUG = 19
+export const MOTHER_FIO_SUG = 20
+export const MOTHER_BIRTHDAY_SUG = 21
+export const MOTHER_ADDRESS_SUG = 22
+export const MARITAL_STATUS_SUG = 23
+export const EDUCATION_LEVEL_SUG = 24
+export const SOCIAL_STATUS_SUG = 25
 
 export const changeSuggestion = (code: string, suggestions: any[], done: boolean) => {
   const suggestion = suggestions.find((item) => item.code === code)
