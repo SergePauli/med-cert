@@ -20,6 +20,7 @@ import Section2 from '../components/c_sections/section_2'
 import Section3 from '../components/c_sections/section_3'
 import Section4 from '../components/c_sections/section_4'
 import Section5 from '../components/c_sections/section_5'
+import Section6 from '../components/c_sections/section_6'
 import { Context } from '..'
 import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
@@ -42,6 +43,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       case "?q=3": return <Section3 />
       case "?q=4": return <Section4 />
       case "?q=5": return <Section5 />
+      case "?q=6": return <Section6 />
       default: return <Section0 /> 
     } 
   }    
@@ -53,9 +55,9 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
     return {
       'p-suggestion-actual': !data.done
     }
-  }  
-  const suggestionHeader = () => {
-    const sugCount = certificateStore.redSuggestionsCount()
+  } 
+  const sugCount = certificateStore.redSuggestionsCount() 
+  const suggestionHeader = () => {    
     const avatar = sugCount === 0 ? <Avatar icon="pi pi-check" shape="circle" style={{ height:'1.5rem', width: '1.5rem',backgroundColor: 'rgb(104 159 56)', color: 'white'}}/> : <Badge value={sugCount}  style={{ backgroundColor: 'rgb(204, 0, 0)', color: 'white', marginLeft: '4px'}}/>
     return <><span>Контроль заполнения</span>{avatar}</>
   }
@@ -69,7 +71,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
     content:(<>
       <div className="p-d-flex p-jc-center">
         {secton_router()}
-        <Card className="p-mr-2 p-mb-2 p-suggestion" header={suggestionHeader}>            
+        <Card className="p-mr-2 p-mb-2 p-suggestion" key={`p_sug_${sugCount}`} header={suggestionHeader}>            
             <DataTable className="p-datatable-sm" rowClassName={rowClass} 
             value={suggestions}>
               <Column field="code" header="Код"></Column>
