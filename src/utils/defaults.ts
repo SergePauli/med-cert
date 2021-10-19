@@ -146,6 +146,31 @@ export const DEFAULT_CERT_SUGGESTIONS = [
     suggestion: "Указание занятости - обязателено для заполнения",
     done: false,
   },
+  {
+    section: "6",
+    code: "п.18",
+    suggestion: "Указание рода причины смерти - обязателено для заполнения",
+    done: false,
+  },
+  {
+    section: "6",
+    code: "п.19",
+    suggestion:
+      "Указание указать дату, время и обстоятельства травмы (отравления), в случае смерти не от заболевания - обязателено для заполнения",
+    done: false,
+  },
+  {
+    section: "6",
+    code: "п.20",
+    suggestion: "Указание типа медицинского работника, установившего причины смерти - обязателено для заполнения",
+    done: false,
+  },
+  {
+    section: "6",
+    code: "п.21",
+    suggestion: "Указание основание установления причины смерти - обязателено для заполнения",
+    done: false,
+  },
 ]
 export const CERT_TYPE_SUG = 0
 export const PERSON_NAME_SUG = 1
@@ -173,6 +198,10 @@ export const MOTHER_ADDRESS_SUG = 22
 export const MARITAL_STATUS_SUG = 23
 export const EDUCATION_LEVEL_SUG = 24
 export const SOCIAL_STATUS_SUG = 25
+export const DEATH_KINDS_SUG = 26
+export const KIND_DEATH_REASON_SUG = 27
+export const EST_MEDIC_SUG = 28
+export const BASIS_DERMINING_SUG = 29
 
 export const changeSuggestion = (code: string, suggestions: any[], done: boolean) => {
   const suggestion = suggestions.find((item) => item.code === code)
