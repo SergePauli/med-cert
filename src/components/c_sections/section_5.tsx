@@ -7,7 +7,7 @@ import '../../styles/components/RadioButton.css'
 import '../../styles/components/Calendar.css'
 import '../../styles/pages/CertificatePage.css'
 import NullFlavorWrapper from '../NullFlavorWrapper'
-import { DEATH_PLACE_TYPE_SUG, EDUCATION_LEVEL_SUG, MARITAL_STATUS_SUG, NA, NULL_FLAVORS, SOCIAL_STATUS_SUG, TERMS_PREGNANCY_SUG } from '../../utils/defaults'
+import { NA, NULL_FLAVORS } from '../../utils/defaults'
 import { IReference } from '../../models/IReference'
 
 import { Dropdown } from 'primereact/dropdown'
@@ -38,22 +38,8 @@ import { MotherInfo } from '../MotherInfo'
     if (isChildInfo && certificate.childInfo===undefined) 
      certificate.childInfo = new ChildInfo({certificate_id: certificate.id} as IChildInfo)
     else if (!isChildInfo && certificate.childInfo!==undefined) certificate.childInfo = undefined
-  },[isChildInfo,certificate, certificateStore.changeSuggestionsEntry])  
-  const checkDeathPlaceType = () =>{
-    certificateStore.changeSuggestionsEntry(DEATH_PLACE_TYPE_SUG, certificate.deathPlace === undefined)
-  }
-  const checkTermPregnancy = () =>{
-      certificateStore.changeSuggestionsEntry(TERMS_PREGNANCY_SUG, certificate.childInfo!==undefined && certificate.childInfo.termPregnancy === undefined)
-    }
-  const checkEducationLevel = () =>{
-    certificateStore.changeSuggestionsEntry(EDUCATION_LEVEL_SUG, certificate.educationLevel === undefined)
-  }
-  const checkMaritalStatus = () =>{
-    certificateStore.changeSuggestionsEntry(MARITAL_STATUS_SUG, certificate.maritalStatus === undefined)
-  }
-  const checkSocialStatus = () =>{
-    certificateStore.changeSuggestionsEntry(SOCIAL_STATUS_SUG, certificate.socialStatus === undefined)
-  }
+  },[isChildInfo,certificate]) 
+  
   const childInfo = certificate.childInfo 
   useEffect(()=>{    
     if (!isMonthChild && childInfo) childInfo.termPregnancy = undefined
@@ -61,8 +47,7 @@ import { MotherInfo } from '../MotherInfo'
       childInfo.weight = undefined
       childInfo.whichAccount = undefined
       childInfo.relatedSubject = undefined
-    }
-    certificateStore.changeSuggestionsEntry(TERMS_PREGNANCY_SUG, (isMonthChild && (childInfo===undefined || childInfo.termPregnancy === undefined)))
+    }    
   }, [isMonthChild, childInfo, isChildInfo, certificateStore])
   const ddStyle = {minWidth:'210px', maxWidth:'500px', marginTop: '0.5rem', marginLeft: '-0.75rem'}
   const dDivStyle = {paddingTop: '0.1rem'}
@@ -78,8 +63,7 @@ import { MotherInfo } from '../MotherInfo'
                   options={DEAD_PLACE_TYPES} optionLabel="name" autoFocus
                   value={DEAD_PLACE_TYPES.find((item)=>item.code === certificate.deathPlace)} 
                   onChange={(e) =>{
-                    certificate.deathPlace = e.value.code
-                    checkDeathPlaceType()
+                    certificate.deathPlace = e.value.code                    
                   }} />
               </div>  
             </div> 
@@ -89,9 +73,8 @@ import { MotherInfo } from '../MotherInfo'
                 <NullFlavorWrapper  checked={isMonthChild}  key={`MonthChild_${isMonthChild}`} 
                   disabled
                   setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                            if (nullFlavors) certificate.setNullFlavors(nullFlavors)                  
-                            if (!e.checked)  certificate.childInfo = undefined
-                              checkTermPregnancy()
+                            if (nullFlavors && certificate.childInfo) certificate.childInfo.nullFlavors = nullFlavors                  
+                            if (!e.checked)  certificate.childInfo = undefined                              
                             }}            
                   label={<label htmlFor="MonthChild">Для детей, умерших в возрасте от 168 час. до 1 месяца</label>}
                   field={<Dropdown inputId="MonthChild"  placeholder="Выбрать" autoFocus 
@@ -99,12 +82,11 @@ import { MotherInfo } from '../MotherInfo'
                     options={TERMS_PREGNANCY} optionLabel="name"
                     value={TERMS_PREGNANCY.find((item)=>item.code === certificate.childInfo?.termPregnancy)} 
                     onChange={(e) =>{                      
-                      if (certificate.childInfo) certificate.childInfo.termPregnancy = e.value.code 
-                      checkTermPregnancy()                    
+                      if (certificate.childInfo) certificate.childInfo.termPregnancy = e.value.code                                          
                     }} />}
                   options={options} 
                   value={defaultCode} 
-                  nullFlavors={certificate.nullFlavors()}  
+                  nullFlavors={certificate.childInfo?.nullFlavors}  
                   field_name="term_pregnancy" paraNum 
                 />    
               </div>  
@@ -115,9 +97,8 @@ import { MotherInfo } from '../MotherInfo'
                 <NullFlavorWrapper  checked={isChildInfo}  key={`YearChild_${isChildInfo}`} 
                   disabled
                   setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                            if (nullFlavors) certificate.setNullFlavors(nullFlavors)                  
+                            if (nullFlavors) certificate.nullFlavors = nullFlavors                  
                               certificate.maritalStatus = undefined
-                              checkMaritalStatus()
                             }}            
                   label={<label htmlFor="YearChild">Для детей, умерших в возрасте от 168 час. до 1 года</label>}
                   field={<MotherInfo childInfo={childInfo} onChange={(chInf: ChildInfo)=>{
@@ -125,7 +106,7 @@ import { MotherInfo } from '../MotherInfo'
                   }} />}
                   options={options} 
                   value={defaultCode} 
-                  nullFlavors={certificate.nullFlavors()}  
+                  nullFlavors={certificate.nullFlavors}  
                   field_name="related_subject" paraNum 
                 />    
               </div>  
@@ -138,9 +119,7 @@ import { MotherInfo } from '../MotherInfo'
                   placeholder="Выбрать" autoFocus 
                   options={MARITAL_STATUSES} optionLabel="name"
                   value={MARITAL_STATUSES.find((item)=>item.code === certificate.maritalStatus)} 
-                  onChange={(e) =>{certificate.maritalStatus= e.value.code
-                      checkMaritalStatus()
-                  }} 
+                  onChange={(e) =>{certificate.maritalStatus= e.value.code}} 
                 />                    
               </div>  
             </div>
@@ -152,10 +131,7 @@ import { MotherInfo } from '../MotherInfo'
                   placeholder="Выбрать" autoFocus 
                   options={EDUCATION_LEVELS} optionLabel="name"
                   value={EDUCATION_LEVELS.find((item)=>item.code === certificate.educationLevel)} 
-                  onChange={(e) =>{
-                    certificate.educationLevel = e.value.code
-                    checkEducationLevel()
-                  }} 
+                  onChange={(e) =>{certificate.educationLevel = e.value.code}} 
                 />   
               </div>  
             </div>
@@ -167,10 +143,7 @@ import { MotherInfo } from '../MotherInfo'
                   placeholder="Выбрать" autoFocus 
                   options={SOCIAL_STATUSES} optionLabel="name"
                   value={SOCIAL_STATUSES.find((item)=>item.code === certificate.socialStatus)} 
-                  onChange={(e) =>{
-                    certificate.socialStatus = e.value.code
-                    checkSocialStatus()
-                  }} 
+                  onChange={(e) => {certificate.socialStatus = e.value.code}} 
                 />    
               </div>  
             </div> 

@@ -97,4 +97,21 @@ export default class Patient {
   set address(value: Address | undefined) {
     this._address = value
   }
+
+  setBirthDay(value: Date | undefined, isYear: boolean) {
+    if (value && !isYear) {
+      if (this._birth_date === undefined)
+        this.setNullFlavors(this.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
+      this.birth_date = value
+      this.birth_year = undefined
+    } else if (value && isYear) {
+      if (this.birth_date === undefined)
+        this.setNullFlavors(this.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
+      this.birth_date = value
+      this.birth_year = (this.birth_date as Date).getFullYear()
+    } else {
+      this.birth_date = undefined
+      this.birth_year = undefined
+    }
+  }
 }

@@ -19,7 +19,8 @@ import '../../styles/pages/CertificatePage.css'
         <div className="p-fluid p-formgrid p-grid">
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="firstname6">Серия</label>
-            <InputText id="firstname6" value={cert.series} disabled type="text" placeholder='Заполняется автоматически' />
+            <InputText id="firstname6" value={cert.series} disabled type="text" 
+              placeholder='Заполняется автоматически' />
           </div>
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="lastname6">Номер</label>
@@ -29,7 +30,7 @@ import '../../styles/pages/CertificatePage.css'
             <label htmlFor="state">Вид свидетельства</label>
             <Dropdown inputId="state"  placeholder="Выбрать" autoFocus 
               options={CERT_TYPE.filter((item)=>"1 2".includes(item.code))} optionLabel="name"
-              value={cert.certType} onChange={(e) =>certificateStore.setCert_type(e.value)} required/>
+              value={cert.certType} onChange={(e) =>certificateStore.cert.certType = e.value} />
           </div>
           <div className="p-field p-col-12 p-md-6">                    
             <label htmlFor="icon">Дата</label>

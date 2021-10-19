@@ -38,15 +38,13 @@ const Section3: FC = () => {
              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) patient.setNullFlavors(nullFlavors)
                 if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
-                else patient.address = undefined
-                certificateStore.checkLifeArea()
+                else patient.address = undefined                
               }} 
              nfValue={fromRelatives ? ASKU : UNK}
              field_name="addr"
              nullFlavors={patient.nullFlavors()}             
              onChange={(value: Address)=>{
-               if (patient.address !== value) patient.address=value
-               certificateStore.checkLifeArea()             
+               if (patient.address !== value) patient.address=value                            
               }}/>
         </div>
         <div className="p-d-flex p-jc-center">          
@@ -55,19 +53,17 @@ const Section3: FC = () => {
             <NullFlavorWrapper                     
               label={<label htmlFor="urban">Местность</label>}
               checked={identified || patient.address!==undefined}  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                if (nullFlavors) certificate.setNullFlavors(nullFlavors)
-                if (!e.checked) certificate.lifeAreaType = undefined
-                certificateStore.checkLifeAreaType()
+                if (nullFlavors) certificate.nullFlavors = nullFlavors
+                if (!e.checked) certificate.lifeAreaType = undefined                
               }} 
-              onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.setNullFlavors(nullFlavors)}}
+              onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
               field={<AreaType value={certificate.lifeAreaType} onChange={(value: number | undefined)=>{
-                certificate.lifeAreaType = value
-                certificateStore.checkLifeAreaType()
+                certificate.lifeAreaType = value                
               }}/>}
               options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
               value={fromRelatives ? ASKU : UNK}
               field_name="life_area_type"
-              nullFlavors={certificate.nullFlavors()}
+              nullFlavors={certificate.nullFlavors}
             />                  
           </div>
         </div>

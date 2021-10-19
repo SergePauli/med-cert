@@ -18,7 +18,7 @@ const Section4: FC = () => {
   const certificate = certificateStore.cert 
   const identified = certificateStore.identified  
   const address = certificate.deathAddr   
-  const checked = address !== undefined || certificate.nullFlavors().findIndex((item)=>item.parent_attr==='death_addr')===-1 
+  const checked = address !== undefined || certificate.nullFlavors.findIndex((item)=>item.parent_attr==='death_addr')===-1 
   const fromRelatives = certificateStore.fromRelatives
   
   useEffect(()=>{ 
@@ -50,9 +50,7 @@ const Section4: FC = () => {
       certificate.deathAddr.street = lAddress.street
       certificate.deathAddr.strucnum = lAddress.strucnum
       certificate.deathAddr.town = lAddress.town      
-    }
-    certificateStore.checkDeathArea()
-    certificateStore.checkDeathAreaType()
+    }    
   }
   return (<>    
     <Card className="c-section p-mr-2 p-mb-2" header={header}>        
@@ -62,17 +60,15 @@ const Section4: FC = () => {
           <AddressFC key={`p10_${address?.id}_${address?.streetAddressLine}`}
              label="Место смерти" checked={checked} paraNum 
              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                if (nullFlavors) certificate.setNullFlavors(nullFlavors)                  
+                if (nullFlavors) certificate.nullFlavors = nullFlavors
                 if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
-                else certificate.deathAddr = undefined
-                certificateStore.checkDeathArea()
+                else certificate.deathAddr = undefined                
               }} 
              nfValue={fromRelatives ? ASKU : UNK}
              field_name="death_addr"
-             nullFlavors={certificate.nullFlavors()}             
+             nullFlavors={certificate.nullFlavors}             
              onChange={(value: Address)=>{
-               if (certificate.deathAddr !== value) certificate.deathAddr=value  
-               certificateStore.checkDeathArea()            
+               if (certificate.deathAddr !== value) certificate.deathAddr=value               
               }}/>
         </div>
         <div className="p-d-flex p-jc-center">          
@@ -82,19 +78,17 @@ const Section4: FC = () => {
               label={<label htmlFor="urban">Местность</label>}
               checked={identified || certificate.deathAddr!==undefined}  
               setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                if (nullFlavors) certificate.setNullFlavors(nullFlavors)
+                if (nullFlavors) certificate.nullFlavors = nullFlavors
                 if (!e.checked) certificate.deathAreaType = undefined
-                certificateStore.checkDeathAreaType()
               }} 
-              onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.setNullFlavors(nullFlavors)}}
+              onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
               field={<AreaType value={certificate.deathAreaType} onChange={(value: number | undefined)=>{
                 certificate.deathAreaType = value
-                certificateStore.checkDeathAreaType()
               }}/>}
               options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
               value={fromRelatives ? ASKU : UNK}
               field_name="death_area_type"
-              nullFlavors={certificate.nullFlavors()}
+              nullFlavors={certificate.nullFlavors}
             />                  
           </div>
         </div>

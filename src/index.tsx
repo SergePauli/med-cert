@@ -9,7 +9,7 @@ interface IState{
   userStore: UserStore
   layoutStore: LayoutStore
   certificateStore: CertificateStore
-  addressStore: AddressStore
+  addressStore: AddressStore  
 }
 const userStore = new UserStore()
 const layoutStore = new LayoutStore()

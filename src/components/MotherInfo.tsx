@@ -9,7 +9,7 @@ import { INullFlavor } from '../models/INullFlavor'
 import { IPersonName } from '../models/IPersonName'
 import { IReference } from '../models/IReference'
 import { IRelatedSubject } from '../models/IRelatedSubject'
-import { CHILD_WEIGHT_SUG, MOTHER_ADDRESS_SUG, MOTHER_BIRTHDAY_SUG, MOTHER_FIO_SUG, NULL_FLAVORS, NUMBER_PREGNANCY_SUG, UNK } from '../utils/defaults'
+import {  NULL_FLAVORS, UNK } from '../utils/defaults'
 import { CheckboxChangeParams } from 'primereact/checkbox'
 import { Calendar } from 'primereact/calendar'
 import AddressFC from './inputs/AddressFC'
@@ -27,13 +27,10 @@ export const MotherInfo = (props: MotherInfoProps) => {
   const [fio, setFio] = useState('')
   const [childInfo] = useState(props.childInfo || new ChildInfo({} as IChildInfo))
   const [relatedSubject] = useState(childInfo.relatedSubject || new RelatedSubject({} as IRelatedSubject))
-  const checkChildWeight = () => {
-     certificateStore.changeSuggestionsEntry(CHILD_WEIGHT_SUG, childInfo.weight === undefined)
-  }
+  
   useEffect(()=>{       
       if (childInfo.relatedSubject!==relatedSubject) childInfo.relatedSubject = relatedSubject
-      setFio(relatedSubject.fio ? `${relatedSubject.fio.family} ${relatedSubject.fio.given_1} ${relatedSubject.fio?.given_2}` : '')   
-      certificateStore.changeSuggestionsEntry(CHILD_WEIGHT_SUG, childInfo.weight === undefined)
+      setFio(relatedSubject.fio ? `${relatedSubject.fio.family} ${relatedSubject.fio.given_1} ${relatedSubject.fio?.given_2}` : '')      
     },[certificateStore, childInfo, relatedSubject])         
     const options = NULL_FLAVORS.filter((item:IReference)=>"UNK".includes(item.code))
     const address = relatedSubject.addr   
@@ -41,24 +38,8 @@ export const MotherInfo = (props: MotherInfoProps) => {
     useEffect(()=>{ 
     if (checked && address) addressStore.address = address
     else if (checked && addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })   
-    },[addressStore, address, checked]) 
+    },[addressStore, address, checked])    
     
-    
-    const checkChildWhichAccount = () =>{
-      certificateStore.changeSuggestionsEntry(NUMBER_PREGNANCY_SUG, childInfo.whichAccount === undefined)
-    }
-    const checkMotherBirthTime = () =>{
-      certificateStore.changeSuggestionsEntry(MOTHER_BIRTHDAY_SUG, relatedSubject.birthTime === undefined &&
-        relatedSubject.nullFlavors.findIndex((item)=>item.parent_attr==='birthTime')===-1)
-    }
-    const checkMotherFIO = () =>{
-      certificateStore.changeSuggestionsEntry(MOTHER_FIO_SUG, relatedSubject.fio === undefined &&
-      relatedSubject.nullFlavors.findIndex((item)=>item.parent_attr==='person_name')===-1)
-    }
-    const checkMotherAddress = () =>{
-      certificateStore.changeSuggestionsEntry(MOTHER_ADDRESS_SUG, (relatedSubject.addr === undefined || (relatedSubject.addr.houseGUID === undefined && relatedSubject.addr.housenum ===undefined)) &&
-      relatedSubject.nullFlavors.findIndex((item)=>item.parent_attr==='addr')===-1)
-    }
     return ( <>
       <div className="p-field p-grid" style={{width:'90%'}}>
         <label htmlFor="weight" 
@@ -66,8 +47,7 @@ export const MotherInfo = (props: MotherInfoProps) => {
         <div className="p-col">
           <InputNumber  id="weight" value={childInfo.weight} max={9999} min={10} 
             onChange={(e)=>{
-              childInfo.weight=e.value
-              checkChildWeight()
+              childInfo.weight=e.value              
             }}
           type="text"/>
         </div>
@@ -77,8 +57,7 @@ export const MotherInfo = (props: MotherInfoProps) => {
         <div className="p-col">
           <InputNumber  id="which_account" max={99} min={1}
             onChange={(e)=>{
-              childInfo.whichAccount=e.value
-              checkChildWhichAccount()
+              childInfo.whichAccount=e.value              
             }} 
             value={childInfo.whichAccount} type="text"/>
         </div>
@@ -91,8 +70,7 @@ export const MotherInfo = (props: MotherInfoProps) => {
                 relatedSubject.fio = undefined                
                 props.onChange(childInfo) 
               }
-              if (nullFlavors) relatedSubject.nullFlavors = nullFlavors 
-              checkMotherFIO()
+              if (nullFlavors) relatedSubject.nullFlavors = nullFlavors              
             }}                 
           label={<label htmlFor="fio">Фамилия матери, имя, отчество(при наличии)</label>}
           field={<InputText  id="fio" type="text" 
@@ -104,8 +82,7 @@ export const MotherInfo = (props: MotherInfoProps) => {
                       const temp = {family: values[0], given_1: values[1]} as IPersonName
                       if (values[2]) temp.given_2 = values[2]
                       relatedSubject.fio = temp
-                      props.onChange(childInfo)
-                      checkMotherFIO()
+                      props.onChange(childInfo)                     
                     }                                        
                   }}/>}                  
           options={options} 
@@ -121,16 +98,14 @@ export const MotherInfo = (props: MotherInfoProps) => {
                       if (!e.checked) {                        
                         relatedSubject.birthTime = undefined                        
                       } 
-                      if (nullFlavors) relatedSubject.nullFlavors = nullFlavors    
-                      checkMotherBirthTime()
+                      if (nullFlavors) relatedSubject.nullFlavors = nullFlavors
                     }} 
           onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{
             if (nullFlavors) relatedSubject.nullFlavors = nullFlavors}}
           field={<Calendar id="dateBirth" showIcon                                            
                   value={relatedSubject.birthTime} 
                   onChange={(e)=>{
-                    relatedSubject.birthTime = e.target.value as Date | undefined 
-                    checkMotherBirthTime()
+                    relatedSubject.birthTime = e.target.value as Date | undefined
                   }}                         
                 />}
           options={options} 
@@ -146,14 +121,12 @@ export const MotherInfo = (props: MotherInfoProps) => {
                 if (nullFlavors) relatedSubject.nullFlavors = nullFlavors                  
                 if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
                 else relatedSubject.addr = undefined
-                checkMotherAddress()
         }} 
         nfValue={UNK}
         field_name="addr"
         nullFlavors={relatedSubject.nullFlavors}             
         onChange={(value: Address)=>{
-          if (relatedSubject.addr !== value) relatedSubject.addr=value  
-          checkMotherAddress()                 
+          if (relatedSubject.addr !== value) relatedSubject.addr=value 
         }}
       />
       </div>          

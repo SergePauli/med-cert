@@ -33,15 +33,15 @@ import IIdentity from '../../models/IIdentity'
   const person =  patient.person   
   const nullFlavorOption =  docChecked ? "UNK" : "ASKU" 
   const seriesProps = {type:"text", id:"series", value:identity?.series,                  
-      onChange:(e:any)=>{if (identity) certificateStore.setIDSeries(e.target.value) }}  
+      onChange:(e:any)=>{if (identity) identity.series = e.target.value }}  
   const seriesField = dul_value?.s_mask ? <InputMask {...{mask:dul_value?.s_mask,...seriesProps} as InputMaskProps }/>
     : <InputText {...seriesProps}/>   
   const numberProps = {type:"text", id:"docNumber", value:identity?.number,                  
-      onChange:(e:any)=>{if (identity) certificateStore.setIDNumber(e.target.value) }}  
+      onChange:(e:any)=>{if (identity) identity.number = e.target.value }}  
   const numberField = dul_value?.n_mask ? <InputMask {...{mask:dul_value?.n_mask,...numberProps} as InputMaskProps }/>
     : <InputText {...numberProps}/> 
   const depCodeProps = {type:"text", id:"depCode", value:identity?.issueOrgCode,                  
-      onChange:(e:any)=>{if (identity) certificateStore.setIORGCODE(e.target.value)}}  
+      onChange:(e:any)=>{if (identity) identity.issueOrgCode = e.target.value}}  
   const depCodeField = dul_value?.c_mask ? <InputMask {...{mask:dul_value?.c_mask,...depCodeProps} as InputMaskProps }/>
     : <InputText {...depCodeProps}/>    
   return (<>    
@@ -57,8 +57,7 @@ import IIdentity from '../../models/IIdentity'
                         identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,          
                       } as IIdentity)
                       else patient.identity = undefined 
-                      if (nullFlavors) patient.setNullFlavors(nullFlavors)    
-                      certificateStore.checkIdentity()
+                      if (nullFlavors) patient.setNullFlavors(nullFlavors)
                     }}
                   nullFlavors={patient.nullFlavors()}
                   field_name="identity"
@@ -100,7 +99,7 @@ import IIdentity from '../../models/IIdentity'
                   field={
                     <InputTextarea id="issueOrgName" value={identity?.issueOrgName} 
                     cols={65} rows={2}   disabled={!identified}
-                    onChange={(e)=>{if (identity) certificateStore.setIORGNAME(e.target.value) }}/>}
+                    onChange={(e)=>{if (identity) identity.issueOrgName = e.target.value }}/>}
                   options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
                   value={identified ? UNK : ASKU} 
                   lincked                                      
@@ -112,11 +111,12 @@ import IIdentity from '../../models/IIdentity'
                   checked={docChecked}                   
                   field={<Calendar  id="issueDate" className="p-mr-2" 
                     dateFormat={"dd/mm/yy"} value={identity?.issueOrgDate}
-                    onChange={(e)=>{if (identity) certificateStore.setIORGDate(e.target.value as Date | undefined)}}
+                    onChange={(e)=>{if (identity) identity.issueOrgDate = e.target.value as Date | undefined}}
                     showIcon />
                   }
                   options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
                   value={identified ? UNK : ASKU}
+                  field_name="issueDate"
                   lincked                                       
                 /> 
               </div>  
@@ -128,7 +128,8 @@ import IIdentity from '../../models/IIdentity'
                   field={depCodeField}
                   options={identified ? [NULL_FLAVORS[NA]] : [NULL_FLAVORS[ASKU]]}
                   value={identified ? NA : ASKU}  
-                  lincked={!docChecked}                                     
+                  lincked={!docChecked}
+                  field_name="issueOrgCode"                                     
                 />                    
               </div>              
             </div>
@@ -139,14 +140,13 @@ import IIdentity from '../../models/IIdentity'
                     label={<label htmlFor="snils">СНИЛС</label>}
                     checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                       if (nullFlavors) person.setNullFlavors(nullFlavors)
-                      if (!e.checked) person.SNILS = undefined
-                      certificateStore.checkSNILS()
+                      if (!e.checked) person.SNILS = undefined                      
                     }} 
                     onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) person.setNullFlavors(nullFlavors)}}
                     field={<InputMask id="snils"  
                       type="text" mask="999-999-999 99"
                       value={person.SNILS} 
-                      onChange={(e)=>{certificateStore.setSNILS(e.target.value)}}/>            
+                      onChange={(e)=>{person.SNILS = e.target.value}}/>            
                     }
                     options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK NA".includes(item.code))} 
                     value={docChecked ? UNK : ASKU}
@@ -161,20 +161,19 @@ import IIdentity from '../../models/IIdentity'
                 <NullFlavorWrapper  paraNum                   
                     label={<label htmlFor="policyOMS">Серия и номер полиса ОМС</label>}
                     checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                      if (nullFlavors) certificate.setNullFlavors(nullFlavors)
-                      if (!e.checked) certificate.policyOMS = undefined
-                      certificateStore.checkOMS()
+                      if (nullFlavors) certificate.nullFlavors = nullFlavors
+                      if (!e.checked) certificate.policyOMS = undefined                      
                     }} 
-                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.setNullFlavors(nullFlavors)}}
+                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
                     field={<InputText id="policyOMS"  
                       type="text" 
                       value={certificate.policyOMS} 
-                      onChange={(e)=>{certificateStore.setPolicyOMS(e.target.value)}}/>            
+                      onChange={(e)=>{certificate.policyOMS = e.target.value}}/>            
                     }
                     options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK NA".includes(item.code))} 
                     value={docChecked ? UNK : ASKU}
                     field_name="policy_OMS"
-                    nullFlavors={certificate.nullFlavors()}
+                    nullFlavors={certificate.nullFlavors}
                 />
               </div>                   
             </div>  
