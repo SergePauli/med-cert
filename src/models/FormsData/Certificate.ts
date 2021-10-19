@@ -22,39 +22,47 @@ export default class Certificate {
   private _deathDatetime: Date | Date[] | undefined
   private _deathYear?: number
   private _deathMonth?: number | undefined
-  private _death_day?: number
   private _deathPlace?: number | undefined
   private _maritalStatus?: number | undefined
   private _educationLevel?: number | undefined
   private _socialStatus?: number | undefined
   private _deathKind?: number | undefined
+  private _extReasonTime?: Date | undefined
+  private _extReasonDescription?: string | undefined
   private _deathAddr?: Address
   private _guid: string
   private _policyOMS?: string | undefined
   private _childInfo?: ChildInfo | undefined
+  private _establishedMedic?: number | undefined
+  private _basisDetermining?: number | undefined
   private _nullFlavors: INullFlavor[]
+
   constructor(props: ICertificateResponse) {
     this._guid = props.guid || uuidv4()
     this._patient = new Patient(props.patient)
     this._effTime = props.eff_time || new Date()
     this._nullFlavors = props.nullFlavors || []
-    if (props.cert_type) this._certType = props.cert_type
-    if (props.series) this._series = props.series
-    if (props.number) this._number = props.number
-    if (props.death_datetime) this._deathDatetime = props.death_datetime
-    if (props.death_year) this._deathYear = props.death_year
-    if (props.number_prev) this._numberPrev = props.number_prev
-    if (props.series_prev) this._seriesPrev = props.series_prev
-    if (props.policy_OMS) this._policyOMS = props.policy_OMS
-    if (props.lifeAreaType) this._lifeAreaType = props.lifeAreaType
-    if (props.deathAreaType) this._deathAreaType = props.deathAreaType
+    this._certType = props.cert_type
+    this._series = props.series
+    this._number = props.number
+    this._deathDatetime = props.death_datetime
+    this._deathYear = props.death_year
+    this._numberPrev = props.number_prev
+    this._seriesPrev = props.series_prev
+    this._policyOMS = props.policy_OMS
+    this._lifeAreaType = props.lifeAreaType
+    this._deathAreaType = props.deathAreaType
     if (props.death_addr) this._deathAddr = new Address(props.death_addr)
-    if (props.death_place) this._deathPlace = props.death_place
-    if (props.death_kind) this._deathKind = props.death_kind
-    if (props.education_level) this._educationLevel = props.education_level
-    if (props.marital_status) this._maritalStatus = props.marital_status
-    if (props.social_status) this._socialStatus = props.social_status
+    this._deathPlace = props.death_place
+    this._deathKind = props.death_kind
+    this._educationLevel = props.education_level
+    this._maritalStatus = props.marital_status
+    this._socialStatus = props.social_status
     if (props.child_info) this._childInfo = new ChildInfo(props.child_info)
+    this._extReasonTime = props.ext_reason_time
+    this._extReasonDescription = props.ext_reason_description
+    this._establishedMedic = props.established_medic
+    this._basisDetermining = props.basis_determining
     makeAutoObservable(this)
   }
   get id() {
@@ -108,10 +116,29 @@ export default class Certificate {
   get guid() {
     return this._guid
   }
-  nullFlavors() {
+
+  get extReasonTime(): Date | undefined {
+    return this._extReasonTime
+  }
+  set extReasonTime(value: Date | undefined) {
+    this._extReasonTime = value
+  }
+  get establishedMedic(): number | undefined {
+    return this._establishedMedic
+  }
+  set establishedMedic(value: number | undefined) {
+    this._establishedMedic = value
+  }
+  get basisDetermining(): number | undefined {
+    return this._basisDetermining
+  }
+  set basisDetermining(value: number | undefined) {
+    this._basisDetermining = value
+  }
+  get nullFlavors() {
     return this._nullFlavors
   }
-  setNullFlavors(nullFlavors: INullFlavor[]) {
+  set nullFlavors(nullFlavors: INullFlavor[]) {
     this._nullFlavors = nullFlavors
   }
   get patient() {
@@ -200,6 +227,12 @@ export default class Certificate {
   set childInfo(value: ChildInfo | undefined) {
     this._childInfo = value
   }
+  get extReasonDescription(): string | undefined {
+    return this._extReasonDescription
+  }
+  set extReasonDescription(value: string | undefined) {
+    this._extReasonDescription = value
+  }
   milisecAge() {
     // Discard the time and time-zone information.
     const a = this._patient.birth_date as Date
@@ -226,5 +259,17 @@ export default class Certificate {
     const ms = this.milisecAge()
     if (ms) return (this._deathDatetime as Date).getFullYear() - (this._patient.birth_date as Date).getFullYear()
     else return false
+  }
+  setDeathDay(value: Date | undefined, isYear: boolean) {
+    if (value && !isYear) {
+      this.deathDatetime = value
+      this.deathYear = undefined
+    } else if (value && isYear) {
+      this.deathDatetime = value
+      this.deathYear = (this.deathDatetime as Date).getFullYear()
+    } else {
+      this.deathDatetime = undefined
+      this.deathYear = undefined
+    }
   }
 }

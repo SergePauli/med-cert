@@ -27,6 +27,10 @@ export interface ICertificateResponse extends INullFlavorable {
   education_level: number | undefined
   social_status: number | undefined
   death_kind: number | undefined
+  ext_reason_time?: Date | undefined
+  ext_reason_description?: string | undefined
+  established_medic?: number | undefined
+  basis_determining?: number | undefined
   child_info?: IChildInfo | undefined
   guid: string
 }
