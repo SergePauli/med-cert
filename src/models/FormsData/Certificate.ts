@@ -5,6 +5,7 @@ import { IReference } from "../IReference"
 import { ICertificateResponse } from "../responses/ICertificateResponse"
 import Address from "./Address"
 import { ChildInfo } from "./ChildInfo"
+import { DeathReason } from "./DeathReason"
 import Patient from "./Patient"
 
 export default class Certificate {
@@ -29,6 +30,11 @@ export default class Certificate {
   private _deathKind?: number | undefined
   private _extReasonTime?: Date | undefined
   private _extReasonDescription?: string | undefined
+  private _reasonA?: DeathReason | undefined
+  private _reasonB?: DeathReason
+  private _reasonC?: DeathReason
+  private _reasonD?: DeathReason
+  private _reasonACME?: DeathReason
   private _deathAddr?: Address
   private _guid: string
   private _policyOMS?: string | undefined
@@ -63,6 +69,17 @@ export default class Certificate {
     this._extReasonDescription = props.ext_reason_description
     this._establishedMedic = props.established_medic
     this._basisDetermining = props.basis_determining
+    if (props.a_reason) this._reasonA = new DeathReason(props.a_reason)
+    if (props.b_reason) this._reasonB = new DeathReason(props.b_reason)
+    if (props.c_reason) this._reasonC = new DeathReason(props.c_reason)
+    if (props.d_reason) this._reasonC = new DeathReason(props.d_reason)
+    if (props.reason_ACME && props.reason_ACME === props.a_reason?.diagnosis.ICD10) this._reasonACME = this._reasonA
+    else if (props.reason_ACME && props.reason_ACME === props.b_reason?.diagnosis.ICD10)
+      this._reasonACME = this._reasonB
+    else if (props.reason_ACME && props.reason_ACME === props.c_reason?.diagnosis.ICD10)
+      this._reasonACME = this._reasonC
+    else if (props.reason_ACME && props.reason_ACME === props.d_reason?.diagnosis.ICD10)
+      this._reasonACME = this._reasonD
     makeAutoObservable(this)
   }
   get id() {
@@ -232,6 +249,30 @@ export default class Certificate {
   }
   set extReasonDescription(value: string | undefined) {
     this._extReasonDescription = value
+  }
+  get reasonA(): DeathReason | undefined {
+    return this._reasonA
+  }
+  set reasonA(value: DeathReason | undefined) {
+    this._reasonA = value
+  }
+  get reasonB(): DeathReason | undefined {
+    return this._reasonB
+  }
+  set reasonB(value: DeathReason | undefined) {
+    this._reasonB = value
+  }
+  get reasonC(): DeathReason | undefined {
+    return this._reasonC
+  }
+  set reasonC(value: DeathReason | undefined) {
+    this._reasonC = value
+  }
+  get reasonD(): DeathReason | undefined {
+    return this._reasonD
+  }
+  set reasonD(value: DeathReason | undefined) {
+    this._reasonD = value
   }
   milisecAge() {
     // Discard the time and time-zone information.
