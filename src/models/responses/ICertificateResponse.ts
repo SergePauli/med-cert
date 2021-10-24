@@ -3,6 +3,7 @@ import { INullFlavorable } from "../INullFlavorable"
 import { IPatient } from "../IPatient"
 import { IReference } from "../IReference"
 import { IAddress } from "./IAddress"
+import { IDeathReason } from "./IDeathReason"
 
 export interface ICertificateResponse extends INullFlavorable {
   id: number
@@ -31,6 +32,11 @@ export interface ICertificateResponse extends INullFlavorable {
   ext_reason_description?: string | undefined
   established_medic?: number | undefined
   basis_determining?: number | undefined
+  a_reason?: IDeathReason
+  b_reason?: IDeathReason
+  c_reason?: IDeathReason
+  d_reason?: IDeathReason
+  reason_ACME?: string
   child_info?: IChildInfo | undefined
   guid: string
 }
