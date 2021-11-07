@@ -4,7 +4,7 @@ import { IUser } from "../models/IUser"
 import { IUserInfo } from "../models/responses/IUserInfo"
 export default class UsersService {
   static async fetchUsers(): Promise<AxiosResponse<IUser[]>> {
-    return $api.post(`${API_URL}model/user/`, {
+    return $api.post(`${API_URL}model/User/`, {
       render_options: { only: ["id", "email", "roles", "organization_id", "activated"] },
     })
   }
