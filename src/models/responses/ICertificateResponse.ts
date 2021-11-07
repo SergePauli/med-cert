@@ -19,7 +19,7 @@ export interface ICertificateResponse extends INullFlavorable {
   patient: IPatient
   lifeAreaType?: number
   deathAreaType?: number
-  death_datetime: Date | Date[] | undefined
+  death_datetime?: Date
   death_year: number
   death_month: number
   death_day: number
