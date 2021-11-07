@@ -1,6 +1,7 @@
+import { INullFlavorable } from "../INullFlavorable"
 import { IDiagnosis } from "./IDiagnosis"
 
-export interface IDeathReason {
+export interface IDeathReason extends INullFlavorable {
   id?: string
   certificate_id: number
   diagnosis: IDiagnosis
