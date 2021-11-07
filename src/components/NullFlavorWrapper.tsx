@@ -52,7 +52,7 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
                 nullFlavors.push({parent_attr: props.field_name, code: props.value })  
                 props.setCheck(e, nullFlavors)
                 nullFlavors.pop()
-              }              
+              } else if (props.setCheck) props.setCheck(e)             
             } else if (props.setCheck) props.setCheck(e)            
           }
         }        
