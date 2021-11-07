@@ -1,6 +1,8 @@
 import { makeAutoObservable } from "mobx"
+import { INullFlavor } from "../INullFlavor"
 import { IDeathReason } from "../responses/IDeathReason"
 import { IDiagnosis } from "../responses/IDiagnosis"
+import { v4 as uuidv4 } from "uuid"
 
 export class DeathReason {
   private _id?: string | undefined
@@ -13,12 +15,14 @@ export class DeathReason {
   private _days?: number | undefined
   private _hours?: number | undefined
   private _minutes?: number | undefined
+  private _nullFlavors: INullFlavor[]
 
   constructor(props: IDeathReason) {
-    this._id = props.id
+    this._id = props.id || uuidv4()
     this._certificateId = props.certificate_id
     this._diagnosis = props.diagnosis
     this._effectiveTime = props.effective_time
+    this._nullFlavors = props.nullFlavors || []
     makeAutoObservable(this)
   }
   get id(): string | undefined {
@@ -77,5 +81,11 @@ export class DeathReason {
   }
   set minutes(value: number | undefined) {
     this._minutes = value
+  }
+  get nullFlavors(): INullFlavor[] {
+    return this._nullFlavors
+  }
+  set nullFlavors(value: INullFlavor[]) {
+    this._nullFlavors = value
   }
 }
