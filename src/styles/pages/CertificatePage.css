@@ -13,7 +13,7 @@
 
 .p-suggestion {
   min-width: 300px;
-  max-width: 500px;
+  max-width: 340px;
 }
 
 .layout-static-inactive .p-suggestion {
@@ -59,4 +59,8 @@
 
 .p-d-flex .p-calendar .p-inputtext {
   flex: inherit;
+}
+
+.ACME-reason {
+  background-color: antiquewhite;
 }
