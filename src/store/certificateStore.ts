@@ -5,6 +5,7 @@ import { IPatient } from "../models/IPatient"
 
 import { ISuggestions } from "../models/ISuggestions"
 import { ICertificateResponse } from "../models/responses/ICertificateResponse"
+import { IDeathReason } from "../models/responses/IDeathReason"
 import { DISEASE_DEADTH_KIND } from "../NSI/1.2.643.5.1.13.13.99.2.21"
 import {
   BASIS_DERMINING_SUG,
@@ -38,6 +39,14 @@ import {
   PATIENT_BIRTHDAY_SUG,
   PATIENT_GENDER_SUG,
   PERSON_NAME_SUG,
+  REASON_A_SUG,
+  REASON_A_TIME_SUG,
+  REASON_B_SUG,
+  REASON_B_TIME_SUG,
+  REASON_C_SUG,
+  REASON_C_TIME_SUG,
+  REASON_D_SUG,
+  REASON_D_TIME_SUG,
   SNILS_SUG,
   SOCIAL_STATUS_SUG,
   TERMS_PREGNANCY_SUG,
@@ -54,6 +63,8 @@ export default class CertificateStore {
   constructor() {
     this.disposers = []
     this._cert = new Certificate({
+      death_datetime: new Date("2021-10-28T01:52:00"),
+      a_reason: { effective_time: new Date("2021-09-10T20:48:00") } as IDeathReason,
       patient: {
         identity: {
           identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,
@@ -249,6 +260,42 @@ export default class CertificateStore {
     })
     this.disposers[29] = autorun(() => {
       this._suggestions[BASIS_DERMINING_SUG].done = this._cert.basisDetermining !== undefined
+    })
+    this.disposers[30] = autorun(() => {
+      this._suggestions[REASON_A_SUG].done = this._cert.reasonA?.diagnosis !== undefined
+    })
+    this.disposers[31] = autorun(() => {
+      this._suggestions[REASON_A_TIME_SUG].done = this._cert.reasonA?.effectiveTime !== undefined
+    })
+    this.disposers[32] = autorun(() => {
+      this._suggestions[REASON_B_SUG].done =
+        this._cert.reasonB?.diagnosis !== undefined ||
+        this._cert.nullFlavors.findIndex((item) => item.parent_attr === "b_reason") !== -1
+    })
+    this.disposers[33] = autorun(() => {
+      this._suggestions[REASON_B_TIME_SUG].done =
+        this._cert.reasonB?.effectiveTime !== undefined ||
+        this._cert.reasonB?.nullFlavors.findIndex((item) => item.parent_attr === "effective_time") !== -1
+    })
+    this.disposers[34] = autorun(() => {
+      this._suggestions[REASON_C_SUG].done =
+        this._cert.reasonC?.diagnosis !== undefined ||
+        this._cert.nullFlavors.findIndex((item) => item.parent_attr === "c_reason") !== -1
+    })
+    this.disposers[35] = autorun(() => {
+      this._suggestions[REASON_C_TIME_SUG].done =
+        this._cert.reasonC?.effectiveTime !== undefined ||
+        this._cert.reasonC?.nullFlavors.findIndex((item) => item.parent_attr === "effective_time") !== -1
+    })
+    this.disposers[36] = autorun(() => {
+      this._suggestions[REASON_D_SUG].done =
+        this._cert.reasonD?.diagnosis !== undefined ||
+        this._cert.nullFlavors.findIndex((item) => item.parent_attr === "d_reason") !== -1
+    })
+    this.disposers[37] = autorun(() => {
+      this._suggestions[REASON_D_TIME_SUG].done =
+        this._cert.reasonD?.effectiveTime !== undefined ||
+        this._cert.reasonD?.nullFlavors.findIndex((item) => item.parent_attr === "effective_time") !== -1
     })
   }
 
