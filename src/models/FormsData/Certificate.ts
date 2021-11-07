@@ -1,8 +1,11 @@
-import { makeAutoObservable } from "mobx"
+import { autorun, makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
+import { UNK } from "../../utils/defaults"
+import { timeDiff } from "../../utils/functions"
 import { INullFlavor } from "../INullFlavor"
 import { IReference } from "../IReference"
 import { ICertificateResponse } from "../responses/ICertificateResponse"
+import { IDeathReason } from "../responses/IDeathReason"
 import Address from "./Address"
 import { ChildInfo } from "./ChildInfo"
 import { DeathReason } from "./DeathReason"
@@ -20,7 +23,7 @@ export default class Certificate {
   private _patient: Patient
   private _lifeAreaType?: number
   private _deathAreaType?: number
-  private _deathDatetime: Date | Date[] | undefined
+  private _deathDatetime?: Date
   private _deathYear?: number
   private _deathMonth?: number | undefined
   private _deathPlace?: number | undefined
@@ -34,7 +37,7 @@ export default class Certificate {
   private _reasonB?: DeathReason
   private _reasonC?: DeathReason
   private _reasonD?: DeathReason
-  private _reasonACME?: DeathReason
+  private _reasonACME?: DeathReason | undefined
   private _deathAddr?: Address
   private _guid: string
   private _policyOMS?: string | undefined
@@ -42,8 +45,10 @@ export default class Certificate {
   private _establishedMedic?: number | undefined
   private _basisDetermining?: number | undefined
   private _nullFlavors: INullFlavor[]
+  disposers: (() => void)[]
 
   constructor(props: ICertificateResponse) {
+    this.disposers = []
     this._guid = props.guid || uuidv4()
     this._patient = new Patient(props.patient)
     this._effTime = props.eff_time || new Date()
@@ -69,10 +74,6 @@ export default class Certificate {
     this._extReasonDescription = props.ext_reason_description
     this._establishedMedic = props.established_medic
     this._basisDetermining = props.basis_determining
-    if (props.a_reason) this._reasonA = new DeathReason(props.a_reason)
-    if (props.b_reason) this._reasonB = new DeathReason(props.b_reason)
-    if (props.c_reason) this._reasonC = new DeathReason(props.c_reason)
-    if (props.d_reason) this._reasonC = new DeathReason(props.d_reason)
     if (props.reason_ACME && props.reason_ACME === props.a_reason?.diagnosis.ICD10) this._reasonACME = this._reasonA
     else if (props.reason_ACME && props.reason_ACME === props.b_reason?.diagnosis.ICD10)
       this._reasonACME = this._reasonB
@@ -81,6 +82,37 @@ export default class Certificate {
     else if (props.reason_ACME && props.reason_ACME === props.d_reason?.diagnosis.ICD10)
       this._reasonACME = this._reasonD
     makeAutoObservable(this)
+    this.disposers[0] = autorun(() => {
+      if (this.reasonB === undefined && this._nullFlavors.findIndex((item) => item.parent_attr === "b_reason") === -1)
+        this._nullFlavors.push({ parent_attr: "b_reason", code: UNK } as INullFlavor)
+      else if (
+        this.reasonB !== undefined &&
+        this._nullFlavors.findIndex((item) => item.parent_attr === "b_reason") !== -1
+      )
+        this.nullFlavors = this._nullFlavors.filter((item) => item.parent_attr !== "b_reason")
+    })
+    this.disposers[1] = autorun(() => {
+      if (this.reasonC === undefined && this._nullFlavors.findIndex((item) => item.parent_attr === "c_reason") === -1)
+        this._nullFlavors.push({ parent_attr: "c_reason", code: UNK } as INullFlavor)
+      else if (
+        this.reasonC !== undefined &&
+        this._nullFlavors.findIndex((item) => item.parent_attr === "c_reason") !== -1
+      )
+        this.nullFlavors = this._nullFlavors.filter((item) => item.parent_attr !== "c_reason")
+    })
+    this.disposers[2] = autorun(() => {
+      if (this.reasonD === undefined && this._nullFlavors.findIndex((item) => item.parent_attr === "d_reason") === -1)
+        this._nullFlavors.push({ parent_attr: "d_reason", code: UNK } as INullFlavor)
+      else if (
+        this.reasonD !== undefined &&
+        this._nullFlavors.findIndex((item) => item.parent_attr === "d_reason") !== -1
+      )
+        this.nullFlavors = this._nullFlavors.filter((item) => item.parent_attr !== "d_reason")
+    })
+    if (props.a_reason) this._reasonA = this.createDeathReason(props.a_reason)
+    if (props.b_reason) this._reasonB = this.createDeathReason(props.b_reason)
+    if (props.c_reason) this._reasonC = this.createDeathReason(props.c_reason)
+    if (props.d_reason) this._reasonD = this.createDeathReason(props.d_reason)
   }
   get id() {
     return this._id
@@ -109,7 +141,7 @@ export default class Certificate {
   get deathDatetime() {
     return this._deathDatetime
   }
-  set deathDatetime(death_datetime: Date | Date[] | undefined) {
+  set deathDatetime(death_datetime: Date | undefined) {
     this._deathDatetime = death_datetime
   }
   get certType() {
@@ -274,14 +306,20 @@ export default class Certificate {
   set reasonD(value: DeathReason | undefined) {
     this._reasonD = value
   }
+  get reasonACME(): DeathReason | undefined {
+    return this._reasonACME
+  }
+  set reasonACME(value: DeathReason | undefined) {
+    this._reasonACME = value
+  }
   milisecAge() {
-    // Discard the time and time-zone information.
+    // Discard the time-zone information.
     const a = this._patient.birth_date as Date
     if (a === undefined) return false
-    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())
+    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate(), a.getHours(), a.getMinutes())
     const b = this._deathDatetime as Date
     if (b === undefined) return false
-    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate())
+    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate(), b.getHours(), b.getMinutes())
     return utc2 - utc1
   }
   hoursAge() {
@@ -297,8 +335,9 @@ export default class Certificate {
     else return false
   }
   yearsAge() {
-    const ms = this.milisecAge()
-    if (ms) return (this._deathDatetime as Date).getFullYear() - (this._patient.birth_date as Date).getFullYear()
+    const dd = this._deathDatetime as Date
+    const db = this._patient.birth_date as Date
+    if (dd !== undefined && db !== undefined) return dd.getFullYear() - db.getFullYear()
     else return false
   }
   setDeathDay(value: Date | undefined, isYear: boolean) {
@@ -312,5 +351,35 @@ export default class Certificate {
       this.deathDatetime = undefined
       this.deathYear = undefined
     }
+  }
+  createDeathReason(props: IDeathReason): DeathReason {
+    const newReason = new DeathReason({ ...props, certificate_id: this._id } as IDeathReason)
+    if (newReason.effectiveTime && this._deathDatetime !== undefined) {
+      const diff = timeDiff(newReason.effectiveTime, this._deathDatetime)
+      if (diff.days && diff.days > 0) newReason.days = diff.days
+      if (diff.hours) newReason.hours = diff.hours
+      if (diff.minutes && diff.minutes > 0) newReason.minutes = diff.minutes
+      if (diff.months && diff.months > 0) newReason.months = diff.months
+      if (diff.weeks && diff.weeks > 0) newReason.weeks = diff.weeks
+      if (diff.years && diff.years > 0) newReason.years = diff.years
+    }
+    return newReason
+  }
+  saveReasonEffTime(reason: DeathReason) {
+    if (this._deathDatetime === undefined) return false
+    let result = new Date(this._deathDatetime)
+    if (reason.minutes) result.setMinutes(result.getMinutes() - reason.minutes)
+    if (reason.hours) result.setHours(result.getHours() - reason.hours)
+    if (reason.days) result.setDate(result.getDate() - reason.days)
+    if (reason.weeks) result.setDate(result.getDate() - reason.weeks * 7)
+    if (reason.months) result.setMonth(result.getMonth() - reason.months)
+    if (reason.years) result.setFullYear(result.getFullYear() - reason.years)
+    reason.effectiveTime = result
+    return true
+  }
+  dispose() {
+    // So, to avoid subtle memory issues, always call the
+    // disposers when the reactions are no longer needed.
+    this.disposers.forEach((disposer) => disposer())
   }
 }
