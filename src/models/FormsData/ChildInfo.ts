@@ -49,10 +49,10 @@ export class ChildInfo {
   set relatedSubject(value: RelatedSubject | undefined) {
     this._relatedSubject = value
   }
-  public get nullFlavors(): INullFlavor[] {
+  get nullFlavors(): INullFlavor[] {
     return this._nullFlavors
   }
-  public set nullFlavors(value: INullFlavor[]) {
+  set nullFlavors(value: INullFlavor[]) {
     this._nullFlavors = value
   }
 }
