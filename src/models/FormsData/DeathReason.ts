@@ -3,6 +3,7 @@ import { INullFlavor } from "../INullFlavor"
 import { IDeathReason } from "../responses/IDeathReason"
 import { IDiagnosis } from "../responses/IDiagnosis"
 import { v4 as uuidv4 } from "uuid"
+import { Procedure } from "./Procedure"
 
 export class DeathReason {
   private _id?: string | undefined
@@ -15,6 +16,7 @@ export class DeathReason {
   private _days?: number | undefined
   private _hours?: number | undefined
   private _minutes?: number | undefined
+  private _procedures: Procedure[]
   private _nullFlavors: INullFlavor[]
 
   constructor(props: IDeathReason) {
@@ -22,6 +24,7 @@ export class DeathReason {
     this._certificateId = props.certificate_id
     this._diagnosis = props.diagnosis
     this._effectiveTime = props.effective_time
+    this._procedures = props.procedures?.map((proc) => new Procedure(proc)) || []
     this._nullFlavors = props.nullFlavors || []
     makeAutoObservable(this)
   }
@@ -82,10 +85,21 @@ export class DeathReason {
   set minutes(value: number | undefined) {
     this._minutes = value
   }
+  get procedures(): Procedure[] {
+    return this._procedures
+  }
+  set procedures(value: Procedure[]) {
+    this._procedures = value
+  }
   get nullFlavors(): INullFlavor[] {
     return this._nullFlavors
   }
   set nullFlavors(value: INullFlavor[]) {
     this._nullFlavors = value
+  }
+  procNames(): string {
+    let result = ""
+    this._procedures.forEach((proc) => (result += proc.textValue || proc.medicalServ.name + " "))
+    return result
   }
 }
