@@ -37,6 +37,7 @@ export default class Certificate {
   private _reasonB?: DeathReason
   private _reasonC?: DeathReason
   private _reasonD?: DeathReason
+  private _deathReasons?: DeathReason[] | undefined
   private _reasonACME?: DeathReason | undefined
   private _deathAddr?: Address
   private _guid: string
@@ -74,12 +75,12 @@ export default class Certificate {
     this._extReasonDescription = props.ext_reason_description
     this._establishedMedic = props.established_medic
     this._basisDetermining = props.basis_determining
-    if (props.reason_ACME && props.reason_ACME === props.a_reason?.diagnosis.ICD10) this._reasonACME = this._reasonA
-    else if (props.reason_ACME && props.reason_ACME === props.b_reason?.diagnosis.ICD10)
+    if (props.reason_ACME && props.reason_ACME === props.a_reason?.diagnosis?.ICD10) this._reasonACME = this._reasonA
+    else if (props.reason_ACME && props.reason_ACME === props.b_reason?.diagnosis?.ICD10)
       this._reasonACME = this._reasonB
-    else if (props.reason_ACME && props.reason_ACME === props.c_reason?.diagnosis.ICD10)
+    else if (props.reason_ACME && props.reason_ACME === props.c_reason?.diagnosis?.ICD10)
       this._reasonACME = this._reasonC
-    else if (props.reason_ACME && props.reason_ACME === props.d_reason?.diagnosis.ICD10)
+    else if (props.reason_ACME && props.reason_ACME === props.d_reason?.diagnosis?.ICD10)
       this._reasonACME = this._reasonD
     makeAutoObservable(this)
     this.disposers[0] = autorun(() => {
@@ -113,6 +114,7 @@ export default class Certificate {
     if (props.b_reason) this._reasonB = this.createDeathReason(props.b_reason)
     if (props.c_reason) this._reasonC = this.createDeathReason(props.c_reason)
     if (props.d_reason) this._reasonD = this.createDeathReason(props.d_reason)
+    if (props.death_reasons) this._deathReasons = props.death_reasons.map((reason) => this.createDeathReason(reason))
   }
   get id() {
     return this._id
@@ -311,6 +313,12 @@ export default class Certificate {
   }
   set reasonACME(value: DeathReason | undefined) {
     this._reasonACME = value
+  }
+  get deathReasons(): DeathReason[] | undefined {
+    return this._deathReasons
+  }
+  set deathReasons(value: DeathReason[] | undefined) {
+    this._deathReasons = value
   }
   milisecAge() {
     // Discard the time-zone information.
