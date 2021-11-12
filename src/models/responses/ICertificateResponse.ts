@@ -36,6 +36,7 @@ export interface ICertificateResponse extends INullFlavorable {
   b_reason?: IDeathReason
   c_reason?: IDeathReason
   d_reason?: IDeathReason
+  death_reasons?: IDeathReason[]
   reason_ACME?: string
   child_info?: IChildInfo | undefined
   guid: string
