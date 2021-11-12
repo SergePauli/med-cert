@@ -22,6 +22,7 @@ import Section4 from '../components/c_sections/section_4'
 import Section5 from '../components/c_sections/section_5'
 import Section6 from '../components/c_sections/section_6'
 import Section7 from '../components/c_sections/section_7'
+import Section8 from '../components/c_sections/section_8'
 import { Context } from '..'
 import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
@@ -47,6 +48,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       case "?q=5": return <Section5 />
       case "?q=6": return <Section6 />
       case "?q=7": return <Section7 />
+      case "?q=8": return <Section8 />
       default: return <Section0 /> 
     } 
   }    
