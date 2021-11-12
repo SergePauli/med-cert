@@ -13,7 +13,7 @@
 
 .p-suggestion {
   min-width: 300px;
-  max-width: 340px;
+  max-width: 320px;
 }
 
 .layout-static-inactive .p-suggestion {
@@ -63,4 +63,15 @@
 
 .ACME-reason {
   background-color: antiquewhite;
+}
+
+.p-add-block {
+  margin-left: 1rem;
+  background-color: #f3eded;
+  padding-top: 8px;
+  border-radius: 3px;
+}
+
+.p-datatable-wrapper>table {
+  width: 100%;
 }
