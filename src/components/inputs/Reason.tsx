@@ -90,7 +90,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
       }}
       field_name="effective_time"
       field={
-        <div className="p-fluid p-formgrid p-grid" >           
+        <div className="p-fluid p-formgrid p-grid" style={{marginLeft:'0'}}>           
           <div className={CSS_classes} style={style} key={`rt_${deathTime}`}>  
             <span className="p-inputgroup-addon">лет</span>          
             <InputText id="year" type="number" min={0} max={99}
