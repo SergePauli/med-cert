@@ -222,6 +222,19 @@ export const DEFAULT_CERT_SUGGESTIONS = [
       "Период времени между началом патол. состояния и смертью в причине г) или его отсутствие - обязательно для заполнения",
     done: false,
   },
+  {
+    section: "8",
+    code: "п.22.II.1",
+    suggestion: "Указание кода прочего состояния или причины его отсутствия - обязательно для заполнения",
+    done: true,
+  },
+  {
+    section: "8",
+    code: "п.22.II.2",
+    suggestion:
+      "Указание периода времени между началом патол. состояния и смертью или причины его отсутствия - обязательно для заполнения",
+    done: true,
+  },
 ]
 export const CERT_TYPE_SUG = 0
 export const PERSON_NAME_SUG = 1
@@ -261,6 +274,8 @@ export const REASON_C_SUG = 34
 export const REASON_C_TIME_SUG = 35
 export const REASON_D_SUG = 36
 export const REASON_D_TIME_SUG = 37
+export const EXT_REASON_SUG = 38
+export const EXT_REASON_TIME_SUG = 39
 
 export const changeSuggestion = (code: string, suggestions: any[], done: boolean) => {
   const suggestion = suggestions.find((item) => item.code === code)
