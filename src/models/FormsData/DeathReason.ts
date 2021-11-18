@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid"
 import { Procedure } from "./Procedure"
 
 export class DeathReason {
-  private _id?: string | undefined
+  private _id: string
   private _certificateId: number
   private _diagnosis?: IDiagnosis | undefined
   private _effectiveTime?: Date | undefined
@@ -28,12 +28,10 @@ export class DeathReason {
     this._nullFlavors = props.nullFlavors || []
     makeAutoObservable(this)
   }
-  get id(): string | undefined {
+  get id(): string {
     return this._id
   }
-  set id(value: string | undefined) {
-    this._id = value
-  }
+
   get certificateId(): number {
     return this._certificateId
   }
@@ -98,8 +96,12 @@ export class DeathReason {
     this._nullFlavors = value
   }
   procNames(): string {
-    let result = ""
-    this._procedures.forEach((proc) => (result += proc.textValue || proc.medicalServ.name + " "))
-    return result
+    let _result = ""
+    this._procedures.forEach((proc) => {
+      _result += proc.textValue || proc.medicalServ.name
+      if (proc.effectiveTime) _result += " от " + proc.timeStr()
+      _result += ";"
+    })
+    return _result
   }
 }

@@ -37,7 +37,7 @@ export default class Certificate {
   private _reasonB?: DeathReason
   private _reasonC?: DeathReason
   private _reasonD?: DeathReason
-  private _deathReasons?: DeathReason[] | undefined
+  private _deathReasons: DeathReason[]
   private _reasonACME?: DeathReason | undefined
   private _deathAddr?: Address
   private _guid: string
@@ -115,6 +115,7 @@ export default class Certificate {
     if (props.c_reason) this._reasonC = this.createDeathReason(props.c_reason)
     if (props.d_reason) this._reasonD = this.createDeathReason(props.d_reason)
     if (props.death_reasons) this._deathReasons = props.death_reasons.map((reason) => this.createDeathReason(reason))
+    else this._deathReasons = []
   }
   get id() {
     return this._id
@@ -314,10 +315,10 @@ export default class Certificate {
   set reasonACME(value: DeathReason | undefined) {
     this._reasonACME = value
   }
-  get deathReasons(): DeathReason[] | undefined {
+  get deathReasons(): DeathReason[] {
     return this._deathReasons
   }
-  set deathReasons(value: DeathReason[] | undefined) {
+  set deathReasons(value: DeathReason[]) {
     this._deathReasons = value
   }
   milisecAge() {

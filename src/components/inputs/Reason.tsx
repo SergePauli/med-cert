@@ -13,7 +13,7 @@ import { IReference } from '../../models/IReference'
 import { IDeathReason } from '../../models/responses/IDeathReason'
 import { IDiagnosis } from '../../models/responses/IDiagnosis'
 import DiagnosisService from '../../services/DiagnosisService'
-import { NULL_FLAVORS, UNK } from '../../utils/defaults'
+import { NA, NULL_FLAVORS, UNK } from '../../utils/defaults'
 import NullFlavorWrapper from '../NullFlavorWrapper'
 
 
@@ -159,17 +159,28 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
         if (e.checked) {
           const reason = props.certificate.createDeathReason({certificate_id: props.certificate.id} as IDeathReason)
           props.onChange(reason)} 
-        else props.onChange(undefined) 
-        console.log('e',e)
+        else { 
+          props.onChange(undefined)
+          if (deathReason && nullFlavors) { 
+            deathReason.nullFlavors = nullFlavors
+            deathReason.effectiveTime = undefined  
+            deathReason.diagnosis = undefined
+            deathReason.nullFlavors.push({parent_attr:'effective_time', code: NA} as INullFlavor)   
+            deathReason.nullFlavors.push({parent_attr:'diagnosis', code: NA} as INullFlavor)       
+          }    
+        }        
         }
       }  
       label={<label>{props.label}</label>} 
-      options={options} nullFlavors={props.certificate.nullFlavors} 
+      options={options} 
+      nullFlavors={props.fieldName===undefined ? deathReason?.nullFlavors : props.certificate.nullFlavors} 
       onChange={(e: IReference, nullFlavors: INullFlavor[] | undefined)=>{
-        if (nullFlavors) certificate.nullFlavors = nullFlavors
+        if (nullFlavors && props.fieldName) certificate.nullFlavors = nullFlavors
+        else if (nullFlavors && deathReason) deathReason.nullFlavors =  nullFlavors
       }}
       paraNum      
-      field_name={props.fieldName}
+      field_name={props.fieldName || 'diagnosis'}
+      value={NA}
       field={
         <div className="p-fluid p-formgrid p-grid">     
           <div className={`p-field p-col-12 ${props.isExt ? 'p-md-10' : 'p-md-8'}`}>             

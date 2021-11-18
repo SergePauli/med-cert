@@ -43,4 +43,19 @@ export class Procedure {
   get deathReasonID(): string {
     return this._deathReasonID
   }
+  timeStr(): string {
+    if (this._effectiveTime === undefined) return ""
+    const optionsTime = {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    } as Intl.DateTimeFormatOptions
+    const optionsDate = { year: "2-digit", month: "short", day: "2-digit" } as Intl.DateTimeFormatOptions
+    return this._effectiveTime?.toLocaleString(
+      "ru",
+      this._effectiveTime.getHours() === 0 && this._effectiveTime.getMinutes() === 0 ? optionsDate : optionsTime
+    )
+  }
 }

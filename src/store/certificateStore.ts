@@ -19,6 +19,8 @@ import {
   DEFAULT_CERT_SUGGESTIONS,
   EDUCATION_LEVEL_SUG,
   EST_MEDIC_SUG,
+  EXT_REASON_SUG,
+  EXT_REASON_TIME_SUG,
   IDNUMBER_SUG,
   IDSERIES_SUG,
   ID_CARD_TYPES,
@@ -340,8 +342,8 @@ export default class CertificateStore {
   }
 
   redSuggestionsCount() {
-    return this.suggestions.reduce((result, item) => {
-      if (!item.done) ++result
+    return this.suggestions.reduce((result, item, index) => {
+      if (!(item.done || index === EXT_REASON_SUG || index === EXT_REASON_TIME_SUG)) ++result
       return result
     }, 0)
   }
