@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { FC, useContext, useEffect} from 'react'
+import { FC, useContext} from 'react'
 import { Context } from '../..'
 import { Card } from 'primereact/card'
 import { CheckboxChangeParams } from 'primereact/checkbox'

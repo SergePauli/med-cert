@@ -59,7 +59,7 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
         }} />
       </>
     }
-  console.log('checkReason ',checkReason, 'newReason ', newReason.diagnosis)  
+    
   const  getMedservs = (event: { query: string })=>{
   const option = {} as any
   if (event.query.trim().length>0) option.name_cont = event.query.trim()
@@ -125,9 +125,11 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
           deathReason={newReason} certificate={certificate}
           key={`ra2_${newReason.effectiveTime}`}           
           onChange={(reason: DeathReason | undefined)=>{  
-            if (reason?.diagnosis) setDiagnosChecked(true)
-            else setDiagnosChecked(false)          
-             }}
+            if (reason) {              
+              if (reason !==newReason) setNewReason(reason)
+            }           
+          }}
+          onDiagnosisChecked={(checked)=>setDiagnosChecked(checked)}
           checked={diagnosChecked}                                   
         />                   
       </div>

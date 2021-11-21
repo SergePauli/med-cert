@@ -28,6 +28,8 @@ type ReasonProps = {
   onChange: (reason: DeathReason | undefined)=>void
   onUp?: ()=>void
   onDown?: ()=>void
+  onTimeChecked?: (checked: boolean)=>void 
+  onDiagnosisChecked?: (checked: boolean, nullFlavors: INullFlavor[] | undefined)=>void
 }
 
 const Reason: FC<ReasonProps> = (props: ReasonProps) => { 
@@ -87,15 +89,19 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
         if (!e.checked) deathReason.effectiveTime = undefined 
         if (nullFlavors) deathReason.nullFlavors = nullFlavors
         props.onChange(deathReason)
+        if (props.onTimeChecked) props.onTimeChecked(e.checked)
       }}
+      onChange={(e: IReference, nullFlavors: INullFlavor[] | undefined)=>{        
+        if (nullFlavors) deathReason.nullFlavors = nullFlavors}}
       field_name="effective_time"
       field={
         <div className="p-fluid p-formgrid p-grid" style={{marginLeft:'0'}}>           
           <div className={CSS_classes} style={style} key={`rt_${deathTime}`}>  
             <span className="p-inputgroup-addon">лет</span>          
             <InputText id="year" type="number" min={0} max={99}
-                onChange={(e)=>{                             
-                deathReason.years = Number.parseInt(e.target.value)
+                onChange={(e)=>{  
+                const value = Number.parseInt(e.target.value)                             
+                deathReason.years = value === 0 ? undefined : value
                 props.certificate.saveReasonEffTime(deathReason)
                 props.onChange(deathReason)              
               }}
@@ -105,7 +111,8 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
             <span className="p-inputgroup-addon">мес</span>            
             <InputText id="month" type="number" 
               min={0} max={12} onChange={(e)=>{
-              deathReason.months = Number.parseInt(e.target.value)
+              const value = Number.parseInt(e.target.value)  
+              deathReason.months = value === 0 ? undefined : value
               props.certificate.saveReasonEffTime(deathReason) 
               props.onChange(deathReason)
             }}
@@ -115,7 +122,8 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
             <span className="p-inputgroup-addon">нед</span>           
             <InputText id="ned" type="number" 
             min={0} max={4} onChange={(e)=>{
-              deathReason.weeks = Number.parseInt(e.target.value)
+              const value = Number.parseInt(e.target.value)
+              deathReason.weeks = value === 0 ? undefined : value
               props.certificate.saveReasonEffTime(deathReason)
               props.onChange(deathReason)
             }}
@@ -125,7 +133,8 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
             <span className="p-inputgroup-addon">сут</span>            
             <InputText id="dne" type="number" 
             min={0} max={7} onChange={(e)=>{
-              deathReason.days = Number.parseInt(e.target.value)
+              const value = Number.parseInt(e.target.value)
+              deathReason.days = value === 0 ? undefined : value
               if (props.certificate.saveReasonEffTime(deathReason)) props.onChange(deathReason)
             }}
             value={deathReason.days}/>
@@ -134,7 +143,8 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
             <span className="p-inputgroup-addon">час</span>            
             <InputText id="hours" type="number"
              min={0} max={23} onChange={(e)=>{
-              deathReason.hours = Number.parseInt(e.target.value)
+              const value = Number.parseInt(e.target.value) 
+              deathReason.hours = value === 0 ? undefined : value
               if (props.certificate.saveReasonEffTime(deathReason)) props.onChange(deathReason)
             }}
              value={deathReason.hours}/>          
@@ -143,7 +153,8 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
             <span className="p-inputgroup-addon">мин</span>            
             <InputText id="minut" type="number"
               min={0} max={59} onChange={(e)=>{
-              deathReason.minutes = Number.parseInt(e.target.value)
+              const value = Number.parseInt(e.target.value)  
+              deathReason.minutes = value === 0 ? undefined : value
               props.certificate.saveReasonEffTime(deathReason) 
               props.onChange(deathReason)
             }}
@@ -158,25 +169,25 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
         setChecked(e.checked)
         if (e.checked) {
           const reason = props.certificate.createDeathReason({certificate_id: props.certificate.id} as IDeathReason)
-          props.onChange(reason)} 
-        else { 
-          props.onChange(undefined)
-          if (deathReason && nullFlavors) { 
-            deathReason.nullFlavors = nullFlavors
+          props.onChange(reason)
+        } else {           
+          if (deathReason) {             
+            deathReason.nullFlavors = []
             deathReason.effectiveTime = undefined  
             deathReason.diagnosis = undefined
             deathReason.nullFlavors.push({parent_attr:'effective_time', code: NA} as INullFlavor)   
             deathReason.nullFlavors.push({parent_attr:'diagnosis', code: NA} as INullFlavor)       
-          }    
-        }        
+          } 
+          props.onChange(undefined)   
         }
-      }  
+        if (props.onDiagnosisChecked) props.onDiagnosisChecked(e.checked, nullFlavors)        
+      }}  
       label={<label>{props.label}</label>} 
       options={options} 
       nullFlavors={props.fieldName===undefined ? deathReason?.nullFlavors : props.certificate.nullFlavors} 
       onChange={(e: IReference, nullFlavors: INullFlavor[] | undefined)=>{
-        if (nullFlavors && props.fieldName) certificate.nullFlavors = nullFlavors
-        else if (nullFlavors && deathReason) deathReason.nullFlavors =  nullFlavors
+        if (nullFlavors!==undefined && props.fieldName!==undefined) certificate.nullFlavors = nullFlavors
+        else if (nullFlavors!==undefined && deathReason!==undefined) deathReason.nullFlavors = nullFlavors
       }}
       paraNum      
       field_name={props.fieldName || 'diagnosis'}

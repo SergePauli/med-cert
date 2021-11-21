@@ -15,11 +15,10 @@ import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
 
 
+
  const Section7: FC = () => {
-  const { certificateStore } = useContext(Context)
-   
-  //const optionCode = 'NA'
-  //const options = NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))  
+  const { certificateStore } = useContext(Context)   
+  
   
   const header = () => {
       return <span> <span className='paragraph p-mr-1'>22(I).</span>  Причины смерти.</span>
@@ -59,7 +58,8 @@ import { InputText } from 'primereact/inputtext'
           onChange={(reason: DeathReason | undefined)=>{ 
             if (reason!==certificate.reasonB ) 
             certificate.reasonB = reason 
-          console.log('reason', reason)}}  
+          }} 
+           
           checked={reasonBckecked} 
           fieldName='b_reason' 
           onDown={()=>{
