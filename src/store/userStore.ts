@@ -5,6 +5,7 @@ import { IUser } from "../models/IUser"
 import { IPassRenew } from "../models/requests/IPassRenew"
 import { IRegistration } from "../models/requests/IRegistration"
 import { AuthResponse } from "../models/responses/AuthResponse"
+import { IUserInfo } from "../models/responses/IUserInfo"
 import AuthService from "../services/AuthService"
 import UsersService from "../services/UsersService"
 import { HOME_ROUTE, LOGIN_ROUTE } from "../utils/consts"
@@ -15,6 +16,7 @@ export default class UserStore {
   private _isLoding: boolean
   private _history: any
   private _token: string
+  private _userInfo?: IUserInfo
 
   constructor() {
     this._user = {} as IUser
@@ -53,15 +55,20 @@ export default class UserStore {
     return this._token
   }
   async login(email: string, password: string) {
-    try {
-      const response = await AuthService.login(email, password)
-      localStorage.setItem("token", response.data.tokens.access)
-      this.setAuth(true)
-      this.setUser(response.data.user)
-      this._history.push(HOME_ROUTE)
-    } catch (e) {
-      this._history.push("/error/" + e.message)
-    }
+    AuthService.login(email, password)
+      .then((response) => {
+        if (response.data) {
+          localStorage.setItem("token", response.data.tokens.access)
+          this.setAuth(true)
+          this.setUser(response.data.user)
+          this._history.push(HOME_ROUTE)
+        } else {
+          this._history.push("/error/Ошибка авторизации: неверный ответ API-сервера")
+        }
+      })
+      .catch((reason) => {
+        this._history.push("/error/" + reason.message)
+      })
   }
   async registration(user: IRegistration) {
     try {
@@ -69,7 +76,7 @@ export default class UserStore {
       this._history.push(
         "/message/Ваша заявка направлена администратору ресурса для активации. Письмо с результатом, будет выслано на Ваш email"
       )
-    } catch (e) {
+    } catch (e: any) {
       this._history.push("/error/" + e.message)
     }
   }
@@ -77,7 +84,7 @@ export default class UserStore {
     try {
       await AuthService.pwd_renew(user)
       this._history.push("/message/Пароль был успешно изменен")
-    } catch (e) {
+    } catch (e: any) {
       this._history.push("/error/" + e.message)
       return false
     }
@@ -86,7 +93,7 @@ export default class UserStore {
     try {
       await AuthService.renew_link(email)
       this._history.push("/message/Вам в почту направлено письмо, со ссылкой на страницу изменения пароля")
-    } catch (e) {
+    } catch (e: any) {
       this._history.push("/error/" + e.message)
       return false
     }
@@ -98,8 +105,9 @@ export default class UserStore {
       localStorage.removeItem("token")
       this.setToken("")
       this.setUser({} as IUser)
+      this._userInfo = undefined
       this._history.push(LOGIN_ROUTE)
-    } catch (e) {
+    } catch (e: any) {
       this._history.push("/error/" + e.message)
     }
   }
@@ -111,7 +119,7 @@ export default class UserStore {
       this.setToken(response.data.tokens.access)
       this.setAuth(true)
       this.setUser(response.data.user)
-    } catch (e) {
+    } catch (e: any) {
       if (e.message?.includes("401")) {
         this._isAuth = false
         this._token = ""
@@ -129,7 +137,7 @@ export default class UserStore {
       this.setLoading(true)
       const response = await UsersService.getUser(id + "")
       return response.data
-    } catch (e) {
+    } catch (e: any) {
       this._history.push("/error/" + e.message)
     } finally {
       this.setLoading(false)
@@ -137,5 +145,14 @@ export default class UserStore {
   }
   history() {
     return this._history
+  }
+  get userInfo() {
+    if (this._userInfo) return this._userInfo
+    else if (this._user.id)
+      this.getUserInfo(this._user.id).then((response) => {
+        if (response) this._userInfo = response
+        else this._userInfo = undefined
+      })
+    return null
   }
 }
