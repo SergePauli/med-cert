@@ -28,15 +28,20 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
     else if (notificationsMenuActive) layoutStore.setNotificationsMenuActive(false)
   } 
   const wrapperClass = classNames("layout-wrapper layout-static p-ripple layout-sidebar-indigo",{"layout-static-inactive": layoutStaticInactive}, {"layout-mobile-active": layoutStore.tabletOrMobile()})
-  const [userInfo, setUserInfo] = useState({} as IUserInfo)   
-   const userId = userStore.user().id   
-   useEffect(()=>{ userStore.getUserInfo(userId).then(data=>{ if (data) setUserInfo(data)})},[userId, userStore])
+  const [userInfo, setUserInfo] = useState<IUserInfo | null>(null)   
+  const userId = userStore.user().id   
+  useEffect(()=>{ 
+     if (userId!== undefined && userInfo === null) 
+     setUserInfo(userStore.userInfo)     
+    },[userId, userInfo, userStore.userInfo]
+  )
+    
   return (
   <div className={wrapperClass} data-theme='light'>
     <div className='layout-content-wrapper' onClick={()=>onClickOutside()}>  
-      <TopBarLayout  title = {props.title}  userInfo= {userInfo} />        
+      <TopBarLayout  title = {props.title}  userInfo={userInfo} />        
       <div className='layout-content' >{props.content}</div>
-      <FooterLayout userInfo= {userInfo} />
+      <FooterLayout userInfo={userInfo} />
     </div>
     <SideBarLayout  activeUrl={props.url} /> 
     <RightSideBarLayout /> 
