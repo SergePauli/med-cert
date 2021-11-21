@@ -6,6 +6,6 @@ export interface IUserInfo {
   id: number
   roles: string
   person_name: IPersonName
-  organization: IReference
+  organization: { id: number; name: string }
   contacts: IContact[]
 }
