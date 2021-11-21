@@ -1,10 +1,10 @@
 import { IUserInfo } from "../../models/responses/IUserInfo"
 import {ROLES}  from "../../utils/consts"
 
-type FooterLayoutProps = {userInfo: IUserInfo }
+type FooterLayoutProps = {userInfo: IUserInfo | null}
 const FooterLayout = (props: FooterLayoutProps) => {
-  const orgName = props.userInfo.organization ? props.userInfo.organization.name : ''
-  const profile = props.userInfo.roles ? ROLES[props.userInfo.roles]: ''
+  const orgName = props.userInfo!==null && props.userInfo.organization ? props.userInfo.organization.name : ''
+  const profile = props.userInfo!==null && props.userInfo.roles ? ROLES[props.userInfo.roles]: ''  
   return (
     <div className="layout-footer">
       <div className="footer-logo-container">

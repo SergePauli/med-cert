@@ -9,7 +9,7 @@ import { MenuItem } from "primereact/menuitem"
 type SideBarLayoutProps = {activeUrl: string}
 const SideBarLayout = observer((props: SideBarLayoutProps) => {
    const {userStore, certificateStore} = useContext(Context)
-   const cert_id =  certificateStore.cert.id 
+   const cert_id =  certificateStore.cert.id?.toString() || 'new'
    const cert_route_id = `${CERTIFICATE_ROUTE}/${cert_id}`
    const items:MenuItem[] = [    
       { label: "Свидетельство", className: "layout-root-menuitem",     
@@ -41,8 +41,7 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
     })      
     return isActive
   }
-  findActive(items)
-  
+  findActive(items)  
   return (
     <div className='layout-sidebar'>      
         <Link className='logo' to='#/'>

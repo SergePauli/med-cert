@@ -44,7 +44,7 @@ const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
         </div>                  
       </>
     )    
-  }
+  }  
   return (
     <>
       <MainLayout {...layoutParams} />

@@ -8,7 +8,7 @@ type RightSideBarLayoutProps = {}
 
 const RightSideBarLayout: FC<RightSideBarLayoutProps> = (props: RightSideBarLayoutProps) =>{ 
   const {layoutStore} = useContext(Context)
-  const className = classNames("layout-sidebar-right", {"layout-sidebar-right-active": layoutStore.rightSideBarActive() })
+  const className = classNames("layout-sidebar-right", {"layout-sidebar-right-active": layoutStore.rightSideBarActive() })  
   return (  
   <div className={className}>
     <h5>Активность</h5>
