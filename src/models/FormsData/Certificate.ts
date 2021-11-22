@@ -45,6 +45,8 @@ export default class Certificate {
   private _childInfo?: ChildInfo | undefined
   private _establishedMedic?: number | undefined
   private _basisDetermining?: number | undefined
+  private _trafficAccident?: number | undefined
+  private _pregnancyConnection?: number | undefined
   private _nullFlavors: INullFlavor[]
   disposers: (() => void)[]
 
@@ -75,6 +77,8 @@ export default class Certificate {
     this._extReasonDescription = props.ext_reason_description
     this._establishedMedic = props.established_medic
     this._basisDetermining = props.basis_determining
+    this._trafficAccident = props.traffic_accident
+    this._pregnancyConnection = props.pregnancy_connection
     if (props.reason_ACME && props.reason_ACME === props.a_reason?.diagnosis?.ICD10) this._reasonACME = this._reasonA
     else if (props.reason_ACME && props.reason_ACME === props.b_reason?.diagnosis?.ICD10)
       this._reasonACME = this._reasonB
@@ -186,6 +190,18 @@ export default class Certificate {
   }
   set basisDetermining(value: number | undefined) {
     this._basisDetermining = value
+  }
+  get trafficAccident(): number | undefined {
+    return this._trafficAccident
+  }
+  set trafficAccident(value: number | undefined) {
+    this._trafficAccident = value
+  }
+  get pregnancyConnection(): number | undefined {
+    return this._pregnancyConnection
+  }
+  set pregnancyConnection(value: number | undefined) {
+    this._pregnancyConnection = value
   }
   get nullFlavors() {
     return this._nullFlavors
