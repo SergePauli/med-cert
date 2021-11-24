@@ -9,16 +9,17 @@ import { ProfileMenu } from '../menus/ProfileMenu'
 import { ExtMenuItem } from '../menus/IMenuProps'
 import { NotificationsMenu } from '../menus/NotificationsMenu'
 import { IUserInfo } from '../../models/responses/IUserInfo'
-type TopBarLayoutProps = {title: string,  userInfo: IUserInfo }
+type TopBarLayoutProps = {title: string,  userInfo: IUserInfo | null }
 const detail_templ ="detail"
 export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
   const {layoutStore, userStore} = useContext(Context)
   const isTOM = useMediaQuery({ query: "(max-width: 991px)" })
   const profileMenuClassName = classNames("profile-item",{"active-menuitem fadeInDown":layoutStore.profileMenuActive()})
   const notificationsMenuClassName = classNames("notifications-item", {"active-menuitem":layoutStore.notificationsMenuActive()})
-  const menuToggle=()=>{    
+  const menuToggle=()=>{ 
+    console.log('isTOM',isTOM, 'layoutStore.tabletOrMobile()',layoutStore.tabletOrMobile(), )   
     if (isTOM && layoutStore.tabletOrMobile()) layoutStore.setTabletOrMobile(false) 
-    else if (!layoutStore.tabletOrMobile()) layoutStore.setTabletOrMobile(true)
+    else if (isTOM && !layoutStore.tabletOrMobile()) layoutStore.setTabletOrMobile(true)
     else layoutStore.sideBarToggle()          
   } 
   const items:MenuItem[] = [    
@@ -38,9 +39,8 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
     return sum += item.detail
    },0)
    
-   const userName = props.userInfo ? 
-   `${props.userInfo.person_name?.family} ${props.userInfo.person_name?.given_1[0]} ${props.userInfo.person_name?.given_2?.charAt(0) ||''}` : '' 
-     
+   const userName = props.userInfo!==null && props.userInfo.person_name ? 
+   `${props.userInfo.person_name?.family} ${props.userInfo.person_name?.given_1[0]} ${props.userInfo.person_name?.given_2?.charAt(0) ||''}` : ''     
   return (
     <div className="layout-topbar">
       <div className="topbar-left">

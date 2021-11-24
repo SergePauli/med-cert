@@ -2,6 +2,7 @@ import { makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
 import { INullFlavor } from "../INullFlavor"
 import { IPatient } from "../IPatient"
+import Address from "./Address"
 import Identity from "./Identity"
 import Person from "./Person"
 
@@ -13,6 +14,7 @@ export default class Patient {
   private _birth_year?: number
   private _provider_organization?: string
   private _addr_type?: number
+  private _address?: Address
   private _guid?: string
   private _identity?: Identity
   private _nullFlavors: INullFlavor[]
@@ -29,6 +31,7 @@ export default class Patient {
       this._identity = new Identity(props.identity)
     }
     this._nullFlavors = props.nullFlavors || []
+    if (props.address) this._address = new Address(props.address)
     makeAutoObservable(this)
   }
   get id() {
@@ -85,8 +88,30 @@ export default class Patient {
   get identity() {
     return this._identity
   }
-
   set identity(identity: Identity | undefined) {
     this._identity = identity
+  }
+  get address() {
+    return this._address
+  }
+  set address(value: Address | undefined) {
+    this._address = value
+  }
+
+  setBirthDay(value: Date | undefined, isYear: boolean) {
+    if (value && !isYear) {
+      if (this._birth_date === undefined)
+        this.setNullFlavors(this.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
+      this.birth_date = value
+      this.birth_year = undefined
+    } else if (value && isYear) {
+      if (this.birth_date === undefined)
+        this.setNullFlavors(this.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
+      this.birth_date = value
+      this.birth_year = (this.birth_date as Date).getFullYear()
+    } else {
+      this.birth_date = undefined
+      this.birth_year = undefined
+    }
   }
 }

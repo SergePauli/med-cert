@@ -33,7 +33,7 @@ const LoginPage: FC = () => {
         }        
         return errors
   }
-  const onSubmit = (data: IAuth, form: any) => {          
+  const onSubmit = async (data: IAuth, form: any) => {          
     userStore.login(data.email, data.password)        
   }
   const onPassordRecovery = async () => {          

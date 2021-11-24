@@ -12,7 +12,7 @@ const AppRouter: FC = observer(() => {
   const {userStore} = useContext(Context) 
   const token =  userStore.token()
   const isAuth =  userStore.isAuth()
-  userStore.setHistory(history) 
+  userStore.setHistory(history)  
   useEffect(()=>{
     if (token.length>0 && !isAuth) {
       userStore.checkAuth()

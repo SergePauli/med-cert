@@ -9,13 +9,14 @@ import { MenuItem } from "primereact/menuitem"
 type SideBarLayoutProps = {activeUrl: string}
 const SideBarLayout = observer((props: SideBarLayoutProps) => {
    const {userStore, certificateStore} = useContext(Context)
-   const cert_id =  certificateStore.cert.id 
+   const cert_id =  certificateStore.cert.id?.toString() || 'new'
+   const cert_route_id = `${CERTIFICATE_ROUTE}/${cert_id}`
    const items:MenuItem[] = [    
       { label: "Свидетельство", className: "layout-root-menuitem",     
         items:[{label:"Секции", icon:"pi-file", items:[
           {label:"Сведения о документе", 
-          url:`${CERTIFICATE_ROUTE}/${cert_id}?q=0`}, 
-          {label:"Начало(п.1-3,7)", url:`${CERTIFICATE_ROUTE}/${cert_id}?q=1`},{label:"Документы(п.4-6)", url:`${CERTIFICATE_ROUTE}/${cert_id}?q=2`},{label:"Место жит.(8-9)", url:"/#"}, {label:"Место смер.(п.10-11)",  url:"/#"},{label:"п.12-17", url:"/#"},{label:"п.18-21", url:"/#"},{label:"Причины (п.22 I)", url:"/#"},{label:"Прочие (п.22 II)", url:"/#"},{label:"п.23-26", url:"/#"}]},
+          url:`${cert_route_id}?q=0`}, 
+          {label:"Начало(п.1-3,7)", url:`${cert_route_id}?q=1`},{label:"Документы(п.4-6)", url:`${cert_route_id}?q=2`},{label:"Место жит.(п.8-9)", url:`${cert_route_id}?q=3`}, {label:"Место смер.(п.10-11)", url:`${cert_route_id}?q=4`},{label:"п.12-17", url:`${cert_route_id}?q=5`},{label:"п.18-21", url:`${cert_route_id}?q=6`},{label:"Причины (п.22 I)", url:`${cert_route_id}?q=7`},{label:"Прочие (п.22 II)", url:`${cert_route_id}?q=8`},{label:"п.23-26", url:`${cert_route_id}?q=9`}]},
         { label: "Списки",  icon:"pi-list", items: [{label:"Свидетельства", icon:"pi-id-card", url:LIST_ROUTE},{label:"Журнал", icon:"pi-align-left", url:"/#"}]},]}, 
       {separator: true},
       { label: "Сеанс", className: "layout-root-menuitem",      
@@ -40,8 +41,7 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
     })      
     return isActive
   }
-  findActive(items)
-  
+  findActive(items)  
   return (
     <div className='layout-sidebar'>      
         <Link className='logo' to='#/'>

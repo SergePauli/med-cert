@@ -4,15 +4,16 @@
 
 .c-section {
   min-width: 400px;
-  max-width: 476px;
+  max-width: 676px;
 }
 
 .layout-static-inactive .c-section {
-  max-width: 600px;
+  max-width: 676px;
 }
 
 .p-suggestion {
-  max-width: 350px;
+  min-width: 300px;
+  max-width: 320px;
 }
 
 .layout-static-inactive .p-suggestion {
@@ -33,6 +34,7 @@
   font-weight: 600;
   margin-left: 0.5rem;
   margin-top: 0.1rem;
+  width: 1.65rem;
 }
 
 .p-checkbox-right.p-field-checkbox>label {
@@ -57,4 +59,19 @@
 
 .p-d-flex .p-calendar .p-inputtext {
   flex: inherit;
+}
+
+.ACME-reason {
+  background-color: antiquewhite;
+}
+
+.p-add-block {
+  margin-left: 1rem;
+  background-color: #f3eded;
+  padding-top: 8px;
+  border-radius: 3px;
+}
+
+.p-datatable-wrapper>table {
+  width: 100%;
 }
