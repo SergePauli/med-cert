@@ -1,3 +1,4 @@
+import { IAuthenticator } from "../IAuthenticator"
 import { IChildInfo } from "../IChildInfo"
 import { INullFlavorable } from "../INullFlavorable"
 import { IPatient } from "../IPatient"
@@ -41,5 +42,9 @@ export interface ICertificateResponse extends INullFlavorable {
   child_info?: IChildInfo | undefined
   traffic_accident?: number
   pregnancy_connection?: number
+  author?: IAuthenticator
+  authenticator?: IAuthenticator
+  legal_authenticator?: IAuthenticator
+  custodian?: number
   guid: string
 }

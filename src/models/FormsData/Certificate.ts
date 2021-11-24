@@ -7,6 +7,7 @@ import { IReference } from "../IReference"
 import { ICertificateResponse } from "../responses/ICertificateResponse"
 import { IDeathReason } from "../responses/IDeathReason"
 import Address from "./Address"
+import Authenticator from "./Authenticator"
 import { ChildInfo } from "./ChildInfo"
 import { DeathReason } from "./DeathReason"
 import Patient from "./Patient"
@@ -47,6 +48,9 @@ export default class Certificate {
   private _basisDetermining?: number | undefined
   private _trafficAccident?: number | undefined
   private _pregnancyConnection?: number | undefined
+  private _author?: Authenticator | undefined
+  private _authenticator?: Authenticator | undefined
+  private _legalAuthenticator?: Authenticator | undefined
   private _nullFlavors: INullFlavor[]
   disposers: (() => void)[]
 
@@ -73,6 +77,9 @@ export default class Certificate {
     this._maritalStatus = props.marital_status
     this._socialStatus = props.social_status
     if (props.child_info) this._childInfo = new ChildInfo(props.child_info)
+    if (props.author) this._author = new Authenticator(props.author)
+    if (props.authenticator) this._authenticator = new Authenticator(props.authenticator)
+    if (props.legal_authenticator) this._legalAuthenticator = new Authenticator(props.legal_authenticator)
     this._extReasonTime = props.ext_reason_time
     this._extReasonDescription = props.ext_reason_description
     this._establishedMedic = props.established_medic
@@ -172,6 +179,24 @@ export default class Certificate {
   get guid() {
     return this._guid
   }
+  get author(): Authenticator | undefined {
+    return this._author
+  }
+  set author(value: Authenticator | undefined) {
+    this._author = value
+  }
+  get authenticator(): Authenticator | undefined {
+    return this._authenticator
+  }
+  set authenticator(value: Authenticator | undefined) {
+    this._authenticator = value
+  }
+  get legalAuthenticator(): Authenticator | undefined {
+    return this._legalAuthenticator
+  }
+  set legalAuthenticator(value: Authenticator | undefined) {
+    this._legalAuthenticator = value
+  }
 
   get extReasonTime(): Date | undefined {
     return this._extReasonTime
@@ -239,7 +264,6 @@ export default class Certificate {
   set lifeAreaType(lat: number | undefined) {
     this._lifeAreaType = lat
   }
-
   get deathAreaType() {
     return this._deathAreaType
   }
