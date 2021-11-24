@@ -41,6 +41,7 @@ import {
   PATIENT_BIRTHDAY_SUG,
   PATIENT_GENDER_SUG,
   PERSON_NAME_SUG,
+  PREGNANCY_CONNECTION_SUG,
   REASON_A_SUG,
   REASON_A_TIME_SUG,
   REASON_B_SUG,
@@ -52,6 +53,7 @@ import {
   SNILS_SUG,
   SOCIAL_STATUS_SUG,
   TERMS_PREGNANCY_SUG,
+  TRAFFFIC_ACCIDENT_SUG,
 } from "../utils/defaults"
 configure({
   enforceActions: "never",
@@ -298,6 +300,16 @@ export default class CertificateStore {
       this._suggestions[REASON_D_TIME_SUG].done =
         this._cert.reasonD?.effectiveTime !== undefined ||
         this._cert.reasonD?.nullFlavors.findIndex((item) => item.parent_attr === "effective_time") !== -1
+    })
+    this.disposers[38] = autorun(() => {
+      this._suggestions[TRAFFFIC_ACCIDENT_SUG].done =
+        this._cert.trafficAccident !== undefined ||
+        this._cert.nullFlavors.findIndex((item) => item.parent_attr === "traffic_accident") !== -1
+    })
+    this.disposers[39] = autorun(() => {
+      this._suggestions[PREGNANCY_CONNECTION_SUG].done =
+        this._cert.pregnancyConnection !== undefined ||
+        this._cert.nullFlavors.findIndex((item) => item.parent_attr === "pregnancy_connection") !== -1
     })
   }
 

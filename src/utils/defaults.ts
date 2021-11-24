@@ -235,6 +235,38 @@ export const DEFAULT_CERT_SUGGESTIONS = [
       "Указание периода времени между началом патол. состояния и смертью или причины его отсутствия - обязательно для заполнения",
     done: true,
   },
+  {
+    section: "9",
+    code: "п.23",
+    suggestion: "Указание периода наступления смерти в случае ДТП  - обязательно для заполнения",
+    done: false,
+  },
+  {
+    section: "9",
+    code: "п.24",
+    suggestion: "Указание срока в случае наступления смерти при беременности  - обязательно для заполнения",
+    done: false,
+  },
+  {
+    section: "9",
+    code: "п.25.1",
+    suggestion:
+      "Указание данных о враче (судебно-медицинском эксперте, фельдшере, акушерке), заполнившем свидетельство - обязательно для заполнения",
+    done: false,
+  },
+  {
+    section: "9",
+    code: "п.26",
+    suggestion:
+      "Указание данных об ответственном за проверку медицинских свидетельств лице - обязательно для заполнения",
+    done: false,
+  },
+  {
+    section: "9",
+    code: "п.25.2",
+    suggestion: "Указание данных о руководителе медицинской организации - обязательно для заполнения",
+    done: false,
+  },
 ]
 export const CERT_TYPE_SUG = 0
 export const PERSON_NAME_SUG = 1
@@ -276,6 +308,11 @@ export const REASON_D_SUG = 36
 export const REASON_D_TIME_SUG = 37
 export const EXT_REASON_SUG = 38
 export const EXT_REASON_TIME_SUG = 39
+export const TRAFFFIC_ACCIDENT_SUG = 40
+export const PREGNANCY_CONNECTION_SUG = 41
+export const AUTHOR_SUG = 42
+export const AUTHENTICATOR_SUG = 43
+export const LEGAL_AUTHENTICATOR_SUG = 44
 
 export const changeSuggestion = (code: string, suggestions: any[], done: boolean) => {
   const suggestion = suggestions.find((item) => item.code === code)
