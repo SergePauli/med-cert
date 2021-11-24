@@ -117,9 +117,7 @@
 
 @media (min-width: 993px) {
   .login-body .login-wrapper .login-image {
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-image: url("../images/bg-login.jpg");
+    background: linear-gradient( 180deg, #324191, #2196F3 86.48%)
   }
 }
 

@@ -5,22 +5,25 @@ import { FC } from 'react'
 import { Route, Switch, useHistory } from 'react-router-dom'
 import { Context } from '..'
 import { NoMatchPage } from '../pages/NoMatchPage'
-import { AUTH_ROUTES, PUBLIC_ROUTES } from '../routes'
+import { AUTH_ROUTES, NON_AUTH_ROUTES, PUBLIC_ROUTES } from '../routes'
 
 const AppRouter: FC = observer(() => {  
   const history = useHistory()
   const {userStore} = useContext(Context) 
-  userStore.setHistory(history) 
+  const token =  userStore.token()
+  const isAuth =  userStore.isAuth()
+  userStore.setHistory(history)  
   useEffect(()=>{
-    if (localStorage.getItem('token')) {
+    if (token.length>0 && !isAuth) {
       userStore.checkAuth()
-    }
-  },[userStore])     
+    }   
+  },[token, userStore, isAuth])  
+  const chech_routes =  userStore.isAuth() || (token.length>0) ?  AUTH_ROUTES : NON_AUTH_ROUTES    
   return (
     <Switch> 
-      {userStore.isAuth() && AUTH_ROUTES.map(
+      { chech_routes.map(
         ({path, Component})=><Route key={path} path={path} component={Component} exact/>)
-      }      
+      }          
       { PUBLIC_ROUTES.map(
         ({path, Component})=><Route key={path} path={path} component={Component} exact/>)
       }

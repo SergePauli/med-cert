@@ -1,0 +1,77 @@
+.p-button-action {
+  min-width: 125px;
+}
+
+.c-section {
+  min-width: 400px;
+  max-width: 676px;
+}
+
+.layout-static-inactive .c-section {
+  max-width: 676px;
+}
+
+.p-suggestion {
+  min-width: 300px;
+  max-width: 320px;
+}
+
+.layout-static-inactive .p-suggestion {
+  max-width: 500px;
+}
+
+.p-suggestion .p-datatable.p-datatable-sm .p-datatable-tbody>tr>td {
+  padding: 0.5rem 0.2rem;
+  font-size: smaller;
+}
+
+.p-suggestion-actual {
+  color: rgb(204, 0, 0) !important;
+}
+
+.p-d-flex .paragraph {
+  color: #d28819;
+  font-weight: 600;
+  margin-left: 0.5rem;
+  margin-top: 0.1rem;
+  width: 1.65rem;
+}
+
+.p-checkbox-right.p-field-checkbox>label {
+  margin-left: 0;
+}
+
+.p-d-flex.p-ai-center .p-field-checkbox, .p-field-radiobutton {
+  margin-bottom: 0;
+}
+
+.p-checkbox-right.p-field-checkbox, .p-checkbox-right.p-field-radiobutton {
+  margin-bottom: 0.5rem;
+}
+
+.p-paragraph-field {
+  margin-bottom: 0.75rem;
+}
+
+.p-d-flex .p-fluid .p-calendar .p-inputtext {
+  width: 7.5rem;
+}
+
+.p-d-flex .p-calendar .p-inputtext {
+  flex: inherit;
+}
+
+.ACME-reason {
+  background-color: antiquewhite;
+}
+
+.p-add-block {
+  margin-left: 1rem;
+  background-color: #f3eded;
+  padding-top: 8px;
+  border-radius: 3px;
+}
+
+.p-datatable-wrapper>table {
+  width: 100%;
+}
