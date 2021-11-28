@@ -1,6 +1,6 @@
 export interface IContact {
   id?: string
-  value: string
-  use?: string
+  telcom_value: string
+  telcom_use?: string
   main?: boolean
 }
