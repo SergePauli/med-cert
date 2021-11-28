@@ -127,7 +127,10 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                 }}
                 placeholder='Регион, Нас.пункт, Улица, Дом'
               />
-          </div>}                   
+          </div>}  
+          onChange={(e: IReference, nullFlavors: INullFlavor[] | undefined) => {
+            props.setCheck({checked:false} as CheckboxChangeParams, nullFlavors)
+          }}                 
         />
       </div>
       <div className="p-paragraph-field p-mr-3 p-mb-2"  style={linkStyle}>      
