@@ -1,5 +1,6 @@
 import { AdminPage } from "./pages/AdminPage"
 import CertificatePage from "./pages/CertificatePage"
+import DoctorsPage from "./pages/DoctorsPage"
 import { ErrorPage } from "./pages/ErrorPage"
 import { ListPage } from "./pages/ListPage"
 import LoginPage from "./pages/LoginPage"
@@ -17,6 +18,7 @@ import {
   MESSAGE_ROUTE,
   PWD_RECOVERY_ROUTE,
   REGISTRATION_ROUTE,
+  DOCTORS_ROUTE,
 } from "./utils/consts"
 
 export const AUTH_ROUTES = [
@@ -24,6 +26,7 @@ export const AUTH_ROUTES = [
   { path: ADMIN_ROUTE, Component: AdminPage },
   { path: LIST_ROUTE, Component: ListPage },
   { path: CERTIFICATE_ROUTE + "/:id", Component: CertificatePage },
+  { path: DOCTORS_ROUTE, Component: DoctorsPage },
   { path: LOGIN_ROUTE, Component: MainPage },
 ]
 export const NON_AUTH_ROUTES = [
