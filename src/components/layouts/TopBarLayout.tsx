@@ -16,15 +16,15 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
   const isTOM = useMediaQuery({ query: "(max-width: 991px)" })
   const profileMenuClassName = classNames("profile-item",{"active-menuitem fadeInDown":layoutStore.profileMenuActive()})
   const notificationsMenuClassName = classNames("notifications-item", {"active-menuitem":layoutStore.notificationsMenuActive()})
-  const menuToggle=()=>{ 
-    console.log('isTOM',isTOM, 'layoutStore.tabletOrMobile()',layoutStore.tabletOrMobile(), )   
+  const menuToggle=()=>{    
     if (isTOM && layoutStore.tabletOrMobile()) layoutStore.setTabletOrMobile(false) 
     else if (isTOM && !layoutStore.tabletOrMobile()) layoutStore.setTabletOrMobile(true)
     else layoutStore.sideBarToggle()          
   } 
   const items:MenuItem[] = [    
       {label:"Пользователь", icon:"pi-user", url:"/#"},
-      {label:"Настройки", icon:"pi-cog", url:"/#"},      
+      {label:"Настройки", icon:"pi-cog", url:"/#"}, 
+      {label:"Врачи", icon:"pi-users", url:"/doctors"},     
       {label:"Выход", icon:"pi-power-off", command:()=>{userStore.logout()}},       
    ]
   const notif_items:ExtMenuItem[] = [    
