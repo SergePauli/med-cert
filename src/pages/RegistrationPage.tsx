@@ -50,13 +50,13 @@ export const RegistrationPage: FC = () =>{
         const names = data.name.trim().split(' ')
         request.person_name_attributes = {family: names[0], given_1: names[1]}         
         if (names.length>2)  request.person_name_attributes.given_2= names[2]  
-        if (data.phone_number) request.contacts_attributes={value: data.phone_number}        
+        if (data.phone_number) request.contacts_attributes={telcom_value: data.phone_number, main: true}        
         request.email = data.email
         request.password = data.password
         request.password_confirmation = data.password_confirmation
         request.organization_id = data.organization.id                  
         userStore.registration(request)        
-    } catch (e){
+    } catch (e:any){
       history.push("/error/"+e.message)      
     }          
   }
