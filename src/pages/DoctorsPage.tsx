@@ -14,6 +14,7 @@ import { IDoctor } from '../models/IDoctor'
 import DoctorService from "../services/DoctorService"
 import '../styles/components/Toolbar.css'
 import '../styles/components/Dialog.css'
+import '../styles/components/Toast.css'
 import { InputMask } from 'primereact/inputmask'
 import MainLayout from '../components/layouts/MainLayout'
 import { observer } from 'mobx-react-lite'
@@ -51,7 +52,7 @@ export const DoctorsPage: FC = () => {
     const [phone, setPhone] = useState('')
     const [position, setPosition] = useState('')
     const [positions, setPositions] = useState<IReferenceId[]>([])
-    const toast = useRef(null)
+    const toast = useRef<Toast>(null)
     const dt = useRef(null)
      
 
@@ -112,9 +113,8 @@ export const DoctorsPage: FC = () => {
                 _doctors[index] = response.data
                 setDoctorDialog(false)
                 setDoctors(_doctors)
+                if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись обновлена', life: 3000 })
               })
-              
-              //if (toast.current) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись обновлена', life: 3000 })
             } else {               
               DoctorService.addDoctor(_doctor).then((response)=>{
                 if (response.data) {                  
@@ -125,10 +125,11 @@ export const DoctorsPage: FC = () => {
                   setEmail('')
                   setPhone('')
                   setPosition('')
+                  if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись добавлена', life: 3000 })
                 }  
               })           
               
-              //toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись добавлена', life: 3000 })
+              
             }
           
         }
@@ -157,7 +158,7 @@ export const DoctorsPage: FC = () => {
           setDoctors(_doctors)
           setDeleteDoctorDialog(false)
           setDoctor(emptyDoctor)
-          //toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись удалена', life: 3000 })
+          if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись удалена', life: 3000 })
         }).catch(reason=>console.log('reason',reason))        
     }
     const findIndexById = (id:number | undefined) => {        
@@ -173,7 +174,7 @@ export const DoctorsPage: FC = () => {
         setDoctors(_doctors);
         setDeleteDoctorsDialog(false);
         setSelectedDoctors([]);
-        //toast.current.show({ severity: 'success', summary: 'Удачно', detail: 'Записи удалены', life: 3000 });
+        if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Удачно', detail: 'Записи удалены', life: 3000 });
     }   
 
     const onInputChange = () => {      
@@ -249,7 +250,7 @@ export const DoctorsPage: FC = () => {
         title: 'Врачи',     
         url: DOCTORS_ROUTE,
         content:
-        <div className="datatable-crud">
+        <div>
             <Toast ref={toast} />
 
             <div className="card">
