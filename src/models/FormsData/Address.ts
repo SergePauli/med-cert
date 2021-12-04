@@ -1,11 +1,13 @@
 import { makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
+import FiasService from "../../services/FiasService"
 import { INullFlavor } from "../INullFlavor"
 import { IReference } from "../IReference"
 import { IAddress } from "../responses/IAddress"
+import { IFiasItem } from "../responses/IFiasItem"
 
 export default class Address {
-  private _id: string
+  private _id?: string
   private _streetAddressLine: string
   private _state?: IReference
   private _district?: IReference
@@ -20,27 +22,27 @@ export default class Address {
   private _flat?: string
   private _postalCode?: string
   private _nullFlavors: INullFlavor[]
+  private _parent?: string
   constructor(props: IAddress, region = undefined as IReference | undefined) {
-    this._id = props.id || uuidv4()
-    this._nullFlavors = props.nullFlavors || []
+    if (props.id) this._id = props.id
     this._state = region
+    this._nullFlavors = props.nullFlavors || []
     this._streetAddressLine = props.streetAddressLine
     this._aoGUID = props.aoGUID
     this._houseGUID = props.houseGUID
     this._postalCode = props.postalCode
-    this._district = { name: props.addressPrints?.district } as IReference
-    this._city = { name: props.addressPrints?.city } as IReference
-    this._town = { name: props.addressPrints?.town } as IReference
-    this._housenum = props.addressPrints?.housenum
-    this._buildnum = props.addressPrints?.buildnum
-    this._strucnum = props.addressPrints?.strucnum
-    this._flat = props.addressPrints?.flat
+    this._housenum = props.house_number
+    this._buildnum = props.building_number
+    this._strucnum = props.struct_number
+    this._flat = props.flat_number
+    this._parent = props.parent_guid
+    this.fetchAddressHierarchy()
     makeAutoObservable(this)
   }
   get id() {
     return this._id
   }
-  set id(id: string) {
+  set id(id: string | undefined) {
     this._id = id
   }
   get streetAddressLine() {
@@ -123,10 +125,54 @@ export default class Address {
   get city() {
     return this._city
   }
-  nullFlavors() {
+
+  get parent() {
+    return this._parent
+  }
+
+  get nullFlavors() {
     return this._nullFlavors
   }
-  setNullFlavors(nullFlavors: INullFlavor[]) {
+  set nullFlavors(nullFlavors: INullFlavor[]) {
     this._nullFlavors = nullFlavors
+  }
+
+  //рекурсивный парсинг структуры адресного объекта
+  parseFiasItem(fiasItem: IFiasItem) {
+    switch (fiasItem.level) {
+      case "Street":
+        this._street = { code: fiasItem.AOGUID, name: `${fiasItem.name} ${fiasItem.shortname}` }
+        break
+      case "Town":
+        this._town = { code: fiasItem.AOGUID, name: `${fiasItem.name} ${fiasItem.shortname}` }
+        break
+      case "City":
+        this._city = { code: fiasItem.AOGUID, name: `${fiasItem.name} ${fiasItem.shortname}` }
+        break
+      case "District":
+        this._district = { code: fiasItem.AOGUID, name: `${fiasItem.name} ${fiasItem.shortname}` }
+        break
+      case "Region":
+        if (fiasItem.code) {
+          const code = fiasItem.code.slice(0, 2)
+          this._state = { code: code, name: `${fiasItem.name}` }
+        }
+        break
+      default:
+        break
+    }
+    if (fiasItem.parent) this.parseFiasItem(fiasItem.parent)
+  }
+  // Получить всю ФИАС структуру адресного объекта по AOGUID
+  fetchAddressHierarchy() {
+    if (this._aoGUID === undefined) return
+    FiasService.getChildItems(this._aoGUID, "building", "", "1")
+      .then((response) => {
+        if (response.data.data)
+          response.data.data.forEach((item) => {
+            this.parseFiasItem(item)
+          })
+      })
+      .catch((reason) => console.log(reason))
   }
 }

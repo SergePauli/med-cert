@@ -1,3 +1,4 @@
+export const HOME_REGION_CODE = "28"
 export const DEFAULT_CERT_SUGGESTIONS = [
   { section: "0", code: "0", suggestion: "Необходимо выбрать тип свидетельства", done: false },
   {

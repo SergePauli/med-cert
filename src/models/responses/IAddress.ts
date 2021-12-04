@@ -1,5 +1,4 @@
 import { INullFlavorable } from "../INullFlavorable"
-import { AddressPrint } from "./IAddressPrint"
 
 export interface IAddress extends INullFlavorable {
   id?: string
@@ -8,5 +7,11 @@ export interface IAddress extends INullFlavorable {
   aoGUID?: string
   houseGUID?: string
   postalCode?: string
-  addressPrints?: AddressPrint
+  code?: string
+  parent_guid?: string
+  actual?: boolean
+  house_number?: string
+  struct_number?: string
+  building_number?: string
+  flat_number?: string
 }

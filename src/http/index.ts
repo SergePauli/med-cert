@@ -45,7 +45,7 @@ $api.interceptors.response.use(
 $fias.interceptors.response.use(
   (config) => config,
   async (error) => {
-    if ([406, 422].includes(error.response.status)) {
+    if (error.response && error.response.status && [406, 422].includes(error.response.status)) {
       if (error.response.data && error.response.data.errors) {
         let message = error.response.data.errors.reduce((result: string, element: string) => {
           result = `${result}, ${element}`

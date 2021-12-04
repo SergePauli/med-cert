@@ -135,7 +135,7 @@ export default class UserStore {
     if (id === undefined) return false
     try {
       this.setLoading(true)
-      const response = await UsersService.getUser(id + "")
+      const response = await UsersService.getUser(id)
       return response.data
     } catch (e: any) {
       this._history.push("/error/" + e.message)

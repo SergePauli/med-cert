@@ -1,14 +1,10 @@
-import { IContact } from "./IContact"
 import { INullFlavorable } from "./INullFlavorable"
-import { IPersonName } from "./IPersonName"
-import { IAddress } from "./responses/IAddress"
+import { IPerson } from "./IPerson"
 
 export interface IDoctor extends INullFlavorable {
-  id?: string
-  person_name?: IPersonName
-  SNILS?: string
+  id?: number
+  person: IPerson
   position?: { id: number; name: string }
-  address?: IAddress
   organization?: { id: number; name: string }
-  contacts?: IContact[]
+  guid: string
 }
