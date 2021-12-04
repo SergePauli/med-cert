@@ -23,6 +23,7 @@ export default class DoctorService {
       ...DOCTOR_RENDER_OPTIONS,
     })
   }
+
   //PUT request for update Doctor /REST_API/v1/model/Doctor/:id
   static async updateDoctor(doctor: IDoctor): Promise<AxiosResponse<IDoctor>> {
     return $api.put(`${API_URL}model/Doctor/${doctor.id}`, {
