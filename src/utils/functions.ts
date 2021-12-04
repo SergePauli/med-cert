@@ -54,3 +54,14 @@ export const timeDiff = (d1: Date, d2: Date) => {
     minutes,
   } as ITimeDiff
 }
+// for API request params objects
+// to remove the indefined items from nested objects as well, using a recursive
+// используем рекурсивную функцию очистки объектов от undefined свойств
+export const removeEmpty = (obj: any) => {
+  let newObj = {} as any
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === Object(obj[key])) newObj[key] = removeEmpty(obj[key])
+    else if (obj[key] !== undefined) newObj[key] = obj[key]
+  })
+  return newObj
+}
