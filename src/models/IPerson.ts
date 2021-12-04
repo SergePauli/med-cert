@@ -1,9 +1,12 @@
+import { IContact } from "./IContact"
 import { INullFlavorable } from "./INullFlavorable"
 import { IPersonName } from "./IPersonName"
+import { IAddress } from "./responses/IAddress"
 
 export interface IPerson extends INullFlavorable {
   id?: string
-  fio: IPersonName
+  person_name: IPersonName
   SNILS?: string
-  guid: string
+  address?: IAddress
+  contacts?: IContact[]
 }
