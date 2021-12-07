@@ -76,7 +76,9 @@ export default class AddressStore {
     const result = {
       id: addr.id,
       state: addr.state?.code,
-      streetAddressLine: addr.streetAddressLine,
+      streetAddressLine: `${addr.streetAddressLine}${addr.flat ? ", " + addr.flat : ""}${
+        addr.postalCode ? ", " + addr.postalCode : ""
+      }`,
       aoGUID: addr.aoGUID,
       houseGUID: addr.houseGUID,
       postalCode: addr.postalCode,
