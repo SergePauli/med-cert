@@ -5,7 +5,7 @@ import { AxiosResponse } from "axios"
 import $api, { API_URL } from "../http"
 import { IDoctor } from "../models/IDoctor"
 import { IReferenceId } from "../models/IReference"
-import { DOCTOR_RENDER_OPTIONS, getDoctorRequest } from "../models/requests/DoctorRequest"
+import { DOCTOR_RENDER_OPTIONS, genCreateDoctorRequest } from "../models/FormsData/DoctorRequest"
 
 export default class DoctorService {
   //POST request for get doctor's list
@@ -19,15 +19,15 @@ export default class DoctorService {
   //POST request for add Doctor /REST_API/v1/model/Doctor/add
   static async addDoctor(doctor: IDoctor): Promise<AxiosResponse<IDoctor>> {
     return $api.post(`${API_URL}model/Doctor/add`, {
-      Doctor: getDoctorRequest(doctor),
+      Doctor: genCreateDoctorRequest(doctor),
       ...DOCTOR_RENDER_OPTIONS,
     })
   }
 
   //PUT request for update Doctor /REST_API/v1/model/Doctor/:id
-  static async updateDoctor(doctor: IDoctor): Promise<AxiosResponse<IDoctor>> {
-    return $api.put(`${API_URL}model/Doctor/${doctor.id}`, {
-      Doctor: getDoctorRequest(doctor),
+  static async updateDoctor(request: any): Promise<AxiosResponse<IDoctor>> {
+    return $api.put(`${API_URL}model/Doctor/${request.Doctor.id}`, {
+      ...request,
       ...DOCTOR_RENDER_OPTIONS,
     })
   }

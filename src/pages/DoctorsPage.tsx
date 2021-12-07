@@ -18,16 +18,17 @@ import '../styles/components/Toast.css'
 import { InputMask } from 'primereact/inputmask'
 import MainLayout from '../components/layouts/MainLayout'
 import { observer } from 'mobx-react-lite'
-import { DOCTORS_ROUTE } from '../utils/consts'
+import { DESTROY_OPTION, DOCTORS_ROUTE } from '../utils/consts'
 import { IContact } from '../models/IContact'
 import { IReferenceId } from '../models/IReference'
 import { AutoComplete } from 'primereact/autocomplete'
 import AddressFC from '../components/inputs/AddressFC'
 import { CheckboxChangeParams } from 'primereact/checkbox'
 import { INullFlavor } from '../models/INullFlavor'
-import { HOME_REGION_CODE, NA } from '../utils/defaults'
+import { DEFAULT_ERROR_TOAST, HOME_REGION_CODE, NA } from '../utils/defaults'
 import Address from '../models/FormsData/Address'
 import { IPerson } from '../models/IPerson'
+import { genUpdateDoctorRequest } from '../models/FormsData/DoctorRequest'
 
 export const DoctorsPage: FC = () => {    
     const {addressStore, userStore} = useContext(Context)
@@ -35,7 +36,7 @@ export const DoctorsPage: FC = () => {
         organization: userStore.userInfo?.organization,
         guid: uuidv4(),       
         person: { person_name: {family:'Тестов', given_1:'Тест'}, 
-          contacts:[{telcom_value:"tel:+79145782405", main: true }] as IContact[],
+          contacts:[] as IContact[],
           SNILS: '456-145-154 25'
           } as IPerson,  
         nullFlavors:[],
@@ -48,8 +49,8 @@ export const DoctorsPage: FC = () => {
     const [doctor, setDoctor] = useState(emptyDoctor)
     const [selectedDoctors, setSelectedDoctors] = useState<IDoctor[]>([])
     const [submitted, setSubmitted] = useState(false)   
-    const [email, setEmail] = useState('') 
-    const [phone, setPhone] = useState('')
+    const [email, setEmail] = useState<IContact>({telcom_value:'', main:false} as IContact) 
+    const [phone, setPhone] = useState<IContact>({telcom_value:'', main:true} as IContact)
     const [position, setPosition] = useState('')
     const [positions, setPositions] = useState<IReferenceId[]>([])
     const toast = useRef<Toast>(null)
@@ -82,8 +83,8 @@ export const DoctorsPage: FC = () => {
             streetAddressLine: "", nullFlavors: [] })
         setSubmitted(false)
         setDoctorDialog(true)
-        setEmail('')
-        setPhone('')
+        setEmail({telcom_value:'', main:false} as IContact)
+        setPhone({telcom_value:'', main:true} as IContact)
         setPosition('')
     }
 
@@ -102,19 +103,30 @@ export const DoctorsPage: FC = () => {
 
     const saveDoctor = () => {
         setSubmitted(true)
-        if (doctor.person?.person_name?.family.trim() && doctor.person?.SNILS) {
+        if (doctor.person?.person_name?.family.trim() && doctor.person?.SNILS && doctor.position) {
             let _doctors = [...doctors]
+            onContactChange(phone)
+            onContactChange(email)
             let _doctor = {...doctor}
-            _doctor.person.address = addressStore.addressProps()
-            
+            _doctor.person.address = addressStore.addressProps()                        
             if (doctor.id) { 
-              DoctorService.updateDoctor(_doctor).then((response)=>{
-                const index = findIndexById(doctor.id)
+              const index = findIndexById(doctor.id)
+              const request = genUpdateDoctorRequest(_doctors[index], _doctor)
+              if (request) DoctorService.updateDoctor(request).then((response)=>{                
                 _doctors[index] = response.data
                 setDoctorDialog(false)
                 setDoctors(_doctors)
                 if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись обновлена', life: 3000 })
+              }).catch((reason)=>{
+                console.log('reason',reason)
+                setDoctorDialog(false)
+                if (toast!==null && toast.current!==null) 
+                  toast.current.show(DEFAULT_ERROR_TOAST)
               })
+              else {
+                if (toast!==null && toast.current!==null) toast.current.show({ severity: 'info', summary: 'Отклонено', detail: 'Изменения отсутствуют', life: 3000 })
+                setDoctorDialog(false)
+              }
             } else {               
               DoctorService.addDoctor(_doctor).then((response)=>{
                 if (response.data) {                  
@@ -122,11 +134,16 @@ export const DoctorsPage: FC = () => {
                   setDoctors(_doctors)
                   setDoctorDialog(false)
                   setDoctor(emptyDoctor)          
-                  setEmail('')
-                  setPhone('')
+                  setEmail({telcom_value:'', main:false} as IContact)
+                  setPhone({telcom_value:'', main:true} as IContact)
                   setPosition('')
                   if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись добавлена', life: 3000 })
                 }  
+              }).catch((reason)=>{
+                console.log('reason',reason)
+                setDoctorDialog(false)
+                if (toast!==null && toast.current!==null) 
+                  toast.current.show(DEFAULT_ERROR_TOAST)
               })           
               
               
@@ -135,11 +152,16 @@ export const DoctorsPage: FC = () => {
         }
     }
 
-    const editDoctor = (_doctor: IDoctor) => {
-        setPhone('')
-        setEmail('')        
-        _doctor.person?.contacts?.forEach((item)=>{if (item.main) setPhone(item.telcom_value)
-        else setEmail(item.telcom_value.replace('mailto:',''))})
+    const editDoctor = (doc: IDoctor) => {        
+        setPhone({telcom_value:'', main:true} as IContact)
+        setEmail({telcom_value:'', main:false} as IContact)   
+        let _doctor = {...doc}
+        _doctor.person = {...doc.person, person_name: {...doc.person.person_name}
+        }   
+        _doctor.person.contacts = []         
+        if (doc.person.contacts) _doctor.person.contacts = _doctor.person.contacts.concat(doc.person.contacts)
+        _doctor.person?.contacts?.forEach((item)=>{if (item.main) setPhone({...item})
+        else setEmail({...item, telcom_value: item.telcom_value.replace('mailto:','')})})
         if (_doctor.person?.address) addressStore.address = new Address(_doctor.person?.address) 
         else  addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
         setPosition(_doctor.position?.name || '')       
@@ -159,7 +181,11 @@ export const DoctorsPage: FC = () => {
           setDeleteDoctorDialog(false)
           setDoctor(emptyDoctor)
           if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись удалена', life: 3000 })
-        }).catch(reason=>console.log('reason',reason))        
+        }).catch(reason=>{
+          console.log('reason',reason)
+          if (toast!==null && toast.current!==null) 
+                  toast.current.show(DEFAULT_ERROR_TOAST)
+        })        
     }
     const findIndexById = (id:number | undefined) => {        
         return doctors.findIndex((element)=>element.id === id)
@@ -182,22 +208,16 @@ export const DoctorsPage: FC = () => {
       setDoctor(_doctor)
     }   
 
-    // Обработчик изменения одного из контактов
-    // Параметр isMain признак изменяемого контакта        
-    // value - новое значение контакта  
-    const onContactChange = (isMain: boolean, value: string) => {            
-      let _doctor = {...doctor}  
-      if (_doctor.person) _doctor.person.contacts = []
-      //Пока считаем, что достаточно обрабатывать только два контакта (смартфон и email)       
-      //В случае необходимости использовать >2 типов - заменить if на switch 
-      if (isMain) { // сменился номер телефона
-        if (value.trim())  _doctor.person?.contacts?.push({telcom_value:value.trim(), main: true}) 
-        _doctor.person?.contacts?.push({telcom_value:"mailto:"+email.trim(), main: false})
-      } else { // сменилася email
-        if (value.trim()) _doctor.person?.contacts?.push({telcom_value:"mailto:"+value.trim(), main: false})
-        _doctor.person?.contacts?.push({telcom_value:phone, main: true})
-      }          
-      setDoctor(_doctor)
+    // Обработчик изменения контактов      
+    const onContactChange = (contact: IContact) => {   
+      let _contact = contact.telcom_value==='' ?
+      (contact.id ? {...contact,...DESTROY_OPTION} : {...contact}) :    
+      (contact.id ? {id:contact.id, parent_guid: contact.parent_guid, telcom_use: contact.telcom_use, telcom_value: contact.telcom_value, main: contact.main} : {...contact}) 
+      if (doctor.person.contacts === undefined) doctor.person.contacts = []
+      if (_contact.id) {        
+          const idx = doctor.person.contacts.findIndex(item=>item.id===_contact.id)  
+          if (idx>-1) doctor.person.contacts[idx] = _contact        
+      } else doctor.person.contacts.push(_contact)       
     } 
 
     const isAddressChecked = ()=>doctor.person.address!==undefined 
@@ -318,21 +338,21 @@ export const DoctorsPage: FC = () => {
                     <label htmlFor="phone">телефон</label>
                     <InputMask id="phone"  
                       type="text" mask="tel:+79999999999"
-                      value={phone} 
-                      onChange={(e)=>{setPhone(e.target.value)  
-                        onContactChange(true, e.target.value)}} required className={classNames({ 'p-invalid': submitted && !/tel:\+?[-0-9().]+/i.test(phone)})}
+                      value={phone.telcom_value} 
+                      onChange={(e)=>{setPhone({...phone, telcom_value: e.target.value})  
+                        }} required className={classNames({ 'p-invalid': submitted && !/tel:\+?[-0-9().]+/i.test(phone.telcom_value)})}
                     />
-                    {submitted && !/tel:\+?[-0-9().]+/i.test(phone) && <small className="p-error">тел.номер некорректен!</small>}
+                    {submitted && !/tel:\+?[-0-9().]+/i.test(phone.telcom_value) && <small className="p-error">тел.номер некорректен!</small>}
                 </div>
                 <div className="p-field  p-col-12 p-md-4">
                     <label htmlFor="email">email</label>
                     <InputText id="email" type="text" 
-                      value={email} 
+                      value={email.telcom_value} 
                       onChange={(e)=>{  
-                        setEmail(e.target.value)  
-                        onContactChange(false, e.target.value)}} className={classNames({ 'p-invalid': submitted && !(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email) || email==='')})}
+                        setEmail({...email, telcom_value:e.target.value})  
+                        }} className={classNames({ 'p-invalid': submitted && !(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email.telcom_value) || email.telcom_value==='')})}
                     />
-                    {submitted && !(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email) || email==='') && <small className="p-error">Неверный email</small>}
+                    {submitted && !(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email.telcom_value) || email.telcom_value==='') && <small className="p-error">Неверный email</small>}
                 </div>
                 <div className='p-field  p-d-flex p-flex-wrap p-jc-start' style={{marginLeft:'0.5rem'}}>
                     <AddressFC checked={isAddressChecked()} label={'Адрес врача'} 
