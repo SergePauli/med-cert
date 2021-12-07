@@ -365,3 +365,9 @@ export const ID_CARD_TYPES = [
 ]
 export const PASSPORT_RF = 0
 export const REGION = { code: "28", name: "Амурская область" }
+export const DEFAULT_ERROR_TOAST = {
+  severity: "error",
+  summary: "Сбой",
+  detail: "Что-то пошло не так, по-пробуйте позднее",
+  life: 3000,
+}
