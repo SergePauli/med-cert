@@ -1,5 +1,4 @@
 import { makeAutoObservable } from "mobx"
-import { v4 as uuidv4 } from "uuid"
 import FiasService from "../../services/FiasService"
 import { INullFlavor } from "../INullFlavor"
 import { IReference } from "../IReference"
@@ -26,8 +25,8 @@ export default class Address {
   constructor(props: IAddress, region = undefined as IReference | undefined) {
     if (props.id) this._id = props.id
     this._state = region
-    this._nullFlavors = props.nullFlavors || []
     this._streetAddressLine = props.streetAddressLine
+    this._nullFlavors = props.nullFlavors || []
     this._aoGUID = props.aoGUID
     this._houseGUID = props.houseGUID
     this._postalCode = props.postalCode
@@ -140,6 +139,9 @@ export default class Address {
   //рекурсивный парсинг структуры адресного объекта
   parseFiasItem(fiasItem: IFiasItem) {
     switch (fiasItem.level) {
+      case "building":
+        this._streetAddressLine = fiasItem.streetAddressLine
+        break
       case "Street":
         this._street = { code: fiasItem.AOGUID, name: `${fiasItem.name} ${fiasItem.shortname}` }
         break
