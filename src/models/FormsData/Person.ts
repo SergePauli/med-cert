@@ -5,24 +5,25 @@ import { IPerson } from "../IPerson"
 import { IPersonName } from "../IPersonName"
 
 export default class Person {
-  private _id: string
-  private _fio?: IPersonName | undefined
+  private _id?: string
+  private _personName?: IPersonName | undefined
   private _SNILS?: string | undefined
   private _nullFlavors: INullFlavor[]
 
   constructor(props: IPerson) {
-    if (props.person_name) this._fio = props.person_name
+    if (props.person_name) this._personName = props.person_name
     if (props.SNILS) this._SNILS = props.SNILS
     this._id = props.id || uuidv4()
     this._nullFlavors = props.nullFlavors || []
     makeAutoObservable(this)
   }
+
   get fio() {
-    return this._fio
+    return this._personName
   }
 
   set fio(fio: IPersonName | undefined) {
-    this._fio = fio
+    this._personName = fio
   }
 
   nullFlavors() {
