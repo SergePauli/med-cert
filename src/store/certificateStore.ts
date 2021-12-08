@@ -73,7 +73,7 @@ export default class CertificateStore {
         identity: {
           identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,
         },
-        person: { fio: { family: "", given_1: "", given_2: "" } },
+        person: { person_name: { family: "", given_1: "", given_2: "" } },
       } as IPatient,
     } as ICertificateResponse)
     this._identified = this._cert.patient.person.fio !== undefined

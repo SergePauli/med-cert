@@ -5,14 +5,14 @@ import '../../styles/components/AutoComplete.css'
 import { FC, useEffect, useContext, useState } from 'react'
 import { INullFlavor } from '../../models/INullFlavor'
 import { IReference } from '../../models/IReference'
-import { NULL_FLAVORS } from '../../utils/defaults'
+import { HOME_REGION_CODE, NULL_FLAVORS } from '../../utils/defaults'
 import NullFlavorWrapper from '../NullFlavorWrapper'
 import { Dropdown } from 'primereact/dropdown'
 import Address from '../../models/FormsData/Address'
 import { InputText } from 'primereact/inputtext'
 import { Context } from '../..'
 import { IFiasItem } from '../../models/responses/IFiasItem'
-import { HOME_REGION_CODE } from '../../store/addressStore'
+
 
 
 type AddressProps = {
@@ -37,9 +37,9 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
   const [searchStr, setSearchStr] = useState<string>('') 
   useEffect(()=>setSearchStr(streetAddressLine)    
   , [streetAddressLine])  
-  const [region, setRegion] = useState<IReference | undefined>(value.state)
-  useEffect(()=>setRegion(value.state)    
-  , [value.state])   
+  const [region, setRegion] = useState<IReference>()
+  useEffect(()=>setRegion(regions?.find((item)=>item.code === value.state?.code))      
+   , [regions, value.state])   
   const [district, setDistrict] = useState<string>('')
   useEffect(()=>setDistrict(value.district?.name || ''), [value.district?.name])
   const [city, setCity] = useState<string>(value.city?.name || '')
@@ -59,7 +59,10 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
     value.aoGUID = e.AOGUID
     value.houseGUID = e.HouseGUID 
     value.streetAddressLine = e.streetAddressLine
-    switch (e.level) {      
+    switch (e.level) {
+      case 'Region' : if (e.code) value.state = {code: e.code.slice(0,2), name: e.name}      
+        setRegion(regions?.find((item)=>item.code === value.state?.code))
+        break
       case 'City': value.city = {code: e.AOGUID, name: e.name}
         setCity(e.name) 
         break
@@ -127,7 +130,10 @@ const AddressFC: FC<AddressProps> = (props: AddressProps) => {
                 }}
                 placeholder='Регион, Нас.пункт, Улица, Дом'
               />
-          </div>}                   
+          </div>}  
+          onChange={(e: IReference, nullFlavors: INullFlavor[] | undefined) => {
+            props.setCheck({checked:false} as CheckboxChangeParams, nullFlavors)
+          }}                 
         />
       </div>
       <div className="p-paragraph-field p-mr-3 p-mb-2"  style={linkStyle}>      

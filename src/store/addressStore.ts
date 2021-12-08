@@ -1,8 +1,9 @@
 import Address from "../models/FormsData/Address"
 import { IReference } from "../models/IReference"
+import { IAddress } from "../models/responses/IAddress"
 import { IFiasItem } from "../models/responses/IFiasItem"
 import FiasService from "../services/FiasService"
-export const HOME_REGION_CODE = "28"
+import { HOME_REGION_CODE } from "../utils/defaults"
 export default class AddressStore {
   private _address: Address
   private _isLoding: boolean
@@ -14,15 +15,22 @@ export default class AddressStore {
     this._isLoding = false
     this._address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
   }
+
   fetchRegionOptions() {
-    FiasService.getRegions()
-      .then((response) => {
-        this._regionsOptions = response.data.data.map((item) => {
-          return { code: item.code?.substr(0, 2), name: item.streetAddressLine } as IReference
+    const _regions = localStorage.getItem("Regions")
+    if (_regions) {
+      this._regionsOptions = JSON.parse(_regions) as IReference[]
+      this.defaultRegion()
+    } else
+      FiasService.getRegions()
+        .then((response) => {
+          this._regionsOptions = response.data.data.map((item) => {
+            return { code: item.code?.substr(0, 2), name: item.streetAddressLine } as IReference
+          })
+          localStorage.setItem("Regions", JSON.stringify(this._regionsOptions))
+          this.defaultRegion()
         })
-        this.defaultRegion()
-      })
-      .finally(() => (this._isLoding = false))
+        .finally(() => (this._isLoding = false))
   }
 
   async searchBar(query: string, regionID = HOME_REGION_CODE as string) {
@@ -48,7 +56,7 @@ export default class AddressStore {
       const response = await FiasService.getChildItems(parent, level, query)
       if (response.data.data)
         this._fiasOptions = response.data.data.map((item) => {
-          if (item.level !== "building" && item.level !== "district") item.name = `${item.name} ${item.shortname}`
+          if (item.level !== "building") item.name = `${item.name} ${item.shortname}`
           return item
         })
       else this._fiasOptions = []
@@ -59,6 +67,28 @@ export default class AddressStore {
     } finally {
       this._isLoding = false
     }
+  }
+
+  // Returned POJO address data
+  // Возвращает POJO объект адреса
+  addressProps(): IAddress {
+    const addr = this._address
+    const result = {
+      id: addr.id,
+      state: addr.state?.code,
+      streetAddressLine: addr.streetAddressLine,
+      aoGUID: addr.aoGUID,
+      houseGUID: addr.houseGUID,
+      postalCode: addr.postalCode,
+      house_number: addr.housenum,
+      struct_number: addr.strucnum,
+      building_number: addr.buildnum,
+      flat_number: addr.flat,
+      parent_guid: addr.parent,
+      //nullFlavors: addr.nullFlavors(),
+    } as IAddress
+
+    return result
   }
 
   set history(history: any) {

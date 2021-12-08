@@ -27,7 +27,7 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
   const [checked, setChecked] = useState<boolean>(props.checked || false) 
   const fieldStyle = props.paraNum ? {marginLeft: '-0.76rem'} : {}
   const ddStyle = {width: '200px'}
-  const nullFlavors = (props.nullFlavors && props.field_name ) ? props.nullFlavors.filter((element)=>element.parent_attr!==props.field_name) : []
+  const nullFlavors = (props.nullFlavors && props.nullFlavors.length>0 && props.field_name ) ? props.nullFlavors.filter((element: INullFlavor)=>element.parent_attr!==props.field_name) : []
   useEffect(()=>{   
     if (props.nullFlavors) {
       const nullFlavor = props.nullFlavors.find(item=>item.parent_attr===props.field_name)
@@ -48,10 +48,10 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
             setChecked(e.checked)
             if (props.nullFlavors) {
               if (props.setCheck && e.checked ) props.setCheck(e, nullFlavors)
-              else if (props.setCheck && props.value && props.field_name) {
-                nullFlavors.push({parent_attr: props.field_name, code: props.value })  
-                props.setCheck(e, nullFlavors)
-                nullFlavors.pop()
+              else if (props.setCheck && props.value && props.field_name) { 
+                let _nullFlavors = nullFlavors               
+                _nullFlavors.push({parent_attr: props.field_name, code: props.value })                                 
+                props.setCheck(e, _nullFlavors)                            
               } else if (props.setCheck) props.setCheck(e)             
             } else if (props.setCheck) props.setCheck(e)            
           }
@@ -75,9 +75,9 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
       onChange={(e: DropdownChangeParams)=>{   
         setValue(e.value)  
         const nullFlavor = {parent_attr: props.field_name, code: NULL_FLAVORS.findIndex((element)=>element.code===e.value.code)}
-        nullFlavors.push(nullFlavor as INullFlavor)
-        if (props.onChange) props.onChange(e.value, nullFlavors) 
-        nullFlavors.pop()                            
+        let _nullFlavors = nullFlavors
+        _nullFlavors.push(nullFlavor as INullFlavor)        
+        if (props.onChange) props.onChange(e.value, _nullFlavors)                                   
       }}
       optionLabel='name'      
       placeholder='Причина отсутствия'
