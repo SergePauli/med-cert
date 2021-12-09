@@ -1,5 +1,8 @@
 {
-  "name": "med-cert",
+  "name": "medss-client",
+  "description": "frontend part of medical certificate of death project",
+  "author": "Serge Pauli <sergepauli@ya.ru>",
+  "license": "MIT",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
