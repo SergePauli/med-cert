@@ -5,9 +5,9 @@ FROM node:12
 ADD squid.crt /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
-
-# создание директории приложения
+# создание директории приложения и прав доступа
 WORKDIR /usr/src/app
+COPY --chown=node:node . .
 
 # установка зависимостей
 # символ астериск ("*") используется для того чтобы по возможности
@@ -20,10 +20,13 @@ COPY package*.json ./
 # копируем исходный код
 COPY . .
 # Устанавливаем зависимости, собираем проект и удаляем зависимости
-RUN npm install --production && npm run build:production && rm -rf node_module
+RUN npm install -g serve && npm install --production && npm run build:production && rm -rf node_module
 
 # Проброс порта 3000
 EXPOSE 3000
+
+# пользователь для запуска
+USER node
 
 # Запуск по умолчанию 
 CMD ["serve", "-s", "build"]
