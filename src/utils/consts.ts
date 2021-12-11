@@ -27,3 +27,15 @@ export const CERT_TYPE = [
 // маркер удаления для использования в запросах на обновление
 // destroy-marker for using in nested_attributes
 export const DESTROY_OPTION = { _destroy: "1" }
+
+//формат дата & время
+export const TIME_FORMAT = {
+  year: "2-digit",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+} as Intl.DateTimeFormatOptions
+
+// формат даты
+export const DATE_FORMAT = { year: "2-digit", month: "short", day: "2-digit" } as Intl.DateTimeFormatOptions
