@@ -1,48 +1,50 @@
 import { observer } from 'mobx-react-lite'
 import { classNames } from 'primereact/utils'
-import { FC, useContext } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
+import '../../styles/components/EventTimeline.css'
 import { Context } from '../..'
+import { ACTIONS,  ITimeEvent } from '../../models/responses/ITimeEvent'
+import {  TIME_FORMAT } from '../../utils/consts'
+import AuditService from '../../services/AuditService'
 
 
 type RightSideBarLayoutProps = {}
 
 const RightSideBarLayout: FC<RightSideBarLayoutProps> = (props: RightSideBarLayoutProps) =>{ 
-  const {layoutStore} = useContext(Context)
-  const className = classNames("layout-sidebar-right", {"layout-sidebar-right-active": layoutStore.rightSideBarActive() })  
+  const {layoutStore, userStore} = useContext(Context)
+  const className = classNames("layout-sidebar-right", {"layout-sidebar-right-active": layoutStore.rightSideBarActive() }) 
+  const [timeEvents, setTimeEvents] = useState<ITimeEvent[]>([])
+  useEffect(()=>{
+    if (timeEvents.length===0) AuditService.getAudits({q:{user_id_eq:userStore.userInfo?.id, sorts: [ 'created_at desc']}, limit: 200})
+    .then(response=>setTimeEvents(response.data))
+    .catch(()=>setTimeEvents([]))
+  },[timeEvents, userStore.userInfo?.id]) 
+    
+  
   return (  
   <div className={className}>
     <h5>Активность</h5>
     <div className="widget-timeline">
+      {timeEvents.map(item=>{
+        console.log('item',item)
+        const ACTION_ATTRIBUTES = ACTIONS.get(item.action)
+        if (ACTION_ATTRIBUTES === undefined) throw Error('неверный action')
+        const timeStr = new Date(item.created_at).toLocaleString(
+      "ru", TIME_FORMAT)
+        return (
       <div className="timeline-event">
-        <span className="timeline-event-icon" style={{backgroundColor: 'rgb(100, 181, 246)'}}>
-          <i className="pi pi-dollar"></i>
+        <span className="timeline-event-icon" style={{ backgroundColor: ACTION_ATTRIBUTES.color }}>
+                <i className={ACTION_ATTRIBUTES.icon}></i>
         </span>
-        <div className="timeline-event-title">Добавлено:</div>
-          <div className="timeline-event-detail">Свидетельство<strong>№21566 5465464</strong>.</div>
+        <div className='timeline-event-title'>{ACTION_ATTRIBUTES.title}</div>
+        <div className='timeline-event-detail'>
+          <p>{item.detail}</p> 
+          <em>{timeStr}</em>
         </div>
-        <div className="timeline-event">
-          <span className="timeline-event-icon" style={{backgroundColor: 'rgb(121, 134, 203)'}}>
-            <i className="timeline-icon pi pi-download"></i>
-          </span>
-          <div className="timeline-event-title">Заменено:</div>
-            <div className="timeline-event-detail">Свидетельство<strong>№21566 5465464</strong>.
-          </div>  
-        </div>
-        <div className="timeline-event">
-          <span className="timeline-event-icon" style={{backgroundColor: 'rgb(77, 182, 172)'}}>
-            <i className="timeline-icon pi pi-question"></i>
-          </span>
-          <div className="timeline-event-title">Замечание:</div>
-          <div className="timeline-event-detail">от <strong>Jane Davis</strong> -Неверы диагноз...</div>
-        </div>
-        <div className="timeline-event">
-          <span className="timeline-event-icon" style={{backgroundColor: 'rgb(77, 208, 225)'}}>
-            <i className="timeline-icon pi pi-comment"></i>
-          </span>
-          <div className="timeline-event-title">Комментарий:</div>
-          <div className="timeline-event-detail">Claire Smith has upvoted your store along with ..</div>
-      </div>
-    </div>
+      </div>)})}
+    </div> 
+        
   </div>
 )}
 export default observer(RightSideBarLayout)
+
