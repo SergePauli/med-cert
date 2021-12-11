@@ -1,3 +1,4 @@
+import { IPersonName } from "../IPersonName"
 import { IUserInfo } from "./IUserInfo"
 
 export const ACTIONS = new Map<string, IActionAttribute>([
@@ -24,11 +25,13 @@ export interface IActionAttribute {
 }
 
 export interface ITimeEvent {
+  id: number
   action: string
   severity: Severity
   detail: string
   table?: string
   summary?: string
-  user: IUserInfo
+  user: { id: number; email: string; person_name: IPersonName }
+  organization: { id: number; name: string }
   created_at: string
 }
