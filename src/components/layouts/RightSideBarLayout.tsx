@@ -15,16 +15,16 @@ const RightSideBarLayout: FC<RightSideBarLayoutProps> = (props: RightSideBarLayo
   const [timeEvents, setTimeEvents] = useState<ITimeEvent[] | null>(null)
   const [q , setQ] = useState<any | null>(null) 
   useEffect(()=>{
-    if (q === null) { 
+    if (q === null && userStore.userInfo) {      
       if (userStore.userInfo?.organization.name.includes('МИАЦ'))
         setQ({ sorts: [ 'created_at desc']})
       else 
-        setQ({organization_id_eq:userStore.userInfo?.organization.id, sorts: [ 'created_at desc']})
+        setQ({user_organization_id_eq: userStore.userInfo?.organization.id, sorts: [ 'created_at desc']})
     }  
-  }, [q, userStore.userInfo?.organization] ) 
+  }, [q, userStore.userInfo, userStore.userInfo?.organization] ) 
   
   useEffect(()=>{
-    if (timeEvents===null) AuditService.getAudits({q, limit: 200})
+    if (timeEvents===null) AuditService.getAudits({q:q, limit: 200})
     .then(response=>setTimeEvents(response.data))
     .catch(()=>setTimeEvents([]))
   },[timeEvents, q]) 
