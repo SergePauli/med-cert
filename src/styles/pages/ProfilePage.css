@@ -1,0 +1,50 @@
+.widget-user-card {
+  padding: 0;
+  text-align: center;
+}
+
+.widget-user-card .user-card-header {
+  position: relative;
+  height: 200px;
+  background-image: linear-gradient(180deg, rgb(96, 125, 139) 10%, rgb(77, 100, 111) 100%);
+}
+
+.widget-user-card .user-card-avatar {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 8rem;
+  height: 8rem;
+  margin-left: -4rem;
+  margin-bottom: -4rem;
+  border-radius: 50%;
+}
+
+.widget-user-card .user-card-body {
+  padding: 6em 2rem 2rem 2rem;
+}
+
+.widget-user-card .user-card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.widget-user-card .user-card-subtext {
+  color: #6c757d;
+}
+
+.widget-user-card .user-card-stats {
+  margin-top: 2rem;
+}
+
+.widget-user-card .user-card-stats i {
+  font-size: 2rem;
+  color: #6c757d;
+}
+
+.widget-user-card .user-card-stats span {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
