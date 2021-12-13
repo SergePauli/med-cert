@@ -13,7 +13,7 @@ import { DeathReason } from "./DeathReason"
 import Patient from "./Patient"
 
 export default class Certificate {
-  private _id?: number
+  private _id: number
   private _series?: string
   private _number?: string
   private _effTime: Date
@@ -55,6 +55,7 @@ export default class Certificate {
   disposers: (() => void)[]
 
   constructor(props: ICertificateResponse) {
+    this._id = props.id || -1
     this.disposers = []
     this._guid = props.guid || uuidv4()
     this._patient = new Patient(props.patient)
@@ -131,7 +132,7 @@ export default class Certificate {
   get id() {
     return this._id
   }
-  set id(id: number | undefined) {
+  set id(id: number) {
     this._id = id
   }
   get series() {
