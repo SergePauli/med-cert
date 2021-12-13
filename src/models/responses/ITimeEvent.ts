@@ -1,5 +1,4 @@
 import { IPersonName } from "../IPersonName"
-import { IUserInfo } from "./IUserInfo"
 
 export const ACTIONS = new Map<string, IActionAttribute>([
   ["added", { title: "Добавлено:", icon: "pi pi-plus", color: "rgb(104, 159, 56)" }],
