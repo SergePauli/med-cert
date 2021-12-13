@@ -17,12 +17,18 @@ import { IRegistration } from '../models/requests/IRegistration'
 import LoginImageDiv from '../static/LoginImageDiv'
 import OrganizationService from '../services/OrganizationService'
 import { useEffect } from 'react'
-import { IReference } from '../models/IReference'
+import { IReferenceId } from '../models/IReference'
 
 export const RegistrationPage: FC = () =>{ 
   const history = useHistory()  
-  const [organizations, setOrganizations] = useState([] as IReference[]);
-  useEffect(()=>{OrganizationService.getOrganizations().then(response=>{setOrganizations(response.data.organizations);console.log(response)})},[])
+  const [organizations, setOrganizations] = useState<IReferenceId[] | null>(null)
+  useEffect(()=>{
+    if (organizations===null) OrganizationService.getOrganizations().then(response=>
+      setOrganizations(response.data.organizations)
+    ).catch(()=>{
+      setOrganizations([])
+      history.push("/error/Ошибка API при получении списка МО")
+    })},[organizations, history])
   const {userStore} = useContext(Context)  
   const validate = (data: IRegisterForm) => {
     let errors: any = {} 
@@ -64,6 +70,7 @@ export const RegistrationPage: FC = () =>{
   const getFormErrorMessage = (meta: any) => {
     return (isFormFieldValid(meta) && <small className="p-error">{meta.error}</small>)
   } 
+  if (organizations)
   return (
   <>
     <div className="login-body">
@@ -142,4 +149,5 @@ export const RegistrationPage: FC = () =>{
       </div>
     </div>
   </>)
+  else return <></>
 }
