@@ -9,6 +9,7 @@ import { ProfileMenu } from '../menus/ProfileMenu'
 import { ExtMenuItem } from '../menus/IMenuProps'
 import { NotificationsMenu } from '../menus/NotificationsMenu'
 import { IUserInfo } from '../../models/responses/IUserInfo'
+import { DOCTORS_ROUTE, MO_SETTINGS_ROUTE, USER_ROUTE } from '../../utils/consts'
 type TopBarLayoutProps = {title: string,  userInfo: IUserInfo | null }
 const detail_templ ="detail"
 export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
@@ -22,9 +23,9 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
     else layoutStore.sideBarToggle()          
   } 
   const items:MenuItem[] = [    
-      {label:"Пользователь", icon:"pi-user", url:"/#"},
-      {label:"Настройки", icon:"pi-cog", url:"/#"}, 
-      {label:"Врачи", icon:"pi-users", url:"/doctors"},     
+      {label:"Пользователь", icon:"pi-user", url:`${USER_ROUTE}/${userStore.userInfo?.id}`},
+      {label:"Настройки", icon:"pi-cog", url:`${MO_SETTINGS_ROUTE}/${userStore.userInfo?.organization.id}`}, 
+      {label:"Врачи", icon:"pi-users", url:`${DOCTORS_ROUTE}`},     
       {label:"Выход", icon:"pi-power-off", command:()=>{userStore.logout()}},       
    ]
   const notif_items:ExtMenuItem[] = [    
