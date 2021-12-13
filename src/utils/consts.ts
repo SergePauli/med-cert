@@ -12,6 +12,8 @@ export const LIST_ROUTE = "/list"
 export const CERTIFICATE_ROUTE = "/cert"
 export const REPORT_ROUTE = "/report"
 export const DOCTORS_ROUTE = "/doctors"
+export const USER_ROUTE = "/user"
+export const MO_SETTINGS_ROUTE = "/organization"
 
 export const ROLES: IObjectKeys = {
   USER: "ПОЛЬЗОВАТЕЛЬ",
