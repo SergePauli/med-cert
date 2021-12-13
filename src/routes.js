@@ -7,7 +7,9 @@ import LoginPage from "./pages/LoginPage"
 import MainPage from "./pages/MainPage"
 import { MessagePage } from "./pages/MessagePage"
 import { PassordRecoveryPage } from "./pages/PasswordRecoveryPage"
+import { ProfilePage } from "./pages/ProfilePage"
 import { RegistrationPage } from "./pages/RegistrationPage"
+import { SettingsPage } from "./pages/SettingsPage"
 import {
   ADMIN_ROUTE,
   CERTIFICATE_ROUTE,
@@ -18,7 +20,9 @@ import {
   MESSAGE_ROUTE,
   PWD_RECOVERY_ROUTE,
   REGISTRATION_ROUTE,
+  USER_ROUTE,
   DOCTORS_ROUTE,
+  MO_SETTINGS_ROUTE,
 } from "./utils/consts"
 
 export const AUTH_ROUTES = [
@@ -27,6 +31,8 @@ export const AUTH_ROUTES = [
   { path: LIST_ROUTE, Component: ListPage },
   { path: CERTIFICATE_ROUTE + "/:id", Component: CertificatePage },
   { path: DOCTORS_ROUTE, Component: DoctorsPage },
+  { path: USER_ROUTE + "/:id", Component: ProfilePage },
+  { path: MO_SETTINGS_ROUTE + "/:id", Component: SettingsPage },
   { path: LOGIN_ROUTE, Component: MainPage },
 ]
 export const NON_AUTH_ROUTES = [
