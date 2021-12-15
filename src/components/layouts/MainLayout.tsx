@@ -10,6 +10,7 @@ import RightSideBarLayout  from './RightSideBarLayout'
 import { IUserInfo } from '../../models/responses/IUserInfo'
 
 
+
 type MainLayoutProps = {
   title: string,
   url:string, 
@@ -20,8 +21,7 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
   const rightSideBarActive = layoutStore.rightSideBarActive()
   const layoutStaticInactive = layoutStore.layoutStaticInactive()
   const profileMenuActive = layoutStore.profileMenuActive()
-  const notificationsMenuActive = layoutStore.notificationsMenuActive()
-  
+  const notificationsMenuActive = layoutStore.notificationsMenuActive()  
   const onClickOutside = ()=>{
     if (rightSideBarActive) layoutStore.setRightSideBarActive(false)
     else if (profileMenuActive) layoutStore.setProfileMenuActive(false)
@@ -37,7 +37,7 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
   )
     
   return (
-  <div className={wrapperClass} data-theme='light'>
+  <div className={wrapperClass} data-theme='light'>    
     <div className='layout-content-wrapper' onClick={()=>onClickOutside()}>  
       <TopBarLayout  title = {props.title}  userInfo={userInfo} />        
       <div className='layout-content' >{props.content}</div>

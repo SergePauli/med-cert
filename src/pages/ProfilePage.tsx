@@ -28,7 +28,7 @@ export const ProfilePage: FC<ProfilePageProps> = (props: ProfilePageProps) =>{
     .catch(()=>console.log('Ошибка получения пользователя')) 
   })
   const user_name = `${user?.person_name.family} ${user?.person_name.given_1}`
-  const user_team = `${user!==null && user.roles ? ROLES[user.roles] : ''} ${user?.organization.name}`
+  const user_team = `${user!==null && user.roles ? ROLES[user.roles.split(' ')[0]] : ''} ${user?.organization.name}`
   const layoutParams = {
     title: 'Профиль пользователя',     
     url: USER_ROUTE,

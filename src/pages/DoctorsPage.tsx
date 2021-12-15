@@ -299,7 +299,7 @@ export const DoctorsPage: FC = () => {
                     <label htmlFor="given_1">Имя</label>
                     <InputText id="given_1" value={doctor.person?.person_name?.given_1} onChange={(e) =>{
                          if (doctor.person?.person_name) doctor.person.person_name.given_1 = e.target.value   
-                         onInputChange()}} required  className={classNames({ 'p-invalid': submitted && !doctor.person?.person_name?.given_1})} />
+                         onInputChange()}} required className={classNames({ 'p-invalid': submitted && !doctor.person?.person_name?.given_1})} />
                     {submitted && !doctor.person?.person_name?.given_1 && <small className="p-error">Имя обязательно.</small>}
                 </div>
                 <div className="p-field  p-col-12 p-md-4">

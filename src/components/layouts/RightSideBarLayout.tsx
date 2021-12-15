@@ -16,7 +16,7 @@ const RightSideBarLayout: FC<RightSideBarLayoutProps> = (props: RightSideBarLayo
   const [q , setQ] = useState<any | null>(null) 
   useEffect(()=>{
     if (q === null && userStore.userInfo) {      
-      if (userStore.userInfo?.organization.name.includes('МИАЦ'))
+      if (userStore.userInfo.roles.includes('ADMIN'))
         setQ({ sorts: [ 'created_at desc']})
       else 
         setQ({user_organization_id_eq: userStore.userInfo?.organization.id, sorts: [ 'created_at desc']})
@@ -24,7 +24,7 @@ const RightSideBarLayout: FC<RightSideBarLayoutProps> = (props: RightSideBarLayo
   }, [q, userStore.userInfo, userStore.userInfo?.organization] ) 
   
   useEffect(()=>{
-    if (timeEvents===null) AuditService.getAudits({q:q, limit: 200})
+    if (timeEvents===null && q!==null) AuditService.getAudits({q:q, limit: 200})
     .then(response=>setTimeEvents(response.data))
     .catch(()=>setTimeEvents([]))
   },[timeEvents, q]) 

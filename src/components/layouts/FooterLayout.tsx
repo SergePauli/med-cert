@@ -4,7 +4,7 @@ import {ROLES}  from "../../utils/consts"
 type FooterLayoutProps = {userInfo: IUserInfo | null}
 const FooterLayout = (props: FooterLayoutProps) => {
   const orgName = props.userInfo!==null && props.userInfo.organization ? props.userInfo.organization.name : ''
-  const profile = props.userInfo!==null && props.userInfo.roles ? ROLES[props.userInfo.roles]: ''  
+  const profile = props.userInfo!==null && props.userInfo.roles ? ROLES[props.userInfo.roles.split(' ')[0]]: ''  
   return (
     <div className="layout-footer">
       <div className="footer-logo-container">

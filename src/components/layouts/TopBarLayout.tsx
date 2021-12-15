@@ -24,7 +24,7 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
   } 
   const items:MenuItem[] = [    
       {label:"Пользователь", icon:"pi-user", url:`${USER_ROUTE}/${userStore.userInfo?.id}`},
-      {label:"Настройки", icon:"pi-cog", url:`${MO_SETTINGS_ROUTE}/${userStore.userInfo?.organization.id}`}, 
+      {label:"Медорганизация", icon:"pi-building", url:`${MO_SETTINGS_ROUTE}/${userStore.userInfo?.organization.id}`}, 
       {label:"Врачи", icon:"pi-users", url:`${DOCTORS_ROUTE}`},     
       {label:"Выход", icon:"pi-power-off", command:()=>{userStore.logout()}},       
    ]
