@@ -8,6 +8,7 @@ import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Divider } from 'primereact/divider'
 import { Context } from '..'
+import { ProgressSpinner } from 'primereact/progressspinner'
 
 type MainPageProps = {}
 
@@ -20,7 +21,7 @@ const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
   const layoutParams= {
     title: 'Главная',     
     url: HOME_ROUTE,
-    content:( 
+    content: userStore ? ( 
       <>     
         <div className="p-d-flex p-flex-column p-jc-around p-flex-md-row p-flex-wrap">
           <Button style={{minWidth:'243px'}} className="p-mr-2 p-mb-2 p-shadow-3" label="Ввод свидетельства"  title="Форма ввода свидетельства" 
@@ -43,7 +44,7 @@ const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
           </Card>
         </div>                  
       </>
-    )    
+    ) : (<ProgressSpinner/>)   
   }  
   return (
     <>
