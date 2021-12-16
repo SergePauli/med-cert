@@ -20,9 +20,9 @@ export default class UserStore {
 
   constructor() {
     this._user = {} as IUser
-    this._isAuth = false
     this._isLoding = false
     this._token = localStorage.getItem("token") || ""
+    this._isAuth = this._token !== ""
     makeAutoObservable(this)
   }
 
