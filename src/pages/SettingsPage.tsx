@@ -17,6 +17,8 @@ import { Button } from 'primereact/button'
 import { Toast } from 'primereact/toast'
 import { DEFAULT_ERROR_TOAST } from '../utils/defaults'
 import { Context } from '..'
+import { Dropdown } from 'primereact/dropdown'
+import { IReferenceId } from '../models/IReference'
 
 // страница настроек профиля организации
 // Organization profile page
@@ -51,22 +53,26 @@ export const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>
   },[organization, ID])
 
   useEffect(()=>{
-    if (organization===null && props.match.params.id) {      
-      if (userStore.userInfo && (userStore.userInfo?.organization.id.toString()===props.match.params.id 
-        || userStore.userInfo?.roles.includes('ADMIN'))) {
+    if (organization===null && props.match.params.id) {
         OrganizationService.getOrganization(props.match.params.id)
         .then(response=>{        
           setOrganization(response.data)        
         })
         .catch((reason=>{console.log(reason)
           if (toast!==null && toast.current!==null) toast.current.show(DEFAULT_ERROR_TOAST)
-        }))
-      } else {        
-        if (toast!==null && toast.current!==null) toast.current.show({sticky: true,...DEFAULT_ERROR_TOAST})
-      } 
+        }))      
     }
   },[organization, props.match.params.id, userStore.userInfo])
-  
+  const [organizations, setOrganizations] = useState<IReferenceId[] | null>(null)
+  useEffect(()=>{
+    if (organizations===null && userStore.userInfo
+       && userStore.userInfo.roles.includes('ADMIN')) 
+    OrganizationService.getOrganizations().then(response=>
+      setOrganizations(response.data.organizations)
+    ).catch(()=>{
+      setOrganizations([])
+      if (toast!==null && toast.current!==null) toast.current.show(DEFAULT_ERROR_TOAST)
+    })},[organizations, userStore.userInfo])
   const changesAudit = (fieldName: string, field: string, oldValue: string, newValue: string) => {
     if (organization ===null) return
     let _audits = audits
@@ -128,11 +134,30 @@ export const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>
     } else if (toast!==null && toast.current!==null) toast.current.show({ severity: 'info', summary: 'Отклонено', detail: 'Изменения отсутствуют или неприменимы', life:3000 })   
   } 
   
+  const adminOpportunities = ()=>{    
+    return (userStore.userInfo && userStore.userInfo.roles.includes('ADMIN')) ? 
+    (<>
+      <div className="p-field p-col-12">
+        <label htmlFor="organization" >Выбрать медорганизацию</label>
+        <Dropdown id="organization"  options={organizations || []}
+          onChange={(e)=>{            
+            if (e.value.id) {
+              const history = userStore.history()
+              let link = `${MO_SETTINGS_ROUTE}/${e.value.id}`
+              setOrganization(null)              
+              history.push(link)              
+            }  
+          }}
+          filter showClear optionLabel="name" />
+      </div>
+    </>) 
+    : (<></>)     
+  }
   const layoutParams = {
     title: 'Профиль медорганизации',     
     url: MO_SETTINGS_ROUTE,
     content: organization ? (<>    
-    <div className="card widget-user-card">
+    <div className="card widget-user-card" key={props.match.params.id}>
       <div className="user-card-header">
         <img src={ava} alt="" className="user-card-avatar" />
       </div>
@@ -245,12 +270,13 @@ export const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>
           <div className="p-field  p-col-12 p-md-6">
             <Button label="ПРИМЕНИТЬ"  className="p-button-success" 
               style={{marginTop: '22px'}} onClick={saveOrganization}  />
-          </div>             
+          </div>   
+          {adminOpportunities()}          
         </div>
       </div>      
     </div>
-     <Toast ref={toast}  />           
-  </>) : (<> <Toast ref={toast}  /><ProgressSpinner/></>)
+    <Toast ref={toast} />           
+  </>) : (<><Toast ref={toast} /><ProgressSpinner/></>)
   }
   return (
     <>
