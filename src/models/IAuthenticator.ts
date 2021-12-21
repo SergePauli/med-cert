@@ -1,6 +1,7 @@
-import { IPersonName } from "./IPersonName"
+import { IReferenceId } from "./IReference"
+
 export interface IAuthenticator {
   id?: string
   time?: Date
-  doctor?: { id: string; person_name: IPersonName }
+  doctor?: IReferenceId
 }
