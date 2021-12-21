@@ -29,7 +29,6 @@ import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
 
 
-
 interface IMatch extends IRouteMatch {  
   params: {id: number}
 }
@@ -38,7 +37,7 @@ interface CertificatePageProps extends IRouteProps {
 }
 
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
-  const { certificateStore } = useContext(Context)
+  const { certificateStore, userStore } = useContext(Context)
   const secton_router = ()=>{
     switch (props.location.search) {
       case "?q=0": return <Section0 />
@@ -54,6 +53,51 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       default: return <Section0 /> 
     } 
   }    
+  const items = [        
+        {
+            label: 'Обновить',
+            icon: 'pi pi-refresh',
+            command: () => {
+                
+            }
+        },
+        {
+            label: 'Удалить',
+            icon: 'pi pi-trash',
+            command: () => {
+                
+            }
+        },
+        {
+            label: 'Сохранить',
+            icon: 'pi pi-pencil',
+            command: () => {
+               
+            }
+        },
+        {
+            label: 'Далее',
+            icon: 'pi pi-chevron-right',
+            command: () => {
+              const section = Number.parseInt(props.location.search[props.location.search.length-1])+1              
+              if (section > -1) {
+                userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=${section}`)
+              } 
+            }
+        }, 
+        {
+            label: 'Назад',
+            icon: 'pi pi-chevron-left',
+            command: () => {
+              const section = Number.parseInt(props.location.search[props.location.search.length-1])-1             
+                if (section > -1) {
+                console.log('section',section)
+                userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=${section}`)
+              }
+            }
+        },
+
+    ]
   const doneBodyTemplate = (rowData:any) => {
         return rowData.done ? <Avatar icon="pi pi-check" shape="circle" style={{ color: 'rgb(104 159 56)'}}/>
         : ''
@@ -76,7 +120,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
     title: 'Медицинское свидетельство о смерти',     
     url: `${CERTIFICATE_ROUTE}/${props.match.params.id}${props.location.search}`,
     content:(<>
-      <div className="p-d-flex p-jc-center">
+      <div className="p-d-flex p-jc-center" >
         {secton_router()}
         <Card className="p-mr-2 p-mb-2 p-suggestion" key={`p_sug_${sugCount}`} header={suggestionHeader}>            
             <DataTable className="p-datatable-sm" rowClassName={rowClass} 
@@ -87,8 +131,9 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             </DataTable> 
         </Card>
       </div>      
-    </>)
-  }  
+    </>),
+    actionItems: items
+  } 
   return (
     <>
       <MainLayout {...layoutParams} />

@@ -8,13 +8,14 @@ import { classNames } from 'primereact/utils'
 import { observer } from 'mobx-react-lite'
 import RightSideBarLayout  from './RightSideBarLayout'
 import { IUserInfo } from '../../models/responses/IUserInfo'
-
-
+import { ActionButtonLayout, IActionItem } from './ActionButtonLayout'
 
 type MainLayoutProps = {
   title: string,
   url:string, 
-  content:React.ReactElement }
+  content:React.ReactElement
+  actionItems?: IActionItem[]
+ }
 
 const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => { 
   const {layoutStore, userStore} = useContext(Context)
@@ -40,11 +41,13 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
   <div className={wrapperClass} data-theme='light'>    
     <div className='layout-content-wrapper' onClick={()=>onClickOutside()}>  
       <TopBarLayout  title = {props.title}  userInfo={userInfo} />        
-      <div className='layout-content' >{props.content}</div>
+      <div className='layout-content' >{props.content}
+        <ActionButtonLayout items={props.actionItems}/>
+      </div>
       <FooterLayout userInfo={userInfo} />
     </div>
     <SideBarLayout  activeUrl={props.url} /> 
-    <RightSideBarLayout /> 
+    <RightSideBarLayout />     
     <div className="layout-search"></div>        
     <div className='layout-mask modal-in' onClick={()=>{layoutStore.setTabletOrMobile(false)}}></div>
   </div>  
