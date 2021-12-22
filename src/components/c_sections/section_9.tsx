@@ -22,6 +22,8 @@ import Authenticator from '../../models/FormsData/Authenticator'
    const certificate = certificateStore.cert 
   const [doctors, setDoctors] = useState<IReferenceId[] | null>(null)
   const [author, setAuthor] = useState<IReferenceId | undefined>(certificate.author?.doctor) 
+  const [legalAuthenticator, setLegalAuthenticator] = useState<IReferenceId | undefined>(certificate.legalAuthenticator?.doctor)
+  const [authenticator, setAuthenticator] = useState<IReferenceId | undefined>(certificate.authenticator?.doctor)
   useEffect(()=>{
     if (doctors===null && userStore.userInfo) {
       DoctorService.getDoctors({       
@@ -117,18 +119,28 @@ import Authenticator from '../../models/FormsData/Authenticator'
                 <label htmlFor="author">Врач (фельдшер, акушерка), заполнивший Медицинское свидетельство о смерти *</label>
                 <Dropdown inputId="author"  placeholder="Выбрать" style={customDropdnStyle}                   
                   optionLabel="name" autoFocus className="p-mb-2"  options={doctors || []} 
-                  value={author}              
+                  value={author} showClear             
                   onChange={(e) =>{
-                    if (e.value.id) { 
+                    if (e.value) { 
                       certificate.author = new Authenticator({time: new Date(), doctor: e.value})
                       setAuthor(e.value)
-                    }                      
+                    } else {
+                      certificate.author = undefined
+                      setAuthor(undefined)
+                    }                       
                   }} />
                 <label htmlFor="legalAuthenticator">Руководитель медицинской организации *</label>
                 <Dropdown inputId="legalAuthenticator"  placeholder="Выбрать" style={customDropdnStyle} 
-                  optionLabel="doctor.name" options={doctors || []}                 
+                  optionLabel="name" options={doctors || []} showClear
+                  value={legalAuthenticator}                
                   onChange={(e) =>{
-                    if (e.value.id) certificate.legalAuthenticator =  new Authenticator({time: new Date(), doctor: e.value})                    
+                    if (e.value) { 
+                      certificate.legalAuthenticator =  new Authenticator({time: new Date(), doctor: e.value})
+                      setLegalAuthenticator(e.value)
+                    } else {
+                      certificate.legalAuthenticator = undefined 
+                      setLegalAuthenticator(undefined)                  
+                    }  
                   }} />  
               </div>               
             </div>
@@ -137,9 +149,16 @@ import Authenticator from '../../models/FormsData/Authenticator'
               <div className="p-paragraph-field p-mr-2 p-mb-2" style={customParagraphFieldStyle}>
                 <label htmlFor="authenticator">Свидетельство проверено ответственным *</label>
                 <Dropdown inputId="authenticator" placeholder="Выбрать" style={customDropdnStyle} 
-                  optionLabel="doctor.name"  options={doctors || []}                
+                  optionLabel="name"  options={doctors || []} showClear
+                  value={authenticator}                
                   onChange={e=>{
-                    if (e.value.id) certificate.authenticator =  new Authenticator({time: new Date(),doctor: e.value})                   
+                    if (e.value) {
+                      certificate.authenticator =  new Authenticator({time: new Date(),doctor: e.value})
+                      setAuthenticator(e.value)
+                    } else { 
+                      certificate.authenticator = undefined 
+                      setAuthenticator(undefined)                     
+                    }  
                   }} 
                 />
               </div>  
