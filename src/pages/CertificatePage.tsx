@@ -124,7 +124,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
         {secton_router()}
         <Card className="p-mr-2 p-mb-2 p-suggestion" key={`p_sug_${sugCount}`} header={suggestionHeader}>            
             <DataTable className="p-datatable-sm" rowClassName={rowClass} 
-            value={suggestions}>
+            value={suggestions} responsiveLayout="scroll">
               <Column field="code" header="Код"></Column>
               <Column field="suggestion" header="Проверка"></Column>
               <Column body={doneBodyTemplate}></Column>
