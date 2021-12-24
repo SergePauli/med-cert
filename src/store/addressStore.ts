@@ -1,3 +1,4 @@
+import { makeAutoObservable } from "mobx"
 import Address from "../models/FormsData/Address"
 import { IReference } from "../models/IReference"
 import { IAddress } from "../models/responses/IAddress"
@@ -10,10 +11,15 @@ export default class AddressStore {
   private _history: any
   private _regionsOptions: IReference[] | undefined
   private _fiasOptions: IFiasItem[] | undefined
+  private _dialogVisible: boolean
+  private _manualMode: boolean
 
   constructor() {
     this._isLoding = false
     this._address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
+    this._dialogVisible = false
+    this._manualMode = false
+    makeAutoObservable(this)
   }
 
   fetchRegionOptions() {
@@ -60,10 +66,8 @@ export default class AddressStore {
           return item
         })
       else this._fiasOptions = []
+      console.log("response", response)
       return this._fiasOptions
-    } catch (e) {
-      console.log(e)
-      return []
     } finally {
       this._isLoding = false
     }
@@ -131,5 +135,18 @@ export default class AddressStore {
     this._address.buildnum = undefined
     this._address.strucnum = undefined
     this._address.streetAddressLine = this._address.state?.name + ", " || ""
+  }
+  get dialogVisible(): boolean {
+    return this._dialogVisible
+  }
+  set dialogVisible(value: boolean) {
+    this._dialogVisible = value
+  }
+
+  get manualMode(): boolean {
+    return this._manualMode
+  }
+  set manualMode(value: boolean) {
+    this._manualMode = value
   }
 }

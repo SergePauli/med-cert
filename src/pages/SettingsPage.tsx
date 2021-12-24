@@ -19,6 +19,8 @@ import { DEFAULT_ERROR_TOAST } from '../utils/defaults'
 import { Context } from '..'
 import { Dropdown } from 'primereact/dropdown'
 import { IReferenceId } from '../models/IReference'
+import AddressDialog from '../components/dialogs/AddressDialog'
+import { observer } from 'mobx-react-lite'
 
 // страница настроек профиля организации
 // Organization profile page
@@ -32,16 +34,15 @@ interface SettingsPageProps extends IRouteProps {
 }
 
 
-export const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>{ 
-  const {userStore} = useContext(Context)
+const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>{ 
+  const {userStore, addressStore} = useContext(Context)
   const [audits, setAudits] = useState<IAudit[]>([])
   const [submitted, setSubmitted] = useState(false)
   const [email, setEmail] = useState<IContact>({telcom_value:'', main:false} as IContact) 
   const [phone, setPhone] = useState<IContact>({telcom_value:'', main:true} as IContact)
   const [organization, setOrganization] = useState<IOrganization | null>(null)
   const [ID, setID] = useState<number | null>(null)
-  const toast = useRef<Toast>(null)
-    
+  const toast = useRef<Toast>(null) 
   useEffect(()=>{
     if (organization!==null && organization.id !== ID) {
       setPhone({telcom_value:'', main:true} as IContact)
@@ -106,8 +107,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>
     _result = _result && !(organization.name===undefined || (organization.name && organization.name.length > 100))
     _result = _result && organization.name_full!==undefined
     return  _result
-  }
-  
+  }  
   const saveOrganization = () => {
     if (organization===null) return
     setSubmitted(true)
@@ -181,9 +181,9 @@ export const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>
         </div>
       </div>        
     </div>
-    <div className='card' style={{textAlign: 'left'}}>      
+    <div className='card' style={{textAlign: 'left'}} >      
         <div className='p-fluid p-formgrid p-grid'>
-          <div className="p-field p-col-12 p-md-5">
+          <div className="p-field p-col-12 p-md-5 ">
             <label htmlFor="name">Наименование</label>
             <InputText id="name" required value={organization.name || ''} 
               onChange={e=>{
@@ -266,16 +266,28 @@ export const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>
               className={classNames({ 'p-invalid': submitted && !(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email.telcom_value) || email.telcom_value==='')})}
                     />
               {submitted && !(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email.telcom_value) || email.telcom_value==='') && <small className="p-error">Неверный email</small>}
+          </div>      
+          <div className="p-field p-col-12 ">
+            <label htmlFor="address">Адрес</label>
+            <div className='p-inputgroup'>
+              <Button id='address' label="Ввод" onClick={()=>{
+                  addressStore.dialogVisible = true                  
+                }} style={{width:'5rem'}}/>
+              <InputText disabled={!addressStore.manualMode}
+                placeholder={organization.address ? organization.address.streetAddressLine : 'введите адрес вида: Амурская область, Павловский район, село Тосево, улица Товарная, дом 13, кв. 9' }/>
+              <Button icon="pi pi-times" className="p-button-danger"/>
+            </div>
           </div>
           <div className="p-field  p-col-12 p-md-6">
             <Button label="ПРИМЕНИТЬ"  className="p-button-success" 
               style={{marginTop: '22px'}} onClick={saveOrganization}  />
           </div>   
           {adminOpportunities()}          
-        </div>
-      </div>      
+        </div>        
+      </div>             
     </div>
-    <Toast ref={toast} />           
+    <Toast ref={toast} /> 
+    <AddressDialog address={organization.address} toast={toast} />        
   </>) : (<><Toast ref={toast} /><ProgressSpinner/></>)
   }
   return (
@@ -284,3 +296,4 @@ export const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>
     </>
   )
 }
+export default observer(SettingsPage)

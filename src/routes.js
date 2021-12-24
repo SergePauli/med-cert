@@ -9,7 +9,7 @@ import { MessagePage } from "./pages/MessagePage"
 import { PassordRecoveryPage } from "./pages/PasswordRecoveryPage"
 import { ProfilePage } from "./pages/ProfilePage"
 import { RegistrationPage } from "./pages/RegistrationPage"
-import { SettingsPage } from "./pages/SettingsPage"
+import SettingsPage from "./pages/SettingsPage"
 import {
   ADMIN_ROUTE,
   CERTIFICATE_ROUTE,
