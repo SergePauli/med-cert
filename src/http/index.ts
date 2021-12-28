@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios"
 import { AuthResponse } from "../models/responses/AuthResponse"
-export const API_URL = "http://localhost:5000/REST_API/v1/"
-export const FIAS_URL = "http://localhost:5050/fias"
+export const API_URL = "http://10.33.7.10:5000/REST_API/v1/"
+export const FIAS_URL = "http://10.33.7.10:5050/fias"
 const $api = axios.create({
   withCredentials: true,
   baseURL: API_URL,
