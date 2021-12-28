@@ -12,8 +12,9 @@ import { Dialog } from 'primereact/dialog'
 import { Dropdown } from 'primereact/dropdown'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
-import { FC, useContext, useEffect, useState } from 'react'
+import { FC, useContext, useEffect, useRef, useState } from 'react'
 import { Context } from '../..'
+import Address from '../../models/FormsData/Address'
 import { IReference } from '../../models/IReference'
 import { IAddress } from '../../models/responses/IAddress'
 import { IFiasItem } from '../../models/responses/IFiasItem'
@@ -23,8 +24,8 @@ type AddressDialogProps = {
   id?:string   
   onOK?: ()=>void
   onCancel?: ()=>void  
-  address: IAddress
-  toast: React.RefObject<Toast>
+  address?: IAddress 
+  strictly?: boolean 
 }
 
 const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{ 
@@ -50,7 +51,7 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
   const [house, setHouse] = useState<string>(value.housenum || '')
   useEffect(()=>setHouse(value.housenum || ''), [value.housenum])
   const [addresses, setAddresses] = useState(addressStore.fiasOptions)   
-  
+  const toast = useRef<Toast>(null)
   const setAddress = (e:IFiasItem)=>{ 
     if (e === null) return      
     if (e.parent!==undefined) setAddress(e.parent)
@@ -90,7 +91,13 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
     } else if (value.state?.code) {
       setRegion(regions?.find((region)=>region.code===value.state?.code))
     }    
-  }, [regions, value, addressStore, region])  
+  }, [regions, value, addressStore, region]) 
+  
+  useEffect(()=>{
+    if (addressStore.address.id === undefined && props.address) {
+      addressStore.address = new Address(props.address) 
+    }
+  })
   
   const onHide = ()=>{ 
     addressStore.dialogVisible = false
@@ -107,18 +114,24 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
    addressStore.getChildItems(parent, level, query)
     .then(response=>setAddresses(response))
     .catch(reason => {  
-       if (props.toast.current) props.toast.current.show({...DEFAULT_ERROR_TOAST, detail:`ошибка запроса к ФИАС: ${reason.message}`})
+       if (toast.current) toast.current.show({...DEFAULT_ERROR_TOAST, detail:`ошибка запроса к ФИАС: ${reason.message}`})
        setAddresses([])
-    })
-    
+    })    
   }
 
+  const cantSaveChanges = ()=> {    
+    if ((props.strictly && addressStore.isNotStrictly()) 
+      || props.address?.streetAddressLine === addressStore.streetAddressLine()) return true
+    else  return false  
+  }
   const footer = (
     <div>
-      <Button label="Применить" icon="pi pi-check" onClick={()=>{
-        if (props.onOK) props.onOK()
-        onHide()
-      }} className="p-button-text p-button-success"/>        
+      <Button label="Применить" icon="pi pi-check" disabled={cantSaveChanges()}
+        onClick={()=>{
+          if (addressStore.isNotStrictly() && !props.strictly) addressStore.address.streetAddressLine = searchStr
+          if (props.onOK) props.onOK()
+          onHide()
+        }} className="p-button-text p-button-success"/>        
       <Button label="Отмена" icon="pi pi-times" onClick={()=>{
         if (props.onCancel) props.onCancel()
         onHide()}} className="p-button-text"/>
@@ -131,9 +144,9 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
     <div className="p-grid p-fluid">  
     <div className='p-field p-col-12'>        
       <div className='p-inputgroup'>
-        <span className='p-inputgroup-addon'>Поиск в ФИАС:</span> 
+        <span className='p-inputgroup-addon'>Строка поиска:</span> 
         <AutoComplete id='searchFIAS' disabled={isLoading}  
-            value={searchStr}
+            value={searchStr} 
             suggestions={addresses}
             completeMethod={(e) =>{
               const query = value.state?.name ? e.query.replace(value.state?.name+',', '') : e.query
@@ -150,7 +163,7 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
               setSearchStr(e.value.streetAddressLine)
             } else setSearchStr(e.target.value)
           }}
-          placeholder='Регион, Нас.пункт, Улица, Дом'
+          placeholder='Регион, Город(Район),(Нас.пункт), Улица, Дом'
         />
       </div> 
     </div>       
@@ -280,7 +293,7 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
             }}                                               
         />        
       </div>
-      <Toast ref={props.toast} />      
+      <Toast ref={toast} />      
     </div>  
   </Dialog>)
 }

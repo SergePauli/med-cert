@@ -16,7 +16,7 @@ export class ChildInfo {
     this._termPregnancy = props.term_pregnancy
     this._weight = props.weight
     this._whichAccount = props.which_account
-    this._nullFlavors = props.nullFlavors || []
+    this._nullFlavors = props.null_flavors || []
     if (props.related_subject) this._relatedSubject = new RelatedSubject(props.related_subject)
     makeAutoObservable(this)
   }

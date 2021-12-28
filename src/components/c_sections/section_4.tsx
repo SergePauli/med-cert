@@ -7,6 +7,7 @@ import { Context } from "../.."
 import Address from "../../models/FormsData/Address"
 import { INullFlavor } from "../../models/INullFlavor"
 import { IReference } from "../../models/IReference"
+import { IAddress } from "../../models/responses/IAddress"
 import { ASKU, HOME_REGION_CODE, NULL_FLAVORS, UNK } from "../../utils/defaults"
 import AddressFC  from "../inputs/AddressFC"
 import { AreaType } from "../inputs/AreaType"
@@ -22,7 +23,7 @@ const Section4: FC = () => {
   
   useEffect(()=>{ 
     if (checked && address) addressStore.address = address
-    else if (checked && addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })   
+    else if (checked && addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)   
     },[addressStore, address, checked])
   
   const header = () => {
@@ -33,7 +34,7 @@ const Section4: FC = () => {
     const lAddress = certificate.patient.address 
     if (lAddress === undefined) {
       certificate.deathAddr = undefined
-      if (addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
+      if (addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)
     } else {
       if (certificate.deathAddr === undefined ) certificate.deathAddr = addressStore.address
       certificate.deathAddr.streetAddressLine = lAddress.streetAddressLine
@@ -60,7 +61,7 @@ const Section4: FC = () => {
              label="Место смерти" checked={checked} paraNum 
              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) certificate.nullFlavors = nullFlavors
-                if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
+                if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)
                 else certificate.deathAddr = undefined                
               }} 
              nfValue={fromRelatives ? ASKU : UNK}

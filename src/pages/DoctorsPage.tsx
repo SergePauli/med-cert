@@ -29,6 +29,7 @@ import { DEFAULT_ERROR_TOAST, HOME_REGION_CODE, NA } from '../utils/defaults'
 import Address from '../models/FormsData/Address'
 import { IPerson } from '../models/IPerson'
 import { genUpdateDoctorRequest } from '../models/FormsData/DoctorRequest'
+import { IAddress } from '../models/responses/IAddress'
 
 export const DoctorsPage: FC = () => {    
     const {addressStore, userStore} = useContext(Context)
@@ -38,8 +39,7 @@ export const DoctorsPage: FC = () => {
         person: { person_name: {family:'Тестов', given_1:'Тест'}, 
           contacts:[] as IContact[],
           SNILS: '456-145-154 25'
-          } as IPerson,  
-        nullFlavors:[],
+          } as IPerson        
     } as IDoctor
     const ADDRESS_FIELD_NAME = 'addr'
     const [doctors, setDoctors] = useState<IDoctor[]>([])
@@ -80,7 +80,7 @@ export const DoctorsPage: FC = () => {
     const openNew = () => {
         setDoctor(emptyDoctor)
         addressStore.address = new Address({ state: HOME_REGION_CODE, 
-            streetAddressLine: "", nullFlavors: [] })
+            streetAddressLine: ""} as IAddress)
         setSubmitted(false)
         setDoctorDialog(true)
         setEmail({telcom_value:'', main:false} as IContact)
@@ -163,7 +163,7 @@ export const DoctorsPage: FC = () => {
         _doctor.person?.contacts?.forEach((item)=>{if (item.main) setPhone({...item})
         else setEmail({...item, telcom_value: item.telcom_value.replace('mailto:','')})})
         if (_doctor.person?.address) addressStore.address = new Address(_doctor.person?.address) 
-        else  addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
+        else  addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)
         setPosition(_doctor.position?.name || '')       
         setDoctor({..._doctor})
         setDoctorDialog(true)
@@ -358,16 +358,16 @@ export const DoctorsPage: FC = () => {
                     <AddressFC checked={isAddressChecked()} label={'Адрес врача'} 
                         setCheck={(e: CheckboxChangeParams, nullFlavors?: INullFlavor[])=>{
                           if (e.checked) {
-                            addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })                 
-                            doctor.nullFlavors = [] 
+                            addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)                 
+                            doctor.null_flavors = [] 
                             if (doctor.person) doctor.person.address = undefined                        
                           } else {
                             if (doctor.person) doctor.person.address = undefined  
-                            doctor.nullFlavors = nullFlavors                            
+                            doctor.null_flavors = nullFlavors                            
                           } 
                           onInputChange()     
                         }}                                              
-                        nullFlavors={doctor.nullFlavors}
+                        nullFlavors={doctor.null_flavors}
                         field_name={ADDRESS_FIELD_NAME}
                         nfValue={NA}
                     /> 

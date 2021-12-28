@@ -20,7 +20,7 @@ export const genCreateDoctorRequest = (doctor: IDoctor) => {
           : undefined,
     },
     null_flavor_attributes:
-      doctor.nullFlavors && doctor.nullFlavors?.length > 0 ? doctor.nullFlavors.map((item) => item) : undefined,
+      doctor.null_flavors && doctor.null_flavors?.length > 0 ? doctor.null_flavors.map((item) => item) : undefined,
   }
   _doctor = removeEmpty(_doctor)
   return _doctor
@@ -121,14 +121,14 @@ export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: IDoctor) => 
       detail: `контакты: ${oldContacts} -> ${newContacts}`,
     } as IAudit)
   }
-  const oldNullFlavors = oldPerson.nullFlavors
+  const oldNullFlavors = oldPerson.null_flavors
     ?.reduce<string>((u, item) => `${u} ${item.parent_attr}${item.code}`, "")
     .trim()
-  const newNullFlavors = newPerson.nullFlavors
+  const newNullFlavors = newPerson.null_flavors
     ?.reduce<string>((u, item) => `${u} ${item.parent_attr}${item.code}`, "")
     .trim()
   if (oldNullFlavors !== newNullFlavors) {
-    _person_attributes.contacts = newPerson.nullFlavors
+    _person_attributes.contacts = newPerson.null_flavors
     createAudit({
       field: "person.nullFlavors",
       before: oldNullFlavors,

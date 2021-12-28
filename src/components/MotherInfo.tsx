@@ -15,6 +15,7 @@ import { Calendar } from 'primereact/calendar'
 import AddressFC from './inputs/AddressFC'
 import Address from '../models/FormsData/Address'
 import { Context } from '..'
+import { IAddress } from '../models/responses/IAddress'
 
 type MotherInfoProps = {
   childInfo?: ChildInfo
@@ -36,7 +37,7 @@ export const MotherInfo = (props: MotherInfoProps) => {
     const checked = relatedSubject.nullFlavors.findIndex((item)=>item.parent_attr==='addr')===-1
     useEffect(()=>{ 
     if (checked && address) addressStore.address = address
-    else if (checked && addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })   
+    else if (checked && addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)   
     },[addressStore, address, checked])    
     
     return ( <>
@@ -118,7 +119,7 @@ export const MotherInfo = (props: MotherInfoProps) => {
         label="Место жительства матери" checked={checked}  
         setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) relatedSubject.nullFlavors = nullFlavors                  
-                if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
+                if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)
                 else relatedSubject.addr = undefined
         }} 
         nfValue={UNK}

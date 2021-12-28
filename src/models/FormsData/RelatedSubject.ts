@@ -16,7 +16,7 @@ export default class RelatedSubject {
   private _nullFlavors: INullFlavor[]
 
   constructor(props: IRelatedSubject) {
-    this._nullFlavors = props.nullFlavors || []
+    this._nullFlavors = props.null_flavors || []
     this._id = props.id || uuidv4()
     this._familyConnection = props.family_connection || MATHER
     this._fio = props.person_name

@@ -30,7 +30,7 @@ export default class Patient {
       props.identity.parentGUID = props.identity.parentGUID || this._guid
       this._identity = new Identity(props.identity)
     }
-    this._nullFlavors = props.nullFlavors || []
+    this._nullFlavors = props.null_flavors || []
     if (props.address) this._address = new Address(props.address)
     makeAutoObservable(this)
   }

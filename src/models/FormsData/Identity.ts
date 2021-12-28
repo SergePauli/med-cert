@@ -22,7 +22,7 @@ export default class Identity {
     if (props.issueOrgCode) this._issueOrgCode = props.issueOrgCode
     this._issueOrgDate = props.issueOrgDate
     this._parentGUID = props.parentGUID
-    this._nullFlavors = props.nullFlavors || []
+    this._nullFlavors = props.null_flavors || []
     makeAutoObservable(this)
   }
   get identityCardType() {

@@ -25,7 +25,7 @@ export class DeathReason {
     this._diagnosis = props.diagnosis
     this._effectiveTime = props.effective_time
     this._procedures = props.procedures?.map((proc) => new Procedure(proc)) || []
-    this._nullFlavors = props.nullFlavors || []
+    this._nullFlavors = props.null_flavors || []
     makeAutoObservable(this)
   }
   get id(): string {

@@ -370,4 +370,5 @@ export const DEFAULT_ERROR_TOAST = {
   summary: "Сбой",
   detail: "Что-то пошло не так, по-пробуйте позднее",
   life: 3000,
+  baseZIndex: 999,
 }

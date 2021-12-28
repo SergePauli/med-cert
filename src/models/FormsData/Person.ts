@@ -14,7 +14,7 @@ export default class Person {
     if (props.person_name) this._personName = props.person_name
     if (props.SNILS) this._SNILS = props.SNILS
     this._id = props.id || uuidv4()
-    this._nullFlavors = props.nullFlavors || []
+    this._nullFlavors = props.null_flavors || []
     makeAutoObservable(this)
   }
 

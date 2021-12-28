@@ -6,6 +6,7 @@ import { Context } from "../.."
 import Address from "../../models/FormsData/Address"
 import { INullFlavor } from "../../models/INullFlavor"
 import { IReference } from "../../models/IReference"
+import { IAddress } from "../../models/responses/IAddress"
 import { ASKU, HOME_REGION_CODE, NULL_FLAVORS, UNK } from "../../utils/defaults"
 import AddressFC  from "../inputs/AddressFC"
 import { AreaType } from "../inputs/AreaType"
@@ -21,7 +22,7 @@ const Section3: FC = () => {
   const fromRelatives = certificateStore.fromRelatives
   useEffect(()=>{ 
     if (checked && address) addressStore.address = address
-    else if (checked && addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })     
+    else if (checked && addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)     
     },[addressStore, address, checked])
   const header = () => {
     return <span>Адрес места жительства</span>
@@ -36,7 +37,7 @@ const Section3: FC = () => {
              checked={checked} paraNum 
              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
                 if (nullFlavors) patient.setNullFlavors(nullFlavors)
-                if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
+                if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)
                 else patient.address = undefined                
               }} 
              nfValue={fromRelatives ? ASKU : UNK}

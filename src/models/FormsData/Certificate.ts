@@ -60,7 +60,7 @@ export default class Certificate {
     this._guid = props.guid || uuidv4()
     this._patient = new Patient(props.patient)
     this._effTime = props.eff_time || new Date()
-    this._nullFlavors = props.nullFlavors || []
+    this._nullFlavors = props.null_flavors || []
     this._certType = props.cert_type
     this._series = props.series
     this._number = props.number
