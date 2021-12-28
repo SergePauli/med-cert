@@ -8,6 +8,8 @@ import { ICertificateResponse } from "../models/responses/ICertificateResponse"
 import { IDeathReason } from "../models/responses/IDeathReason"
 import { DISEASE_DEADTH_KIND } from "../NSI/1.2.643.5.1.13.13.99.2.21"
 import {
+  AUTHENTICATOR_SUG,
+  AUTHOR_SUG,
   BASIS_DERMINING_SUG,
   CERT_DEATH_THIME_SUG,
   CERT_TYPE_SUG,
@@ -28,6 +30,7 @@ import {
   IORGDATE_SUG,
   IORGNAME_SUG,
   KIND_DEATH_REASON_SUG,
+  LEGAL_AUTHENTICATOR_SUG,
   LIFE_AREA_SUG,
   LIFE_PLACE_SUG,
   MARITAL_STATUS_SUG,
@@ -80,6 +83,9 @@ export default class CertificateStore {
     this._fromRelatives = this._identified && this._cert.patient.identity === undefined
     this._suggestions = DEFAULT_CERT_SUGGESTIONS
     makeAutoObservable(this)
+
+    // проверки полноты заполнения свидетельства
+    // работают как реакции на изменение данных
     this.disposers[0] = autorun(() => {
       const fio = this._cert.patient?.person.fio
       const isPersonNameSug =
@@ -308,8 +314,17 @@ export default class CertificateStore {
     })
     this.disposers[39] = autorun(() => {
       this._suggestions[PREGNANCY_CONNECTION_SUG].done =
-        this._cert.pregnancyConnection !== undefined ||
+        !!this._cert.pregnancyConnection ||
         this._cert.nullFlavors.findIndex((item) => item.parent_attr === "pregnancy_connection") !== -1
+    })
+    this.disposers[40] = autorun(() => {
+      this._suggestions[AUTHOR_SUG].done = !!this._cert.author
+    })
+    this.disposers[41] = autorun(() => {
+      this._suggestions[AUTHENTICATOR_SUG].done = !!this._cert.authenticator
+    })
+    this.disposers[42] = autorun(() => {
+      this._suggestions[LEGAL_AUTHENTICATOR_SUG].done = !!this._cert.legalAuthenticator
     })
   }
 

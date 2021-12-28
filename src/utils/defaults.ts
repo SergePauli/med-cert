@@ -257,15 +257,15 @@ export const DEFAULT_CERT_SUGGESTIONS = [
   },
   {
     section: "9",
-    code: "п.26",
-    suggestion:
-      "Указание данных об ответственном за проверку медицинских свидетельств лице - обязательно для заполнения",
+    code: "п.25.2",
+    suggestion: "Указание данных о руководителе медицинской организации - обязательно для заполнения",
     done: false,
   },
   {
     section: "9",
-    code: "п.25.2",
-    suggestion: "Указание данных о руководителе медицинской организации - обязательно для заполнения",
+    code: "п.26",
+    suggestion:
+      "Указание данных об ответственном за проверку медицинских свидетельств лице - обязательно для заполнения",
     done: false,
   },
 ]
@@ -312,8 +312,8 @@ export const EXT_REASON_TIME_SUG = 39
 export const TRAFFFIC_ACCIDENT_SUG = 40
 export const PREGNANCY_CONNECTION_SUG = 41
 export const AUTHOR_SUG = 42
-export const AUTHENTICATOR_SUG = 43
-export const LEGAL_AUTHENTICATOR_SUG = 44
+export const AUTHENTICATOR_SUG = 44
+export const LEGAL_AUTHENTICATOR_SUG = 43
 
 export const changeSuggestion = (code: string, suggestions: any[], done: boolean) => {
   const suggestion = suggestions.find((item) => item.code === code)
