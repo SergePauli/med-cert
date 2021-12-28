@@ -1,10 +1,12 @@
 import { makeAutoObservable } from "mobx"
 import Address from "../models/FormsData/Address"
+import { getCleanNullFlavor, INullFlavor } from "../models/INullFlavor"
 import { IReference } from "../models/IReference"
 import { IAddress } from "../models/responses/IAddress"
 import { IFiasItem } from "../models/responses/IFiasItem"
 import FiasService from "../services/FiasService"
-import { HOME_REGION_CODE } from "../utils/defaults"
+import { DESTROY_OPTION } from "../utils/consts"
+import { HOME_REGION_CODE, UNK } from "../utils/defaults"
 export default class AddressStore {
   private _address: Address
   private _isLoding: boolean
@@ -16,7 +18,7 @@ export default class AddressStore {
 
   constructor() {
     this._isLoding = false
-    this._address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "", nullFlavors: [] })
+    this._address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "" } as IAddress)
     this._dialogVisible = false
     this._manualMode = false
     makeAutoObservable(this)
@@ -66,13 +68,55 @@ export default class AddressStore {
           return item
         })
       else this._fiasOptions = []
-      console.log("response", response)
       return this._fiasOptions
     } finally {
       this._isLoding = false
     }
   }
 
+  // Returned full streetAddressLine include flat and postal code to save in IAddress
+  // Возвращает полный строковый адрес, включая квартиру и почтовы код,
+  // обычно не используемые в строке поиска, для сохранения в POJO
+
+  streetAddressLine(): string {
+    const addr = this._address
+    return `${addr.streetAddressLine}${addr.flat ? ", " + addr.flat : ""}${
+      addr.postalCode ? ", " + addr.postalCode : ""
+    }`
+  }
+
+  createNullFlavors(): INullFlavor[] {
+    const addr = this._address
+    let _nullFlafors = [] as INullFlavor[]
+    //check postalcode
+    let _nullFlavor = addr.nullFlavors.find((item) => item.parent_attr === "postalCode")
+    if (addr.postalCode && _nullFlavor) _nullFlafors.push({ ..._nullFlavor, ...DESTROY_OPTION })
+    else if (!addr.postalCode && _nullFlavor) {
+      const candidat = getCleanNullFlavor(_nullFlavor)
+      if (candidat) _nullFlafors.push(candidat)
+    } else if (!addr.postalCode && _nullFlavor === undefined)
+      _nullFlafors.push({ code: UNK, parent_attr: "postalCode" })
+    //check aoGUID
+    _nullFlavor = addr.nullFlavors.find((item) => item.parent_attr === "aoGUID")
+    if (addr.aoGUID && _nullFlavor) _nullFlafors.push({ ..._nullFlavor, ...DESTROY_OPTION })
+    else if (!addr.aoGUID && _nullFlavor) {
+      const candidat = getCleanNullFlavor(_nullFlavor)
+      if (candidat) _nullFlafors.push(candidat)
+    } else if (!addr.aoGUID && _nullFlavor === undefined) _nullFlafors.push({ code: UNK, parent_attr: "aoGUID" })
+    //check houseGUID
+    _nullFlavor = addr.nullFlavors.find((item) => item.parent_attr === "houseGUID")
+    if (addr.houseGUID && _nullFlavor) _nullFlafors.push({ ..._nullFlavor, ...DESTROY_OPTION })
+    else if (!addr.houseGUID && _nullFlavor) {
+      const candidat = getCleanNullFlavor(_nullFlavor)
+      if (candidat) _nullFlafors.push(candidat)
+    } else if (!addr.houseGUID && _nullFlavor === undefined) _nullFlafors.push({ code: UNK, parent_attr: "houseGUID" })
+    return _nullFlafors
+  }
+  // Check address for FIAS requarens
+  isNotStrictly(): boolean {
+    const addr = this._address
+    return !addr.aoGUID || !addr.houseGUID || !addr.postalCode
+  }
   // Returned POJO address data
   // Возвращает POJO объект адреса
   addressProps(): IAddress {
@@ -80,9 +124,7 @@ export default class AddressStore {
     const result = {
       id: addr.id,
       state: addr.state?.code,
-      streetAddressLine: `${addr.streetAddressLine}${addr.flat ? ", " + addr.flat : ""}${
-        addr.postalCode ? ", " + addr.postalCode : ""
-      }`,
+      streetAddressLine: this.streetAddressLine(),
       aoGUID: addr.aoGUID,
       houseGUID: addr.houseGUID,
       postalCode: addr.postalCode,
@@ -91,7 +133,7 @@ export default class AddressStore {
       building_number: addr.buildnum,
       flat_number: addr.flat,
       parent_guid: addr.parent,
-      //nullFlavors: addr.nullFlavors(),
+      null_flavors_attributes: this.createNullFlavors(),
     } as IAddress
 
     return result

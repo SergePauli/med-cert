@@ -6,6 +6,7 @@ import { IOrganization } from "../models/IOrganization"
 const ORGANIZATION_RENDER_OPTIONS = {
   render_options: { except: ["updated_at", "old_oid"], include: ["address", "contacts"] },
   includes: ["address", "contacts"],
+  address: { except: ["updated_at", "created_at"], include: ["null_flavors"] },
 }
 export default class OrganizationService {
   // GET from public endpoint /auth/organizations/

@@ -26,7 +26,7 @@ export default class Address {
     if (props.id) this._id = props.id
     this._state = region
     this._streetAddressLine = props.streetAddressLine
-    this._nullFlavors = props.nullFlavors || []
+    this._nullFlavors = props.null_flavors || []
     this._aoGUID = props.aoGUID
     this._houseGUID = props.houseGUID
     this._postalCode = props.postalCode
@@ -167,8 +167,8 @@ export default class Address {
   }
   // Получить всю ФИАС структуру адресного объекта по AOGUID
   fetchAddressHierarchy() {
-    if (this._aoGUID === undefined) return
-    FiasService.getChildItems(this._aoGUID, "building", "", "1")
+    if (!this._aoGUID) return
+    FiasService.getChildItems(this._aoGUID, this._houseGUID ? "building" : "", "", "1")
       .then((response) => {
         if (response.data.data)
           response.data.data.forEach((item) => {
