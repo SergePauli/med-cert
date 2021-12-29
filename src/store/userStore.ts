@@ -23,6 +23,7 @@ export default class UserStore {
     this._isLoding = false
     this._token = localStorage.getItem("token") || ""
     this._isAuth = this._token !== ""
+    if (this._isAuth) this.checkAuth()
     makeAutoObservable(this)
   }
 
