@@ -2,6 +2,7 @@ import { autorun, makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
 import { UNK } from "../../utils/defaults"
 import { timeDiff } from "../../utils/functions"
+import { IAudit } from "../IAudit"
 import { INullFlavor } from "../INullFlavor"
 import { IReference } from "../IReference"
 import { ICertificateResponse } from "../responses/ICertificateResponse"
@@ -52,9 +53,11 @@ export default class Certificate {
   private _authenticator?: Authenticator | undefined
   private _legalAuthenticator?: Authenticator | undefined
   private _nullFlavors: INullFlavor[]
+  private _audits: IAudit[]
   disposers: (() => void)[]
 
   constructor(props: ICertificateResponse) {
+    this._audits = []
     this._id = props.id || -1
     this.disposers = []
     this._guid = props.guid || uuidv4()
@@ -362,6 +365,10 @@ export default class Certificate {
   set deathReasons(value: DeathReason[]) {
     this._deathReasons = value
   }
+  get audits() {
+    return this._audits
+  }
+
   milisecAge() {
     // Discard the time-zone information.
     const a = this._patient.birth_date as Date
