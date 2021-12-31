@@ -6,29 +6,29 @@ import { IReference } from "../IReference"
 import { IAddress } from "./IAddress"
 import { IDeathReason } from "./IDeathReason"
 
-export interface ICertificateResponse extends INullFlavorable {
+export interface ICertificate extends INullFlavorable {
   id: number
   series: string
   number: string
   eff_time: Date
   cert_type: IReference
-  series_prev: string
-  number_prev: string
-  eff_time_prev: Date
+  series_prev?: string
+  number_prev?: string
+  eff_time_prev?: Date
   death_addr?: IAddress
   policy_OMS?: string
-  patient: IPatient
+  patient?: IPatient
   lifeAreaType?: number
   deathAreaType?: number
   death_datetime?: Date
-  death_year: number
-  death_month: number
-  death_day: number
-  death_place: number | undefined
-  marital_status: number | undefined
-  education_level: number | undefined
-  social_status: number | undefined
-  death_kind: number | undefined
+  death_year?: number
+  death_month?: number
+  death_day?: number
+  death_place?: number | undefined
+  marital_status?: number | undefined
+  education_level?: number | undefined
+  social_status?: number | undefined
+  death_kind?: number | undefined
   ext_reason_time?: Date | undefined
   ext_reason_description?: string | undefined
   established_medic?: number | undefined

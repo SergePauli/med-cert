@@ -1,11 +1,11 @@
 import { autorun, makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
-import { UNK } from "../../utils/defaults"
+import { NA } from "../../utils/defaults"
 import { timeDiff } from "../../utils/functions"
 import { IAudit } from "../IAudit"
-import { INullFlavor } from "../INullFlavor"
+import { checkFieldNullFlavor, INullFlavor } from "../INullFlavor"
 import { IReference } from "../IReference"
-import { ICertificateResponse } from "../responses/ICertificateResponse"
+import { ICertificate } from "../responses/ICertificate"
 import { IDeathReason } from "../responses/IDeathReason"
 import Address from "./Address"
 import Authenticator from "./Authenticator"
@@ -54,14 +54,15 @@ export default class Certificate {
   private _legalAuthenticator?: Authenticator | undefined
   private _nullFlavors: INullFlavor[]
   private _audits: IAudit[]
+  private _oldOne?: ICertificate
   disposers: (() => void)[]
 
-  constructor(props: ICertificateResponse) {
+  constructor(props: ICertificate) {
+    this._oldOne = { ...props }
     this._audits = []
     this._id = props.id || -1
-    this.disposers = []
     this._guid = props.guid || uuidv4()
-    this._patient = new Patient(props.patient)
+    this._patient = props.patient ? new Patient(props.patient) : new Patient()
     this._effTime = props.eff_time || new Date()
     this._nullFlavors = props.null_flavors || []
     this._certType = props.cert_type
@@ -97,40 +98,18 @@ export default class Certificate {
       this._reasonACME = this._reasonC
     else if (props.reason_ACME && props.reason_ACME === props.d_reason?.diagnosis?.ICD10)
       this._reasonACME = this._reasonD
-    makeAutoObservable(this)
-    this.disposers[0] = autorun(() => {
-      if (this.reasonB === undefined && this._nullFlavors.findIndex((item) => item.parent_attr === "b_reason") === -1)
-        this._nullFlavors.push({ parent_attr: "b_reason", code: UNK } as INullFlavor)
-      else if (
-        this.reasonB !== undefined &&
-        this._nullFlavors.findIndex((item) => item.parent_attr === "b_reason") !== -1
-      )
-        this.nullFlavors = this._nullFlavors.filter((item) => item.parent_attr !== "b_reason")
-    })
-    this.disposers[1] = autorun(() => {
-      if (this.reasonC === undefined && this._nullFlavors.findIndex((item) => item.parent_attr === "c_reason") === -1)
-        this._nullFlavors.push({ parent_attr: "c_reason", code: UNK } as INullFlavor)
-      else if (
-        this.reasonC !== undefined &&
-        this._nullFlavors.findIndex((item) => item.parent_attr === "c_reason") !== -1
-      )
-        this.nullFlavors = this._nullFlavors.filter((item) => item.parent_attr !== "c_reason")
-    })
-    this.disposers[2] = autorun(() => {
-      if (this.reasonD === undefined && this._nullFlavors.findIndex((item) => item.parent_attr === "d_reason") === -1)
-        this._nullFlavors.push({ parent_attr: "d_reason", code: UNK } as INullFlavor)
-      else if (
-        this.reasonD !== undefined &&
-        this._nullFlavors.findIndex((item) => item.parent_attr === "d_reason") !== -1
-      )
-        this.nullFlavors = this._nullFlavors.filter((item) => item.parent_attr !== "d_reason")
-    })
+
     if (props.a_reason) this._reasonA = this.createDeathReason(props.a_reason)
     if (props.b_reason) this._reasonB = this.createDeathReason(props.b_reason)
     if (props.c_reason) this._reasonC = this.createDeathReason(props.c_reason)
     if (props.d_reason) this._reasonD = this.createDeathReason(props.d_reason)
     if (props.death_reasons) this._deathReasons = props.death_reasons.map((reason) => this.createDeathReason(reason))
     else this._deathReasons = []
+    makeAutoObservable(this)
+    this.disposers = []
+    this.disposers[0] = autorun(() => checkFieldNullFlavor("b_reason", this.reasonB, this._nullFlavors, NA))
+    this.disposers[1] = autorun(() => checkFieldNullFlavor("c_reason", this._reasonC, this._nullFlavors, NA))
+    this.disposers[2] = autorun(() => checkFieldNullFlavor("d_reason", this.reasonD, this._nullFlavors, NA))
   }
   get id() {
     return this._id
