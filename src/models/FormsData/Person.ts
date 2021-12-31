@@ -6,11 +6,11 @@ import { IPersonName } from "../IPersonName"
 
 export default class Person {
   private _id?: string
-  private _personName?: IPersonName | undefined
+  private _personName?: IPersonName
   private _SNILS?: string | undefined
   private _nullFlavors: INullFlavor[]
 
-  constructor(props: IPerson) {
+  constructor(props = {} as IPerson) {
     if (props.person_name) this._personName = props.person_name
     if (props.SNILS) this._SNILS = props.SNILS
     this._id = props.id || uuidv4()
@@ -26,10 +26,10 @@ export default class Person {
     this._personName = fio
   }
 
-  nullFlavors() {
+  get nullFlavors() {
     return this._nullFlavors
   }
-  setNullFlavors(nullFlavors: INullFlavor[]) {
+  set nullFlavors(nullFlavors: INullFlavor[]) {
     this._nullFlavors = nullFlavors
   }
   get SNILS() {

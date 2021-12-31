@@ -19,7 +19,7 @@ import '../../styles/pages/CertificatePage.css'
         <div className="p-fluid p-formgrid p-grid">
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="firstname6">Серия</label>
-            <InputText id="firstname6" value={cert.series} disabled type="text" 
+            <InputText id="firstname6" value={cert.series} type="text" 
               placeholder='Заполняется автоматически' />
           </div>
           <div className="p-field p-col-12 p-md-6">

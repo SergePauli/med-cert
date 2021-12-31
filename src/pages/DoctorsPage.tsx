@@ -156,7 +156,7 @@ export const DoctorsPage: FC = () => {
         setPhone({telcom_value:'', main:true} as IContact)
         setEmail({telcom_value:'', main:false} as IContact)   
         let _doctor = {...doc}
-        _doctor.person = {...doc.person, person_name: {...doc.person.person_name}
+        if (doc.person.person_name) _doctor.person = {...doc.person, person_name: {...doc.person.person_name}
         }   
         _doctor.person.contacts = []         
         if (doc.person.contacts) _doctor.person.contacts = _doctor.person.contacts.concat(doc.person.contacts)
@@ -292,8 +292,9 @@ export const DoctorsPage: FC = () => {
                     <label htmlFor="family">Фамилия</label>
                     <InputText id="family" value={doctor.person?.person_name?.family} onChange={(e) =>{
                          if (doctor.person?.person_name) doctor.person.person_name.family = e.target.value     
-                         onInputChange()}} required autoFocus className={classNames({ 'p-invalid': submitted && !doctor.person?.person_name.family})} />
-                    {submitted && !doctor.person?.person_name.family && <small className="p-error">Фамилия обязательна.</small>}
+                         onInputChange()}} required autoFocus 
+                         className={classNames({ 'p-invalid': submitted && !!doctor.person?.person_name && !doctor.person?.person_name.family})} />
+                    {submitted && !!doctor.person?.person_name && !doctor.person?.person_name.family && <small className="p-error">Фамилия обязательна.</small>}
                 </div>
                 <div className="p-field  p-col-12 p-md-2">
                     <label htmlFor="given_1">Имя</label>
@@ -396,4 +397,4 @@ export const DoctorsPage: FC = () => {
     </>
   )
 }
-export default observer(DoctorsPage)                
+export default observer(DoctorsPage)               

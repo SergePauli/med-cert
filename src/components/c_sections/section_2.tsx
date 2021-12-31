@@ -57,9 +57,9 @@ import IIdentity from '../../models/IIdentity'
                         identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,          
                       } as IIdentity)
                       else patient.identity = undefined 
-                      if (nullFlavors) patient.setNullFlavors(nullFlavors)
+                      if (nullFlavors) patient.nullFlavors = nullFlavors
                     }}
-                  nullFlavors={patient.nullFlavors()}
+                  nullFlavors={patient.nullFlavors}
                   field_name="identity"
                   label={<label htmlFor="identity_card_type">Документ, удостоверяющей личность умершего: </label>}
                   field={<Dropdown  id="identity_card_type" value={dul_value} 
@@ -139,10 +139,10 @@ import IIdentity from '../../models/IIdentity'
                 <NullFlavorWrapper paraNum                    
                     label={<label htmlFor="snils">СНИЛС</label>}
                     checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                      if (nullFlavors) person.setNullFlavors(nullFlavors)
+                      if (nullFlavors) person.nullFlavors = nullFlavors
                       if (!e.checked) person.SNILS = undefined                      
                     }} 
-                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) person.setNullFlavors(nullFlavors)}}
+                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) person.nullFlavors = nullFlavors}}
                     field={<InputMask id="snils"  
                       type="text" mask="999-999-999 99"
                       value={person.SNILS} 
@@ -151,7 +151,7 @@ import IIdentity from '../../models/IIdentity'
                     options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK NA".includes(item.code))} 
                     value={docChecked ? UNK : ASKU}
                     field_name="SNILS"
-                    nullFlavors={person.nullFlavors()}
+                    nullFlavors={person.nullFlavors}
                 />                               
               </div>              
             </div>

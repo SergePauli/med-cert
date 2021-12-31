@@ -15,12 +15,12 @@ export default class Patient {
   private _provider_organization?: string
   private _addr_type?: number
   private _address?: Address
-  private _guid?: string
+  private _guid: string
   private _identity?: Identity
   private _nullFlavors: INullFlavor[]
-  constructor(props: IPatient) {
+  constructor(props = {} as IPatient) {
     this._guid = props.guid || uuidv4()
-    this._person = new Person(props.person)
+    this._person = props.person ? new Person(props.person) : new Person()
     if (props.gender) this._gender = props.gender
     if (props.addr_type) this._addr_type = props.addr_type
     if (props.birth_date) this._birth_date = props.birth_date
@@ -58,13 +58,11 @@ export default class Patient {
   get guid() {
     return this._guid
   }
-  set guid(guid: string | undefined) {
-    this._guid = guid
-  }
-  nullFlavors() {
+
+  get nullFlavors() {
     return this._nullFlavors
   }
-  setNullFlavors(nullFlavors: INullFlavor[]) {
+  set nullFlavors(nullFlavors: INullFlavor[]) {
     this._nullFlavors = nullFlavors
   }
   get addr_type() {
@@ -101,12 +99,12 @@ export default class Patient {
   setBirthDay(value: Date | undefined, isYear: boolean) {
     if (value && !isYear) {
       if (this._birth_date === undefined)
-        this.setNullFlavors(this.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
+        this.nullFlavors = this.nullFlavors.filter((element) => element.parent_attr !== "birth_date")
       this.birth_date = value
       this.birth_year = undefined
     } else if (value && isYear) {
       if (this.birth_date === undefined)
-        this.setNullFlavors(this.nullFlavors().filter((element) => element.parent_attr !== "birth_date"))
+        this.nullFlavors = this.nullFlavors.filter((element) => element.parent_attr !== "birth_date")
       this.birth_date = value
       this.birth_year = (this.birth_date as Date).getFullYear()
     } else {

@@ -29,7 +29,9 @@ import Authenticator from '../../models/FormsData/Authenticator'
       DoctorService.getDoctors({       
         q:{organization_id_eq: userStore.userInfo.organization.id}        
       }).then(response=>{
-        const data = response.data.map(doctor=>{return {id: doctor.id, name: `${doctor.person.person_name.family} ${doctor.person.person_name.given_1} ${doctor.person.person_name.given_2} ${doctor.position?.name}`} as IReferenceId})
+        const data = response.data.map(doctor=>{
+          if (!doctor.person || !doctor.person.person_name) return {id: doctor.id, name: doctor.position?.name } as IReferenceId
+          return {id: doctor.id, name: `${doctor.person.person_name.family} ${doctor.person.person_name.given_1} ${doctor.person.person_name.given_2} ${doctor.position?.name}`} as IReferenceId})
         if (data) setDoctors(data)
       })
     }

@@ -63,7 +63,7 @@ import Identity from '../../models/FormsData/Identity'
                     patient.setBirthDay(patient.birth_date as Date | undefined, false)
                   }
                   patient.identity = undefined  
-                  patient.nullFlavors().push({parent_attr:'identity', code:ASKU})                 
+                  patient.nullFlavors.push({parent_attr:'identity', code:ASKU})                 
                 } else 
                   patient.identity = new Identity({identityCardType: ID_CARD_TYPES[PASSPORT_RF].code} as IIdentity)                
                 }}/>
@@ -81,7 +81,7 @@ import Identity from '../../models/FormsData/Identity'
                     { 
                       if (e.checked)  person.fio = fio
                       else person.fio = undefined 
-                      if (nullFlavors) person.setNullFlavors(nullFlavors)
+                      if (nullFlavors) person.nullFlavors = nullFlavors
                     }}                 
                   label={<label htmlFor="family">Фамилия</label>}
                   field={<InputText  id="family" value={fio.family} 
@@ -92,7 +92,7 @@ import Identity from '../../models/FormsData/Identity'
                   }}/>}                  
                   options={NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))} 
                   value={certificateStore.fromRelatives ? ASKU : NA} 
-                  nullFlavors={person.nullFlavors()}  
+                  nullFlavors={person.nullFlavors}  
                   field_name="person_name"                                 
                 />             
               </div>
@@ -183,9 +183,9 @@ import Identity from '../../models/FormsData/Identity'
                         patient.birth_date = undefined
                         patient.birth_year = undefined 
                       } 
-                      if (nullFlavors) patient.setNullFlavors(nullFlavors) 
+                      if (nullFlavors) patient.nullFlavors = nullFlavors 
                     }} 
-                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) patient.setNullFlavors(nullFlavors)}}
+                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) patient.nullFlavors = nullFlavors}}
                     field={<div className="p-d-flex p-jc-start p-ai-center">              
                       <Calendar id="dateBirth" className="p-mr-2" 
                         view={yearBTChecked ? "month" : "date"} dateFormat={yearBTChecked ? "yy" : "dd/mm/yy"}                          
@@ -205,7 +205,7 @@ import Identity from '../../models/FormsData/Identity'
                     options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
                     value={certificateStore.fromRelatives ? ASKU : UNK}
                     field_name="birth_date"
-                    nullFlavors={patient.nullFlavors()}
+                    nullFlavors={patient.nullFlavors}
                 />                               
               </div>              
             </div>

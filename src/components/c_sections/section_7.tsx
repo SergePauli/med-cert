@@ -14,8 +14,6 @@ import Reason from '../inputs/Reason'
 import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
 
-
-
  const Section7: FC = () => {
   const { certificateStore } = useContext(Context)   
   
@@ -28,13 +26,14 @@ import { InputText } from 'primereact/inputtext'
     if (certificate.reasonA === undefined) certificate.reasonA = certificate.createDeathReason({} as IDeathReason) 
   })  
   const mainCSSClass = (isACME: boolean) => isACME  ? "p-fluid p-d-flex p-jc-start ACME-reason" : "p-fluid p-d-flex p-jc-start"
-  const reasonBckecked = certificate.reasonB!==undefined
-  const reasonCckecked = certificate.reasonC!==undefined
-  const reasonDckecked = certificate.reasonD!==undefined
+  const reasonBckecked = !!certificate.reasonB
+  const reasonCckecked = !!certificate.reasonC
+  const reasonDckecked = !!certificate.reasonD
+  console.log('reasonCckecked', reasonCckecked, certificate.reasonC)
       
   return (<>    
     <Card className="c-section p-mr-2 p-mb-2" header={header}>        
-      <div className={mainCSSClass(certificate.reasonA!==undefined && certificate.reasonA===certificate.reasonACME)}
+      <div className={mainCSSClass(!!certificate.reasonA && certificate.reasonA===certificate.reasonACME)}
        style={{width: '98%'}} key={`ra_${certificate.reasonA?.id}`}> 
         <div className='paragraph p-mr-1'>а) </div>           
         <Reason label="Болезнь или состояние, непосредственно приведшее к смерти" 
@@ -51,15 +50,14 @@ import { InputText } from 'primereact/inputtext'
           }}
         />
       </div>  
-      <div className={mainCSSClass(certificate.reasonB!==undefined && certificate.reasonB===certificate.reasonACME)} style={{width: '98%'}} key={`rb_${certificate.reasonB?.id}`}>   
+      <div className={mainCSSClass(!!certificate.reasonB && certificate.reasonB===certificate.reasonACME)} style={{width: '98%'}} key={`rb_${certificate.reasonB?.id}`}>   
         <div className='paragraph p-mr-1'>б) </div>
         <Reason label="Патологическое состояние, которое привело к возникновению непос- редственной причины смерти" 
           deathReason={certificate.reasonB} certificate={certificate}  key={`rb2_${certificate.reasonB?.id}`}
           onChange={(reason: DeathReason | undefined)=>{ 
             if (reason!==certificate.reasonB ) 
             certificate.reasonB = reason 
-          }} 
-           
+          }}           
           checked={reasonBckecked} 
           fieldName='b_reason' 
           onDown={()=>{
@@ -74,14 +72,15 @@ import { InputText } from 'primereact/inputtext'
           }}            
         />
       </div>  
-      <div className={mainCSSClass(certificate.reasonC!==undefined && certificate.reasonC===certificate.reasonACME)} 
+      <div className={mainCSSClass(!!certificate.reasonC && certificate.reasonC===certificate.reasonACME)} 
       style={{width: '98%'}} key={`rc_${certificate.reasonC?.id}`}>  
         <div className='paragraph p-mr-1'>в) </div>
         <Reason label="Первоначальная причина смерти" 
           deathReason={certificate.reasonC} certificate={certificate} 
           key={`rc2_${reasonCckecked}_${certificate.reasonC?.effectiveTime}`}
-          onChange={(reason: DeathReason | undefined)=>{ if (reason!==certificate.reasonC ) certificate.reasonC = reason }} fieldName='c_reason'
-          checked={reasonCckecked}
+          onChange={(reason: DeathReason | undefined)=>{ 
+            if (reason !== certificate.reasonC) certificate.reasonC = reason            
+          }} fieldName='c_reason' checked={reasonCckecked}
           onUp={()=>{
             const reason = certificate.reasonC
             certificate.reasonC = certificate.reasonB

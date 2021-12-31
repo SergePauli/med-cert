@@ -70,35 +70,38 @@ export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: IDoctor) => 
   let _person_name_attributes = {} as any
   const oldFIO = oldPerson?.person_name
   const newFIO = newValue.person?.person_name
-  if (oldFIO.family !== newFIO.family) {
-    _person_name_attributes.family = newFIO.family
-    createAudit({
-      field: "person.person_name.family",
-      before: oldFIO.family,
-      after: newFIO.family,
-      detail: `фамилия: ${oldFIO.family} -> ${newFIO.family}`,
-    } as IAudit)
-  }
-  if (oldFIO.given_1 !== newFIO.given_1) {
-    _person_name_attributes.given_1 = newFIO.given_1
-    createAudit({
-      field: "person.person_name.given_1",
-      before: oldFIO.given_1,
-      after: newFIO.given_1,
-      detail: `имя: ${oldFIO.given_1} -> ${newFIO.given_1}`,
-    } as IAudit)
-  }
-  if (oldFIO.given_2 !== newFIO.given_2) {
-    _person_name_attributes.given_2 = newFIO.given_2
-    createAudit({
-      field: "person.person_name.given_2",
-      before: oldFIO.given_2,
-      after: newFIO.given_2,
-      detail: `Отчество: ${oldFIO.given_2} -> ${newFIO.given_2}`,
-    } as IAudit)
+  if (!!oldFIO && !!newFIO) {
+    if (oldFIO.family !== newFIO.family) {
+      _person_name_attributes.family = newFIO.family
+      createAudit({
+        field: "person.person_name.family",
+        before: oldFIO.family,
+        after: newFIO.family,
+        detail: `фамилия: ${oldFIO.family} -> ${newFIO.family}`,
+      } as IAudit)
+    }
+    if (oldFIO.given_1 !== newFIO.given_1) {
+      _person_name_attributes.given_1 = newFIO.given_1
+      createAudit({
+        field: "person.person_name.given_1",
+        before: oldFIO.given_1,
+        after: newFIO.given_1,
+        detail: `имя: ${oldFIO.given_1} -> ${newFIO.given_1}`,
+      } as IAudit)
+    }
+    if (oldFIO.given_2 !== newFIO.given_2) {
+      _person_name_attributes.given_2 = newFIO.given_2
+      createAudit({
+        field: "person.person_name.given_2",
+        before: oldFIO.given_2,
+        after: newFIO.given_2,
+        detail: `Отчество: ${oldFIO.given_2} -> ${newFIO.given_2}`,
+      } as IAudit)
+    }
   }
   if (Object.keys(_person_name_attributes).length > 0)
-    _person_attributes.person_name_attributes = { id: newValue.person.person_name.id, ..._person_name_attributes }
+    if (newValue.person.person_name)
+      _person_attributes.person_name_attributes = { id: newValue.person.person_name.id, ..._person_name_attributes }
   const oldAddress = oldPerson.address?.streetAddressLine
   const newAddress = newPerson.address?.streetAddressLine
   if (oldAddress !== newAddress) {

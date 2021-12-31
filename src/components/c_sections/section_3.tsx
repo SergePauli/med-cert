@@ -18,7 +18,7 @@ const Section3: FC = () => {
   const patient = certificate.patient
   const address = patient.address 
   const identified = certificateStore.identified
-  const checked = address !== undefined || patient.nullFlavors().findIndex((item)=>item.parent_attr==='addr')===-1 
+  const checked = address !== undefined || patient.nullFlavors.findIndex((item)=>item.parent_attr==='addr')===-1 
   const fromRelatives = certificateStore.fromRelatives
   useEffect(()=>{ 
     if (checked && address) addressStore.address = address
@@ -36,13 +36,13 @@ const Section3: FC = () => {
              label="Место постоянного жительства(регистрации)"
              checked={checked} paraNum 
              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                if (nullFlavors) patient.setNullFlavors(nullFlavors)
+                if (nullFlavors) patient.nullFlavors = nullFlavors
                 if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)
                 else patient.address = undefined                
               }} 
              nfValue={fromRelatives ? ASKU : UNK}
              field_name="addr"
-             nullFlavors={patient.nullFlavors()}             
+             nullFlavors={patient.nullFlavors}             
              onChange={(value: Address)=>{
                if (patient.address !== value) patient.address=value                            
               }}/>
