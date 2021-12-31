@@ -67,7 +67,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
     } 
   }
   const deathTime = props.certificate.deathDatetime  
-  const deathReason = props.deathReason
+  const [deathReason, setDeathReason] = useState<DeathReason | null | undefined>(props.deathReason)
   const certificate = props.certificate
   const upButton = props.onUp === undefined ? <></> : <Button icon="pi pi-angle-up" onClick={props.onUp} className="p-button-rounded p-button-secondary p-mr-1" />
   const downButton = props.onDown === undefined ? <></> : <Button icon="pi pi-angle-down" onClick={props.onDown} className="p-button-rounded p-button-secondary" />
@@ -79,8 +79,8 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
           </span>
         )
     }
-  const effTime = checked && deathReason!==undefined && deathTime!==undefined ? (<NullFlavorWrapper disabled={props.disabled} 
-      checked={checked && (deathReason.effectiveTime!==undefined || props.disabled)} 
+  const effTime = checked && !!deathReason && !!deathTime ? (<NullFlavorWrapper disabled={props.disabled} 
+      checked={checked && (!!deathReason.effectiveTime || props.disabled)} 
       key={`et_${deathReason.effectiveTime}`} 
       label={<label>Период времени между началом патол. состояния и смертью</label>} 
       options={options}  paraNum value={UNK}
@@ -162,16 +162,17 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
           </div>
         </div>
       }
-    />) : <></>
-  return (<div className="p-paragraph-field" key={`rs_${checked}`} style={{width: '100%'}}>  
+    />) : <></>        
+  return (<div className="p-paragraph-field"  style={{width: '100%'}}>  
     <NullFlavorWrapper disabled={props.disabled} checked={checked} key={`rs2_${deathReason?.id}_${deathReason?.diagnosis}`}
       setCheck={(e: CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-        setChecked(e.checked)
+        setChecked(e.checked)        
         if (e.checked) {
           const reason = props.certificate.createDeathReason({certificate_id: props.certificate.id} as IDeathReason)
           props.onChange(reason)
+          setDeathReason(reason)
         } else {           
-          if (deathReason) {             
+          if (!!deathReason) {             
             deathReason.nullFlavors = []
             deathReason.effectiveTime = undefined  
             deathReason.diagnosis = undefined
@@ -184,10 +185,10 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
       }}  
       label={<label>{props.label}</label>} 
       options={options} 
-      nullFlavors={props.fieldName===undefined ? deathReason?.nullFlavors : props.certificate.nullFlavors} 
+      nullFlavors={!props.fieldName ? deathReason?.nullFlavors : props.certificate.nullFlavors} 
       onChange={(e: IReference, nullFlavors: INullFlavor[] | undefined)=>{
-        if (nullFlavors!==undefined && props.fieldName!==undefined) certificate.nullFlavors = nullFlavors
-        else if (nullFlavors!==undefined && deathReason!==undefined) deathReason.nullFlavors = nullFlavors
+        if (nullFlavors && props.fieldName) certificate.nullFlavors = nullFlavors
+        else if (nullFlavors && deathReason) deathReason.nullFlavors = nullFlavors
       }}
       paraNum      
       field_name={props.fieldName || 'diagnosis'}
@@ -199,11 +200,11 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               suggestions={diagnoses} delay={1000} dropdown
               completeMethod={getDiagnoses} itemTemplate={diagnosisOptionTemplate}
               field="s_name" onChange={(e) =>{ 
-                if (deathReason!==undefined && e.value.s_name!==undefined) { 
+                if (!!deathReason && !!e.value.s_name) { 
                   deathReason.diagnosis = e.value
                   if (deathReason.diagnosis) setDiagnosisCode(deathReason.diagnosis?.ICD10)
                 } else if(e.value) {
-                  if (deathReason) deathReason.diagnosis = undefined
+                  if (!!deathReason) deathReason.diagnosis = undefined
                   setDiagnosisText(e.value)                  
                 } else {
                   if (deathReason) deathReason.diagnosis = undefined
@@ -217,7 +218,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               suggestions={diagnoses} delay={1000} field="ICD10"
               itemTemplate={diagnosisOptionTemplate}
               completeMethod={getCodes} onChange={(e) =>{ 
-                if (deathReason!==undefined && e.value.s_name!==undefined) {
+                if (!!deathReason && !!e.value.s_name) {
                   deathReason.diagnosis = e.value
                   if (deathReason.diagnosis) setDiagnosisCode(deathReason.diagnosis?.ICD10)
                 } else if(e.value) {
