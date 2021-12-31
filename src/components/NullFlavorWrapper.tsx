@@ -30,7 +30,7 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
   const nullFlavors = (props.nullFlavors && props.nullFlavors.length>0 && props.field_name ) ? props.nullFlavors.filter((element: INullFlavor)=>element.parent_attr!==props.field_name) : []
   useEffect(()=>{   
     if (props.nullFlavors) {
-      const nullFlavor = props.nullFlavors.find(item=>item.parent_attr===props.field_name)
+      const nullFlavor = props.nullFlavors.find(item=>item.parent_attr===props.field_name && !item._destroy)
       if (nullFlavor) {
         setValue(NULL_FLAVORS[nullFlavor.code])
         setChecked(false)
@@ -86,7 +86,7 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
     <div style={fieldStyle}>{props.field}</div>
   ) : (
     <div style={ddStyle}>{dropdown}</div>
-  )
+  )  
   return (<>{checkboxLabel}{canNullFlavor}</>)
 }
 export default NullFlavorWrapper
