@@ -1,4 +1,3 @@
-import { DESTROY_OPTION } from "../utils/consts"
 import { UNK } from "../utils/defaults"
 import { IDestroyble } from "./IDestroyble"
 
@@ -18,21 +17,27 @@ export const getCleanNullFlavor = (old: INullFlavor): INullFlavor | undefined =>
   return _new
 }
 
+//генерируем заполнитель UNK автоматически,
+//проверяя значение field
+//и массив заполнителей до внесения изменений: original
+export const checkFieldNullFlavor = (
+  key: string,
+  field: any | null | undefined,
+  nullFlavors: INullFlavor[],
+  code = UNK
+) => {
+  const idx = nullFlavors.findIndex((item) => item.parent_attr === key)
+  if (field && idx !== -1) nullFlavors[idx]._destroy = "1"
+  else if (!field && idx !== -1 && nullFlavors[idx]._destroy === "1") {
+    nullFlavors[idx] = { ...getCleanNullFlavor(nullFlavors[idx]) } as INullFlavor
+  } else if (!field && idx === -1) nullFlavors.push({ code: code, parent_attr: key })
+}
+
 //генерируем заполнители UNK автоматически,
 //проверяя карту fields<имя поля, значение>
 //и массив заполнителей до внесения изменений: original
-export const createNullFlavors = (
-  fields: Map<string, string | null | undefined>,
-  original: INullFlavor[]
-): INullFlavor[] => {
-  let _nullFlafors = [] as INullFlavor[]
+export const createNullFlavors = (fields: Map<string, any | null | undefined>, original: INullFlavor[]) => {
   fields.forEach((value, key) => {
-    const _nullFlavor = original.find((item) => item.parent_attr === key)
-    if (value && _nullFlavor) _nullFlafors.push({ ..._nullFlavor, ...DESTROY_OPTION })
-    else if (!value && _nullFlavor) {
-      const candidat = getCleanNullFlavor(_nullFlavor)
-      if (candidat) _nullFlafors.push(candidat)
-    } else if (!value && !_nullFlavor) _nullFlafors.push({ code: UNK, parent_attr: key })
+    checkFieldNullFlavor(key, value, original)
   })
-  return _nullFlafors
 }
