@@ -51,8 +51,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
   else DiagnosisService.fetchDiagnoses(option).then(response=>{
         if (response.data.length>0) setDiagnoses(response.data)
         else setDiagnoses([])        
-      }).catch((reason)=>console.log(reason)) 
-    
+      }).catch((reason)=>console.log(reason))    
   }
   const  getCodes = (event: { query: string })=>{    
     if (event.query.trim().length>0) {
@@ -67,8 +66,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
     } 
   }
   const deathTime = props.certificate.deathDatetime  
-  const [deathReason, setDeathReason] = useState<DeathReason | null | undefined>(props.deathReason)
-  const certificate = props.certificate
+  const [deathReason, setDeathReason] = useState<DeathReason | null | undefined>(props.deathReason)  
   const upButton = props.onUp === undefined ? <></> : <Button icon="pi pi-angle-up" onClick={props.onUp} className="p-button-rounded p-button-secondary p-mr-1" />
   const downButton = props.onDown === undefined ? <></> : <Button icon="pi pi-angle-down" onClick={props.onDown} className="p-button-rounded p-button-secondary" />
   const diagnosisOptionTemplate = (option: IDiagnosis) => {
@@ -185,11 +183,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
       }}  
       label={<label>{props.label}</label>} 
       options={options} 
-      nullFlavors={!props.fieldName ? deathReason?.nullFlavors : props.certificate.nullFlavors} 
-      onChange={(e: IReference, nullFlavors: INullFlavor[] | undefined)=>{
-        if (nullFlavors && props.fieldName) certificate.nullFlavors = nullFlavors
-        else if (nullFlavors && deathReason) deathReason.nullFlavors = nullFlavors
-      }}
+      nullFlavors={!props.fieldName ? deathReason?.nullFlavors : props.certificate.nullFlavors}       
       paraNum      
       field_name={props.fieldName || 'diagnosis'}
       value={NA}
