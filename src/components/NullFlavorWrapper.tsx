@@ -34,9 +34,7 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
       if (nullFlavor) {
         setValue(NULL_FLAVORS[nullFlavor.code])
         setChecked(false)
-      } else if (props.checked===undefined) {
-        setChecked(true)
-      }
+      } else if (!props.checked) setChecked(true)
     }    
   },[props.nullFlavors, props.field_name, props.checked])   
   
@@ -73,11 +71,17 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
       value={value}      
       options={props.options}
       onChange={(e: DropdownChangeParams)=>{   
-        setValue(e.value)  
-        const nullFlavor = {parent_attr: props.field_name, code: NULL_FLAVORS.findIndex((element)=>element.code===e.value.code)}
-        let _nullFlavors = nullFlavors
-        _nullFlavors.push(nullFlavor as INullFlavor)        
-        if (props.onChange) props.onChange(e.value, _nullFlavors)                                   
+        setValue(e.value)                
+        if (props.onChange) { // for not in MobX nullflavors
+          const nullFlavor = {parent_attr: props.field_name, code: NULL_FLAVORS.findIndex((element)=>element.code===e.value.code)}
+          let _nullFlavors = nullFlavors
+          _nullFlavors.push(nullFlavor as INullFlavor)
+          props.onChange(e.value, _nullFlavors)
+        } else if (!!props.nullFlavors) { //standart case nullFlavor
+            const idx = props.nullFlavors.findIndex(item=>item.parent_attr===props.field_name)
+            if (idx > -1) props.nullFlavors[idx].code = NULL_FLAVORS.findIndex((element)=>element.code===e.value.code)
+            else throw new Error(`Error change nullFlavor: invalid field name:  ${props.field_name}`)            
+        }                                    
       }}
       optionLabel='name'      
       placeholder='Причина отсутствия'
