@@ -2,7 +2,7 @@ import { makeAutoObservable } from "mobx"
 import Address from "../models/FormsData/Address"
 import { getCleanNullFlavor, INullFlavor } from "../models/INullFlavor"
 import { IReference } from "../models/IReference"
-import { IAddress } from "../models/responses/IAddress"
+import { DEFAULT_ADDRESS, IAddress } from "../models/responses/IAddress"
 import { IFiasItem } from "../models/responses/IFiasItem"
 import FiasService from "../services/FiasService"
 import { DESTROY_OPTION } from "../utils/consts"
@@ -15,10 +15,11 @@ export default class AddressStore {
   private _fiasOptions: IFiasItem[] | undefined
   private _dialogVisible: boolean
   private _manualMode: boolean
+  private _onAddrComplete?: (() => void) | undefined
 
   constructor() {
     this._isLoding = false
-    this._address = new Address({ state: HOME_REGION_CODE, streetAddressLine: "" } as IAddress)
+    this._address = new Address(DEFAULT_ADDRESS)
     this._dialogVisible = false
     this._manualMode = false
     makeAutoObservable(this)
@@ -190,5 +191,12 @@ export default class AddressStore {
   }
   set manualMode(value: boolean) {
     this._manualMode = value
+  }
+
+  get onAddrComplete(): (() => void) | undefined {
+    return this._onAddrComplete
+  }
+  set onAddrComplete(value: (() => void) | undefined) {
+    this._onAddrComplete = value
   }
 }
