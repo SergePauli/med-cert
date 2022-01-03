@@ -14,18 +14,12 @@ import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { FC, useContext, useEffect, useRef, useState } from 'react'
 import { Context } from '../..'
-import Address from '../../models/FormsData/Address'
 import { IReference } from '../../models/IReference'
-import { IAddress } from '../../models/responses/IAddress'
 import { IFiasItem } from '../../models/responses/IFiasItem'
 import { DEFAULT_ERROR_TOAST, HOME_REGION_CODE } from '../../utils/defaults'
 
-type AddressDialogProps = {
-  id?:string   
-  onOK?: ()=>void
-  onCancel?: ()=>void  
-  address?: IAddress 
-  strictly?: boolean 
+type AddressDialogProps = {  
+  onCancel?: ()=>void 
 }
 
 const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{ 
@@ -91,13 +85,8 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
     } else if (value.state?.code) {
       setRegion(regions?.find((region)=>region.code===value.state?.code))
     }    
-  }, [regions, value, addressStore, region]) 
+  }, [regions, value, addressStore, region])  
   
-  useEffect(()=>{
-    if (addressStore.address.id === undefined && props.address) {
-      addressStore.address = new Address(props.address) 
-    }
-  })
   
   const onHide = ()=>{ 
     addressStore.dialogVisible = false
@@ -120,16 +109,16 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
   }
 
   const cantSaveChanges = ()=> {    
-    if ((props.strictly && addressStore.isNotStrictly()) 
-      || props.address?.streetAddressLine === addressStore.streetAddressLine()) return true
+    if ((!addressStore.manualMode && addressStore.isNotStrictly()) 
+      || addressStore.address.oldOne.streetAddressLine === addressStore.streetAddressLine()) return true
     else  return false  
   }
   const footer = (
     <div>
       <Button label="Применить" icon="pi pi-check" disabled={cantSaveChanges()}
         onClick={()=>{
-          if (addressStore.isNotStrictly() && !props.strictly) addressStore.address.streetAddressLine = searchStr
-          if (props.onOK) props.onOK()
+          if (addressStore.isNotStrictly() && addressStore.manualMode) addressStore.address.streetAddressLine = searchStr
+          if (addressStore.onAddrComplete) addressStore.onAddrComplete()          
           onHide()
         }} className="p-button-text p-button-success"/>        
       <Button label="Отмена" icon="pi pi-times" onClick={()=>{
