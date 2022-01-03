@@ -33,8 +33,8 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
       const nullFlavor = props.nullFlavors.find(item=>item.parent_attr===props.field_name && !item._destroy)
       if (nullFlavor) {
         setValue(NULL_FLAVORS[nullFlavor.code])
-        setChecked(false)
-      } else if (!props.checked) setChecked(true)
+        if (props.checked!==true) setChecked(false)
+      } else if (props.checked!==false) setChecked(true)
     }    
   },[props.nullFlavors, props.field_name, props.checked])   
   
