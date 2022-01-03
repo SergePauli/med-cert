@@ -9,13 +9,13 @@ import { INullFlavor } from '../models/INullFlavor'
 import { IPersonName } from '../models/IPersonName'
 import { IReference } from '../models/IReference'
 import { IRelatedSubject } from '../models/IRelatedSubject'
-import {  HOME_REGION_CODE, NULL_FLAVORS, UNK } from '../utils/defaults'
 import { CheckboxChangeParams } from 'primereact/checkbox'
 import { Calendar } from 'primereact/calendar'
-import AddressFC from './inputs/AddressFC'
-import Address from '../models/FormsData/Address'
 import { Context } from '..'
-import { IAddress } from '../models/responses/IAddress'
+import { DEFAULT_ADDRESS, IAddress } from '../models/responses/IAddress'
+import AddressFC2 from './inputs/AddressFC2'
+import { NULL_FLAVORS, UNK } from '../utils/defaults'
+import AddressDialog from './dialogs/AddressDialog'
 
 type MotherInfoProps = {
   childInfo?: ChildInfo
@@ -25,20 +25,18 @@ type MotherInfoProps = {
 export const MotherInfo = (props: MotherInfoProps) => {
   const { addressStore, certificateStore} = useContext(Context)  
   const [fio, setFio] = useState('')
+  const submitted = certificateStore.submitted
   const [childInfo] = useState(props.childInfo || new ChildInfo({} as IChildInfo))
   const [relatedSubject] = useState(childInfo.relatedSubject || new RelatedSubject({} as IRelatedSubject))
-  
-  useEffect(()=>{       
-      if (childInfo.relatedSubject!==relatedSubject) childInfo.relatedSubject = relatedSubject
-      setFio(relatedSubject.fio ? `${relatedSubject.fio.family} ${relatedSubject.fio.given_1} ${relatedSubject.fio?.given_2}` : '')      
-    },[certificateStore, childInfo, relatedSubject])         
-    const options = NULL_FLAVORS.filter((item:IReference)=>"UNK".includes(item.code))
-    const address = relatedSubject.addr   
+  const [address, setAddress] = useState(relatedSubject.addr)
+  useEffect(()=>{    
+      setFio(relatedSubject.fio ? `${relatedSubject.fio.family} ${relatedSubject.fio.given_1} ${relatedSubject.fio?.given_2}` : '')         
+      if (childInfo.relatedSubject!==relatedSubject) childInfo.relatedSubject = relatedSubject         
+      if (!props.childInfo) props.onChange(childInfo)   
+    },[props, childInfo, relatedSubject])         
+    const options = NULL_FLAVORS.filter((item:IReference)=>"UNK".includes(item.code))       
     const checked = relatedSubject.nullFlavors.findIndex((item)=>item.parent_attr==='addr')===-1
-    useEffect(()=>{ 
-    if (checked && address) addressStore.address = address
-    else if (checked && addressStore.address.aoGUID) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)   
-    },[addressStore, address, checked])    
+        
     
     return ( <>
       <div className="p-field p-grid" style={{width:'90%'}}>
@@ -114,21 +112,32 @@ export const MotherInfo = (props: MotherInfoProps) => {
           field_name="birthTime"
         />                               
       </div> 
-      <div className="p-field p-d-flex p-flex-wrap p-jc-start" style={{width: '98%'}}>
-      <AddressFC key={`p14_${address?.id}_${address?.streetAddressLine}`}
-        label="Место жительства матери" checked={checked}  
-        setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                if (nullFlavors) relatedSubject.nullFlavors = nullFlavors                  
-                if (e.checked) addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)
-                else relatedSubject.addr = undefined
-        }} 
-        nfValue={UNK}
-        field_name="addr"
-        nullFlavors={relatedSubject.nullFlavors}             
-        onChange={(value: Address)=>{
-          if (relatedSubject.addr !== value) relatedSubject.addr=value 
-        }}
-      />
-      </div>          
+      <div className="p-field" style={{width: '98%'}}>
+        <NullFlavorWrapper                      
+              label={<label htmlFor="mother_addr">Место жительства матери</label>}
+              checked={checked}  
+              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+                if (nullFlavors) relatedSubject.nullFlavors = nullFlavors
+                if (!e.checked) relatedSubject.addr = undefined                
+              }}               
+              field={<AddressFC2  submitted={submitted} 
+                      id='mother_addr'            
+                      value={address || DEFAULT_ADDRESS} 
+                      onClear={(value: IAddress)=>{                                               
+                        relatedSubject.addr = value
+                        setAddress(relatedSubject.addr)
+                      }}
+                      onChange={()=>{
+                        relatedSubject.addr = addressStore.addressProps()
+                        setAddress(relatedSubject.addr)
+                      }}  
+                    />}
+              options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
+              value={UNK}
+              field_name="addr"
+              nullFlavors={relatedSubject.nullFlavors}
+            />
+      </div>  
+      <AddressDialog />        
     </>)
 }

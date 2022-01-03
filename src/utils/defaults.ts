@@ -75,13 +75,13 @@ export const DEFAULT_CERT_SUGGESTIONS = [
     done: false,
   },
   {
-    section: "4",
+    section: "3",
     code: "п.10",
     suggestion: "Вид места смерти или причина его отсутствия - обязательны для заполнения",
     done: false,
   },
   {
-    section: "4",
+    section: "3",
     code: "п.11",
     suggestion: "Вид места смерти или причина его отсутствия - обязательны для заполнения",
     done: false,

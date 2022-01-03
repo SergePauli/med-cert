@@ -66,8 +66,11 @@ export default class CertificateStore {
   private _suggestions: ISuggestions[]
   private _identified: boolean
   private _fromRelatives: boolean
+  private _submitted: boolean
+
   disposers: (() => void)[]
   constructor() {
+    this._submitted = false
     this.disposers = []
     this._cert = new Certificate({
       death_datetime: new Date("2021-10-28T01:52:00"),
@@ -167,20 +170,15 @@ export default class CertificateStore {
       this._suggestions[IDNUMBER_SUG].done = !isIDNumber
     })
     this.disposers[12] = autorun(() => {
+      const person = this._cert.patient.person
       const isLifeArea =
-        (this._cert.patient.address === undefined ||
-          this._cert.patient.address.aoGUID === undefined ||
-          this._cert.patient.address.postalCode === undefined ||
-          this._cert.patient.address.housenum === undefined) &&
-        this._cert.patient.nullFlavors.findIndex((element) => element.parent_attr === "addr") === -1
+        (!person.address || !person.address.aoGUID || !person.address.postalCode || !person.address.houseGUID) &&
+        person.nullFlavors.findIndex((element) => element.parent_attr === "address") === -1
       this._suggestions[LIFE_PLACE_SUG].done = !isLifeArea
     })
     this.disposers[13] = autorun(() => {
       const isDeathArea =
-        (this._cert.deathAddr === undefined ||
-          this._cert.deathAddr.aoGUID === undefined ||
-          this._cert.deathAddr.postalCode === undefined ||
-          this._cert.deathAddr.housenum === undefined) &&
+        (!this._cert.deathAddr || !this._cert.deathAddr.houseGUID) &&
         this._cert.nullFlavors.findIndex((element) => element.parent_attr === "death_addr") === -1
       this._suggestions[DEATH_PLACE_SUG].done = !isDeathArea
     })
@@ -241,9 +239,7 @@ export default class CertificateStore {
         !childInfo ||
         (!!childInfo.relatedSubject &&
           (childInfo.relatedSubject.nullFlavors.findIndex((item) => item.parent_attr === "addr") !== -1 ||
-            (!!childInfo.relatedSubject.addr &&
-              !!childInfo.relatedSubject.addr.aoGUID &&
-              (!!childInfo.relatedSubject.addr.houseGUID || !!childInfo.relatedSubject.addr.housenum))))
+            (!!childInfo.relatedSubject.addr && !!childInfo.relatedSubject.addr.houseGUID)))
       this._suggestions[MOTHER_ADDRESS_SUG].done = isMOTHER_ADDRESS
     })
     this.disposers[23] = autorun(() => {
@@ -366,6 +362,13 @@ export default class CertificateStore {
 
   set suggestions(suggestions: ISuggestions[]) {
     this._suggestions = suggestions
+  }
+
+  get submitted(): boolean {
+    return this._submitted
+  }
+  set submitted(value: boolean) {
+    this._submitted = value
   }
 
   redSuggestionsCount() {

@@ -3,14 +3,14 @@ import { v4 as uuidv4 } from "uuid"
 import { INullFlavor } from "../INullFlavor"
 import { IPersonName } from "../IPersonName"
 import { IRelatedSubject } from "../IRelatedSubject"
-import Address from "./Address"
+import { IAddress } from "../responses/IAddress"
 
 const MATHER = 1
 
 export default class RelatedSubject {
   private _id: string
   private _familyConnection: number
-  private _addr?: Address | undefined
+  private _addr?: IAddress | undefined
   private _fio?: IPersonName | undefined
   private _birthTime?: Date | undefined
   private _nullFlavors: INullFlavor[]
@@ -21,16 +21,16 @@ export default class RelatedSubject {
     this._familyConnection = props.family_connection || MATHER
     this._fio = props.person_name
     this._birthTime = props.birthTime
-    if (props.addr) this._addr = new Address(props.addr)
+    this._addr = props.addr
     makeAutoObservable(this)
   }
   get id(): string {
     return this._id
   }
-  get addr(): Address | undefined {
+  get addr(): IAddress | undefined {
     return this._addr
   }
-  set addr(value: Address | undefined) {
+  set addr(value: IAddress | undefined) {
     this._addr = value
   }
   get fio(): IPersonName | undefined {

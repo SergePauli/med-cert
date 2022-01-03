@@ -16,7 +16,7 @@ import { DEAD_PLACE_TYPES } from '../../NSI/1.2.643.5.1.13.13.99.2.20'
 import { MARITAL_STATUSES } from '../../NSI/1.2.643.5.1.13.13.99.2.15'
 import { EDUCATION_LEVELS } from '../../NSI/1.2.643.5.1.13.13.99.2.16'
 import { SOCIAL_STATUSES } from '../../NSI/1.2.643.5.1.13.13.11.1038'
-import { INullFlavor } from '../../models/INullFlavor'
+import { checkFieldNullFlavor, INullFlavor } from '../../models/INullFlavor'
 import { TERMS_PREGNANCY } from '../../NSI/1.2.643.5.1.13.13.99.2.18'
 import { ChildInfo } from '../../models/FormsData/ChildInfo'
 import { IChildInfo } from '../../models/IChildInfo'
@@ -32,23 +32,29 @@ import { MotherInfo } from '../MotherInfo'
       return <span>Прочие данные умершего</span>
     }
   const certificate = certificateStore.cert
-  const isChildInfo = certificate.hoursAge() > 168 && certificate.yearsAge() < 1          
-  const isMonthChild = isChildInfo && certificate.daysAge() < 30  
+  const age = certificate.hoursAge()  
+  const isChildInfo = !!age && certificate.hoursAge() > 168 &&  certificate.yearsAge() < 1          
+  const isMonthChild = isChildInfo && certificate.daysAge() < 30 
+  
   useEffect(()=>{
     if (isChildInfo && certificate.childInfo===undefined) 
      certificate.childInfo = new ChildInfo({certificate_id: certificate.id} as IChildInfo)
     else if (!isChildInfo && certificate.childInfo!==undefined) certificate.childInfo = undefined
-  },[isChildInfo,certificate]) 
+  },[isChildInfo, certificate]) 
   
   const childInfo = certificate.childInfo 
   useEffect(()=>{    
-    if (!isMonthChild && childInfo) childInfo.termPregnancy = undefined
-    if (!isChildInfo && childInfo) {
-      childInfo.weight = undefined
-      childInfo.whichAccount = undefined
-      childInfo.relatedSubject = undefined
+    if (!isMonthChild && childInfo) {
+        childInfo.termPregnancy = undefined
+        checkFieldNullFlavor('term_pregnancy',childInfo.termPregnancy, childInfo.nullFlavors, NA)
     }    
-  }, [isMonthChild, childInfo, isChildInfo, certificateStore])
+  },[isMonthChild, childInfo]) 
+  useEffect(()=>{       
+    if (!isChildInfo && !!certificate.childInfo) {
+      certificate.childInfo = undefined
+      checkFieldNullFlavor('related_subject', certificate.childInfo, certificate.nullFlavors, NA)
+    }    
+  }, [ isChildInfo, certificate ])
   const ddStyle = {minWidth:'210px', maxWidth:'500px', marginTop: '0.5rem', marginLeft: '-0.75rem'}
   const dDivStyle = {paddingTop: '0.1rem'}
       
