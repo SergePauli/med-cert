@@ -6,6 +6,7 @@ import { IAddress } from "../responses/IAddress"
 import { IFiasItem } from "../responses/IFiasItem"
 
 export default class Address {
+  private _oldOne: IAddress
   private _id?: string
   private _streetAddressLine: string
   private _state?: IReference
@@ -22,9 +23,9 @@ export default class Address {
   private _postalCode?: string
   private _nullFlavors: INullFlavor[]
   private _parent?: string
-  constructor(props: IAddress, region = undefined as IReference | undefined) {
+  constructor(props: IAddress) {
     if (props.id) this._id = props.id
-    this._state = region
+    this._oldOne = props
     this._streetAddressLine = props.streetAddressLine
     this._nullFlavors = props.null_flavors || []
     this._aoGUID = props.aoGUID
@@ -38,6 +39,11 @@ export default class Address {
     this.fetchAddressHierarchy()
     makeAutoObservable(this)
   }
+
+  get oldOne(): IAddress {
+    return this._oldOne
+  }
+
   get id() {
     return this._id
   }
