@@ -15,14 +15,14 @@ import { InputMask } from 'primereact/inputmask'
 import { IContact } from '../models/IContact'
 import { Button } from 'primereact/button'
 import { Toast } from 'primereact/toast'
-import { DEFAULT_ERROR_TOAST, HOME_REGION_CODE } from '../utils/defaults'
+import { DEFAULT_ERROR_TOAST } from '../utils/defaults'
 import { Context } from '..'
 import { Dropdown } from 'primereact/dropdown'
 import { IReferenceId } from '../models/IReference'
 import AddressDialog from '../components/dialogs/AddressDialog'
 import { observer } from 'mobx-react-lite'
 import { IAddress } from '../models/responses/IAddress'
-import Address from '../models/FormsData/Address'
+import AddressFC2 from '../components/inputs/AddressFC2'
 
 // страница настроек профиля организации
 // Organization profile page
@@ -274,27 +274,16 @@ const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>{
                     />
               {submitted && !(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email.telcom_value) || email.telcom_value==='') && <small className="p-error">Неверный email</small>}
           </div>      
-          <div className="p-field p-col-12 ">
-            <label htmlFor="address">Адрес</label>
-            <div className='p-inputgroup'>
-              <Button id='address' label="Ввод" onClick={()=>{
-                  addressStore.dialogVisible = true                  
-                }} style={{width:'5rem'}}/>
-              <InputText 
-                value={organization.address?.streetAddressLine}
-                placeholder={'введите адрес вида: Амурская область, Павловский район, село Тосево, улица Товарная, дом 13, кв. 9' } className={classNames({ 'p-invalid': submitted && (!organization.address || !organization.address.houseGUID)})} />
-              <Button icon="pi pi-times" className="p-button-danger" onClick={()=>{
-                const addr = organization.address
-                let _addr = {state: HOME_REGION_CODE, streetAddressLine:""} as IAddress
-                if (addr.id) _addr.id = addr.id
-                if (addr.parent_guid) _addr.parent_guid = addr.parent_guid
-                if (addr.null_flavors) _addr.null_flavors = addr.null_flavors
-                setOrganization({...organization, address: {..._addr}})
-                addressStore.address = new Address(_addr)
-              }}/>
-            </div>
-            {submitted && (!organization.address || !organization.address.houseGUID) && <small className="p-error">Адресс организации введен не полностью или отсутствует </small>}
-          </div>
+          <AddressFC2 className="p-col-12" submitted={submitted} 
+            label='Адрес медорганизации'
+            value={organization.address} strictly 
+            onClear={(value: IAddress)=>setOrganization({...organization, address: {...value}})}
+            onChange={()=>{        
+              let _organization = {...organization, address: addressStore.addressProps()}                
+              changesAudit("Адрес", "address", organization.address?.streetAddressLine || '', _organization.address?.streetAddressLine || '')                 
+              setOrganization(_organization)
+            }}  
+          />
           <div className="p-field  p-col-12 p-md-6">
             <Button label="ПРИМЕНИТЬ"  className="p-button-success" 
               style={{marginTop: '22px'}} onClick={saveOrganization}  />
@@ -304,13 +293,7 @@ const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>{
       </div>             
     </div>
     <Toast ref={toast} /> 
-    <AddressDialog address={organization.address} strictly
-      onOK={()=>{        
-        let _organization = {...organization, address: addressStore.addressProps()}                
-        changesAudit("Адрес", "address", organization.address?.streetAddressLine || '', _organization.address?.streetAddressLine || '')                 
-        setOrganization(_organization)
-      }} 
-    />        
+    <AddressDialog />        
   </>) : (<><Toast ref={toast} /><ProgressSpinner/></>)
   }
   return (

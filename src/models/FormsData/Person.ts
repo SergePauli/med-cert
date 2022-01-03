@@ -1,19 +1,21 @@
-import { v4 as uuidv4 } from "uuid"
 import { makeAutoObservable } from "mobx"
 import { INullFlavor } from "../INullFlavor"
 import { IPerson } from "../IPerson"
 import { IPersonName } from "../IPersonName"
+import { IAddress } from "../responses/IAddress"
 
 export default class Person {
   private _id?: string
   private _personName?: IPersonName
   private _SNILS?: string | undefined
   private _nullFlavors: INullFlavor[]
+  private _address?: IAddress | undefined
 
   constructor(props = {} as IPerson) {
-    if (props.person_name) this._personName = props.person_name
-    if (props.SNILS) this._SNILS = props.SNILS
-    this._id = props.id || uuidv4()
+    this._personName = props.person_name
+    this._SNILS = props.SNILS
+    this._id = props.id
+    this._address = props.address
     this._nullFlavors = props.null_flavors || []
     makeAutoObservable(this)
   }
@@ -42,5 +44,11 @@ export default class Person {
 
   get id() {
     return this._id
+  }
+  get address(): IAddress | undefined {
+    return this._address
+  }
+  set address(value: IAddress | undefined) {
+    this._address = value
   }
 }
