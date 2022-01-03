@@ -11,7 +11,7 @@ const FooterLayout = (props: FooterLayoutProps) => {
         <span className="app-name">{orgName}:</span>
         <span className="app-profile">{profile}</span>
       </div>
-      <span className="copyright">2021 © ГБУЗ АО "АМИАЦ"</span>
+      <span className="copyright">2022 © ГБУЗ АО "АМИАЦ"</span>
     </div>       
   )
 }
