@@ -1,3 +1,4 @@
+import { HOME_REGION_CODE } from "../../utils/defaults"
 import { INullFlavorable } from "../INullFlavorable"
 
 export interface IAddress extends INullFlavorable {
@@ -15,3 +16,4 @@ export interface IAddress extends INullFlavorable {
   building_number?: string
   flat_number?: string
 }
+export const DEFAULT_ADDRESS = { state: HOME_REGION_CODE, streetAddressLine: "" } as IAddress
