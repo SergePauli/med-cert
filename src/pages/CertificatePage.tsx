@@ -18,7 +18,6 @@ import Section0 from '../components/c_sections/section_0'
 import Section1 from '../components/c_sections/section_1'
 import Section2 from '../components/c_sections/section_2'
 import Section3 from '../components/c_sections/section_3'
-import Section4 from '../components/c_sections/section_4'
 import Section5 from '../components/c_sections/section_5'
 import Section6 from '../components/c_sections/section_6'
 import Section7 from '../components/c_sections/section_7'
@@ -43,8 +42,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       case "?q=0": return <Section0 />
       case "?q=1": return <Section1 />
       case "?q=2": return <Section2 />
-      case "?q=3": return <Section3 />
-      case "?q=4": return <Section4 />
+      case "?q=3": return <Section3 />      
       case "?q=5": return <Section5 />
       case "?q=6": return <Section6 />
       case "?q=7": return <Section7 />

@@ -5,9 +5,9 @@ import { timeDiff } from "../../utils/functions"
 import { IAudit } from "../IAudit"
 import { checkFieldNullFlavor, INullFlavor } from "../INullFlavor"
 import { IReference } from "../IReference"
+import { IAddress } from "../responses/IAddress"
 import { ICertificate } from "../responses/ICertificate"
 import { IDeathReason } from "../responses/IDeathReason"
-import Address from "./Address"
 import Authenticator from "./Authenticator"
 import { ChildInfo } from "./ChildInfo"
 import { DeathReason } from "./DeathReason"
@@ -41,7 +41,7 @@ export default class Certificate {
   private _reasonD?: DeathReason
   private _deathReasons: DeathReason[]
   private _reasonACME?: DeathReason | undefined
-  private _deathAddr?: Address
+  private _deathAddr?: IAddress
   private _guid: string
   private _policyOMS?: string | undefined
   private _childInfo?: ChildInfo | undefined
@@ -75,7 +75,7 @@ export default class Certificate {
     this._policyOMS = props.policy_OMS
     this._lifeAreaType = props.lifeAreaType
     this._deathAreaType = props.deathAreaType
-    if (props.death_addr) this._deathAddr = new Address(props.death_addr)
+    this._deathAddr = props.death_addr
     this._deathPlace = props.death_place
     this._deathKind = props.death_kind
     this._educationLevel = props.education_level
@@ -257,7 +257,7 @@ export default class Certificate {
   get deathAddr() {
     return this._deathAddr
   }
-  set deathAddr(value: Address | undefined) {
+  set deathAddr(value: IAddress | undefined) {
     this._deathAddr = value
   }
   get deathKind(): number | undefined {
@@ -373,6 +373,7 @@ export default class Certificate {
   yearsAge() {
     const dd = this._deathDatetime as Date
     const db = this._patient.birth_date as Date
+    console.log(dd.getFullYear() - db.getFullYear())
     if (dd !== undefined && db !== undefined) return dd.getFullYear() - db.getFullYear()
     else return false
   }
