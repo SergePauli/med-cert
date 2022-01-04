@@ -23,7 +23,7 @@ import { IReferenceId } from '../models/IReference'
 import AddressDialog from '../components/dialogs/AddressDialog'
 import { observer } from 'mobx-react-lite'
 import { IAddress } from '../models/responses/IAddress'
-import AddressFC2 from '../components/inputs/AddressFC2'
+import AddressFC2 from '../components/inputs/InputAddress'
 
 // страница настроек профиля организации
 // Organization profile page

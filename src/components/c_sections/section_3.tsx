@@ -10,7 +10,7 @@ import { DEFAULT_ADDRESS, IAddress } from "../../models/responses/IAddress"
 import { ASKU, NULL_FLAVORS, UNK } from "../../utils/defaults"
 import { removeEmpty } from "../../utils/functions"
 import AddressDialog from "../dialogs/AddressDialog"
-import AddressFC2 from "../inputs/AddressFC2"
+import AddressFC2 from "../inputs/InputAddress"
 import { AreaType } from "../inputs/AreaType"
 import NullFlavorWrapper from "../NullFlavorWrapper"
 

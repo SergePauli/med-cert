@@ -13,7 +13,7 @@ import { CheckboxChangeParams } from 'primereact/checkbox'
 import { Calendar } from 'primereact/calendar'
 import { Context } from '..'
 import { DEFAULT_ADDRESS, IAddress } from '../models/responses/IAddress'
-import AddressFC2 from './inputs/AddressFC2'
+import AddressFC2 from './inputs/InputAddress'
 import { NULL_FLAVORS, UNK } from '../utils/defaults'
 import AddressDialog from './dialogs/AddressDialog'
 

@@ -28,7 +28,7 @@ import Address from '../models/FormsData/Address'
 import { IPerson } from '../models/IPerson'
 import { genUpdateDoctorRequest } from '../models/FormsData/DoctorRequest'
 import { DEFAULT_ADDRESS, IAddress } from '../models/responses/IAddress'
-import AddressFC2 from '../components/inputs/AddressFC2'
+import AddressFC2 from '../components/inputs/InputAddress'
 import AddressDialog from '../components/dialogs/AddressDialog'
 
 export const DoctorsPage: FC = () => {    
