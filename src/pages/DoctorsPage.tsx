@@ -15,6 +15,7 @@ import DoctorService from "../services/DoctorService"
 import '../styles/components/Toolbar.css'
 import '../styles/components/Dialog.css'
 import '../styles/components/Toast.css'
+import '../styles/components/AutoComplete.css'
 import { InputMask } from 'primereact/inputmask'
 import MainLayout from '../components/layouts/MainLayout'
 import { observer } from 'mobx-react-lite'
@@ -22,14 +23,13 @@ import { DESTROY_OPTION, DOCTORS_ROUTE } from '../utils/consts'
 import { IContact } from '../models/IContact'
 import { IReferenceId } from '../models/IReference'
 import { AutoComplete } from 'primereact/autocomplete'
-import AddressFC from '../components/inputs/AddressFC'
-import { CheckboxChangeParams } from 'primereact/checkbox'
-import { INullFlavor } from '../models/INullFlavor'
-import { DEFAULT_ERROR_TOAST, HOME_REGION_CODE, NA } from '../utils/defaults'
+import { DEFAULT_ERROR_TOAST, HOME_REGION_CODE } from '../utils/defaults'
 import Address from '../models/FormsData/Address'
 import { IPerson } from '../models/IPerson'
 import { genUpdateDoctorRequest } from '../models/FormsData/DoctorRequest'
-import { IAddress } from '../models/responses/IAddress'
+import { DEFAULT_ADDRESS, IAddress } from '../models/responses/IAddress'
+import AddressFC2 from '../components/inputs/AddressFC2'
+import AddressDialog from '../components/dialogs/AddressDialog'
 
 export const DoctorsPage: FC = () => {    
     const {addressStore, userStore} = useContext(Context)
@@ -41,7 +41,7 @@ export const DoctorsPage: FC = () => {
           SNILS: '456-145-154 25'
           } as IPerson        
     } as IDoctor
-    const ADDRESS_FIELD_NAME = 'addr'
+    
     const [doctors, setDoctors] = useState<IDoctor[]>([])
     const [doctorDialog, setDoctorDialog] = useState(false)
     const [deleteDoctorDialog, setDeleteDoctorDialog] = useState(false)
@@ -220,11 +220,6 @@ export const DoctorsPage: FC = () => {
       } else doctor.person.contacts.push(_contact)       
     } 
 
-    const isAddressChecked = ()=>doctor.person.address!==undefined 
-    //|| doctor.nullFlavors?.findIndex((item)=>item.parent_attr===ADDRESS_FIELD_NAME) ===-1
-    
-    
-
     const rightToolbarTemplate = () => {
       return (
         <React.Fragment>                
@@ -286,8 +281,9 @@ export const DoctorsPage: FC = () => {
                 </DataTable>
             </div>
 
-            <Dialog visible={doctorDialog} style={{ width: '800px' }} header="Данные врача" modal className="p-fluid" footer={doctorDialogFooter} onHide={hideDialog}>   
-               <div className='p-grid'> 
+            <Dialog visible={doctorDialog} style={{ width: '800px' }} header="Данные врача" modal 
+             footer={doctorDialogFooter} onHide={hideDialog}>   
+               <div className='p-fluid p-formgrid p-grid'> 
                 <div className="p-field p-col-12 p-md-3">
                     <label htmlFor="family">Фамилия</label>
                     <InputText id="family" value={doctor.person?.person_name?.family} onChange={(e) =>{
@@ -355,27 +351,20 @@ export const DoctorsPage: FC = () => {
                     />
                     {submitted && !(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email.telcom_value) || email.telcom_value==='') && <small className="p-error">Неверный email</small>}
                 </div>
-                <div className='p-field  p-d-flex p-flex-wrap p-jc-start' style={{marginLeft:'0.5rem'}}>
-                    <AddressFC checked={isAddressChecked()} label={'Адрес врача'} 
-                        setCheck={(e: CheckboxChangeParams, nullFlavors?: INullFlavor[])=>{
-                          if (e.checked) {
-                            addressStore.address = new Address({ state: HOME_REGION_CODE, streetAddressLine: ""} as IAddress)                 
-                            doctor.null_flavors = [] 
-                            if (doctor.person) doctor.person.address = undefined                        
-                          } else {
-                            if (doctor.person) doctor.person.address = undefined  
-                            doctor.null_flavors = nullFlavors                            
-                          } 
-                          onInputChange()     
-                        }}                                              
-                        nullFlavors={doctor.null_flavors}
-                        field_name={ADDRESS_FIELD_NAME}
-                        nfValue={NA}
-                    /> 
-                </div>    
-               </div> 
+                <AddressFC2 className="p-col-12" submitted={submitted} 
+                  label='Адрес проживания'
+                  value={doctor.person.address || DEFAULT_ADDRESS} strictly 
+                  onClear={(value: IAddress)=>{
+                    doctor.person.address = {...value}
+                    onInputChange()
+                  }}
+                  onChange={()=>{        
+                    doctor.person.address = addressStore.addressProps()
+                    onInputChange()
+                }} />    
+               </div>               
             </Dialog>
-
+            <AddressDialog />
             <Dialog visible={deleteDoctorDialog} style={{ width: '450px' }} header="Подтвердите" modal footer={deleteDoctorDialogFooter} onHide={hideDeleteDoctorDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem'}} />
