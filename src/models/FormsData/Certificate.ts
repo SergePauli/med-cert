@@ -2,9 +2,9 @@ import { autorun, makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
 import { NA } from "../../utils/defaults"
 import { timeDiff } from "../../utils/functions"
+import { ISerializable } from "../common/ISerializabale"
 import { IAudit } from "../IAudit"
 import { checkFieldNullFlavor, INullFlavor } from "../INullFlavor"
-import { IReference } from "../IReference"
 import { IAddress } from "../responses/IAddress"
 import { ICertificate } from "../responses/ICertificate"
 import { IDeathReason } from "../responses/IDeathReason"
@@ -13,12 +13,12 @@ import { ChildInfo } from "./ChildInfo"
 import { DeathReason } from "./DeathReason"
 import Patient from "./Patient"
 
-export default class Certificate {
+export default class Certificate implements ISerializable {
   private _id: number
   private _series?: string
   private _number?: string
   private _effTime: Date
-  private _certType: IReference | undefined
+  private _certType?: number
   private _seriesPrev?: string
   private _numberPrev?: string
   private _effTimePrev?: Date
@@ -75,13 +75,14 @@ export default class Certificate {
     this._policyOMS = props.policy_OMS
     this._lifeAreaType = props.lifeAreaType
     this._deathAreaType = props.deathAreaType
-    this._deathAddr = props.death_addr
+    this._deathAddr = props.death_addr || props.death_addr_attributes
     this._deathPlace = props.death_place
     this._deathKind = props.death_kind
     this._educationLevel = props.education_level
     this._maritalStatus = props.marital_status
     this._socialStatus = props.social_status
     if (props.child_info) this._childInfo = new ChildInfo(props.child_info)
+    else if (props.child_info_attributes) this._childInfo = new ChildInfo(props.child_info_attributes)
     if (props.author) this._author = new Authenticator(props.author)
     if (props.authenticator) this._authenticator = new Authenticator(props.authenticator)
     if (props.legal_authenticator) this._legalAuthenticator = new Authenticator(props.legal_authenticator)
@@ -144,7 +145,7 @@ export default class Certificate {
   get certType() {
     return this._certType
   }
-  set certType(cert_type: IReference | undefined) {
+  set certType(cert_type: number | undefined) {
     this._certType = cert_type
   }
   get seriesPrev() {
@@ -414,6 +415,48 @@ export default class Certificate {
     reason.effectiveTime = result
     return true
   }
+
+  getAttributes(): ICertificate {
+    let _cert = { eff_time: this._effTime, guid: this.guid } as ICertificate
+    if (this._id !== -1) _cert.id = this._id
+    if (this._authenticator) _cert.authenticator_attributes = this._authenticator.getAttributes()
+    if (this._author) _cert.author_attributes = this._author.getAttributes()
+    if (this._basisDetermining) _cert.basis_determining = this._basisDetermining
+    if (this._certType) _cert.cert_type = this._certType
+    if (this._childInfo) _cert.child_info_attributes = this._childInfo.getAttributes()
+    if (this._deathAddr) _cert.death_addr_attributes = this._deathAddr
+    if (this._deathAreaType) _cert.deathAreaType = this._deathAreaType
+    if (this._deathDatetime) _cert.death_datetime = this._deathDatetime
+    if (this._deathKind) _cert.death_kind = this._deathKind
+    if (this._deathPlace) _cert.death_place = this.deathPlace
+    if (this._deathReasons.length > 0)
+      _cert.death_reasons_attributes = this._deathReasons.map((item) => item.getAttributes())
+    if (this._educationLevel) _cert.education_level = this._educationLevel
+    if (this._effTime) _cert.eff_time = this._effTime
+    if (this._effTimePrev) _cert.eff_time_prev = this._effTimePrev
+    if (this._establishedMedic) _cert.established_medic = this._establishedMedic
+    if (this._extReasonDescription) _cert.ext_reason_description = this.extReasonDescription
+    if (this._extReasonTime) _cert.ext_reason_time = this._extReasonTime
+    if (this._lifeAreaType) _cert.lifeAreaType = this._lifeAreaType
+    if (this._policyOMS) _cert.policy_OMS = this._policyOMS
+    if (this._pregnancyConnection) _cert.pregnancy_connection = this.pregnancyConnection
+    if (this._maritalStatus) _cert.marital_status = this._maritalStatus
+    if (this._nullFlavors.length > 0) _cert.null_flavors_attributes = this._nullFlavors
+    if (this._number) _cert.number = this._number
+    if (this._numberPrev) _cert.number_prev = this._numberPrev
+    if (this._reasonA) _cert.a_reason = this._reasonA.getAttributes()
+    if (this._reasonACME) _cert.reason_ACME = this._reasonACME.diagnosis?.ICD10
+    if (this._reasonB) _cert.b_reason = this._reasonB.getAttributes()
+    if (this._reasonC) _cert.c_reason = this._reasonC.getAttributes()
+    if (this._reasonD) _cert.d_reason = this._reasonD.getAttributes()
+    if (this._series) _cert.series = this._series
+    if (this._seriesPrev) _cert.series_prev = this._seriesPrev
+    if (this._socialStatus) _cert.social_status = this._socialStatus
+    if (this._trafficAccident) _cert.traffic_accident = this._trafficAccident
+    if (this._patient) _cert.patient_attributes = this._patient.getAttributes()
+    return _cert
+  }
+
   dispose() {
     // So, to avoid subtle memory issues, always call the
     // disposers when the reactions are no longer needed.
