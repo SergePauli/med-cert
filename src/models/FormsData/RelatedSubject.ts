@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx"
-import { v4 as uuidv4 } from "uuid"
+import { ISerializable } from "../common/ISerializabale"
 import { INullFlavor } from "../INullFlavor"
 import { IPersonName } from "../IPersonName"
 import { IRelatedSubject } from "../IRelatedSubject"
@@ -7,8 +7,8 @@ import { IAddress } from "../responses/IAddress"
 
 const MATHER = 1
 
-export default class RelatedSubject {
-  private _id: string
+export default class RelatedSubject implements ISerializable {
+  private _id?: string
   private _familyConnection: number
   private _addr?: IAddress | undefined
   private _fio?: IPersonName | undefined
@@ -16,15 +16,15 @@ export default class RelatedSubject {
   private _nullFlavors: INullFlavor[]
 
   constructor(props: IRelatedSubject) {
-    this._nullFlavors = props.null_flavors || []
-    this._id = props.id || uuidv4()
+    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
+    this._id = props.id
     this._familyConnection = props.family_connection || MATHER
     this._fio = props.person_name
     this._birthTime = props.birthTime
     this._addr = props.addr
     makeAutoObservable(this)
   }
-  get id(): string {
+  get id(): string | undefined {
     return this._id
   }
   get addr(): IAddress | undefined {
@@ -51,5 +51,14 @@ export default class RelatedSubject {
   }
   set nullFlavors(value: INullFlavor[]) {
     this._nullFlavors = value
+  }
+
+  getAttributes(): IRelatedSubject {
+    let _rs = { family_connection: this._familyConnection } as IRelatedSubject
+    if (this._nullFlavors.length > 0) _rs.null_flavors_attributes = this._nullFlavors
+    if (this._addr) _rs.addr_attributes = this._addr
+    if (this._birthTime) _rs.birthTime = this._birthTime
+    if (this._fio) _rs.person_name_attributes = this._fio
+    return _rs
   }
 }
