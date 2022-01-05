@@ -1,20 +1,19 @@
 import { makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
+import { ISerializable } from "../common/ISerializabale"
 import { INullFlavor } from "../INullFlavor"
 import { IPatient } from "../IPatient"
-import Address from "./Address"
 import Identity from "./Identity"
 import Person from "./Person"
 
-export default class Patient {
+export default class Patient implements ISerializable {
   private _id?: string | undefined
   private _person: Person
   private _gender?: number | undefined
   private _birth_date: Date | Date[] | undefined
   private _birth_year?: number
-  private _provider_organization?: string
+  private _provider_organization?: number
   private _addr_type?: number
-  private _address?: Address
   private _guid: string
   private _identity?: Identity
   private _nullFlavors: INullFlavor[]
@@ -26,13 +25,22 @@ export default class Patient {
     if (props.birth_date) this._birth_date = props.birth_date
     if (props.id) this._id = props.id
     if (props.birth_year) this._birth_year = props.birth_year
-    if (props.identity) {
-      props.identity.parentGUID = props.identity.parentGUID || this._guid
-      this._identity = new Identity(props.identity)
-    }
-    this._nullFlavors = props.null_flavors || []
-    if (props.address) this._address = new Address(props.address)
+    if (props.identity) this._identity = new Identity(props.identity)
+    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
+
     makeAutoObservable(this)
+  }
+  getAttributes(): IPatient {
+    let _patient = { guid: this._guid } as IPatient
+    if (this._id) _patient.id = this.id
+    if (this._addr_type) _patient.addr_type = this._addr_type
+    if (this._birth_date) _patient.birth_date = this._birth_date
+    if (this._birth_year) _patient.birth_year = this._birth_year
+    if (this._gender) _patient.gender = this._gender
+    if (this._identity) _patient.identity_attributes = this._identity.getAttributes()
+    if (this._provider_organization) _patient.organization_id = this._provider_organization
+    if (this._person) _patient.person_attributes = this._person.getAttributes()
+    return _patient
   }
   get id() {
     return this._id
@@ -74,7 +82,7 @@ export default class Patient {
   get provider_organization() {
     return this._provider_organization
   }
-  set provider_organization(provider_organization: string | undefined) {
+  set provider_organization(provider_organization: number | undefined) {
     this._provider_organization = provider_organization
   }
   get birth_year() {
@@ -88,12 +96,6 @@ export default class Patient {
   }
   set identity(identity: Identity | undefined) {
     this._identity = identity
-  }
-  get address() {
-    return this._address
-  }
-  set address(value: Address | undefined) {
-    this._address = value
   }
 
   setBirthDay(value: Date | undefined, isYear: boolean) {
