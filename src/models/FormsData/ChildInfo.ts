@@ -1,10 +1,10 @@
 import { makeAutoObservable } from "mobx"
+import { ISerializable } from "../common/ISerializabale"
 import { IChildInfo } from "../IChildInfo"
 import { INullFlavor } from "../INullFlavor"
 import RelatedSubject from "./RelatedSubject"
 
-export class ChildInfo {
-  private _certificateId: number
+export class ChildInfo implements ISerializable {
   private _termPregnancy?: number | undefined
   private _weight?: number | undefined
   private _whichAccount?: number | undefined
@@ -12,17 +12,12 @@ export class ChildInfo {
   private _nullFlavors: INullFlavor[]
 
   constructor(props: IChildInfo) {
-    this._certificateId = props.certificate_id
     this._termPregnancy = props.term_pregnancy
     this._weight = props.weight
     this._whichAccount = props.which_account
-    this._nullFlavors = props.null_flavors || []
+    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
     if (props.related_subject) this._relatedSubject = new RelatedSubject(props.related_subject)
     makeAutoObservable(this)
-  }
-
-  get certificateId(): number {
-    return this._certificateId
   }
 
   get termPregnancy(): number | undefined {
@@ -54,5 +49,15 @@ export class ChildInfo {
   }
   set nullFlavors(value: INullFlavor[]) {
     this._nullFlavors = value
+  }
+
+  getAttributes(): IChildInfo {
+    let _chInfo = {} as IChildInfo
+    if (this._nullFlavors.length > 0) _chInfo.null_flavors_attributes = this._nullFlavors
+    if (this._relatedSubject) _chInfo.related_subject_attributes = this._relatedSubject.getAttributes()
+    if (this._termPregnancy) _chInfo.term_pregnancy = this._termPregnancy
+    if (this._weight) _chInfo.weight = this._weight
+    if (this._whichAccount) _chInfo.which_account = this._whichAccount
+    return _chInfo
   }
 }
