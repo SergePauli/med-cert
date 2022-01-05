@@ -1,21 +1,31 @@
 import { makeAutoObservable } from "mobx"
 import { DATE_FORMAT, TIME_FORMAT } from "../../utils/consts"
+import { ISerializable } from "../common/ISerializabale"
 import { IMedicalServs } from "../responses/IMedservs"
 import { IProcedure } from "../responses/IProcedure"
 
-export class Procedure {
+export class Procedure implements ISerializable {
   private _id?: number
-  private _deathReasonID: string
   private _medicalServ: IMedicalServs
   private _textValue?: String | undefined
   private _effectiveTime?: Date
   constructor(props: IProcedure) {
     this._id = props.id
-    this._deathReasonID = props.external_reason
     this._medicalServ = props.medical_serv
     this._textValue = props.text_value
     this._effectiveTime = props.effective_time
     makeAutoObservable(this)
+  }
+  getAttributes(): IProcedure {
+    let _pr = {} as IProcedure
+    if (this._id) _pr.id = this._id
+    if (this._effectiveTime) _pr.effective_time = this._effectiveTime
+    if (this._medicalServ) {
+      _pr.medical_serv = this._medicalServ
+      _pr.medical_serv_id = this._medicalServ.id
+    }
+    if (this._textValue) _pr.text_value = this._textValue
+    return _pr
   }
   get id(): number | undefined {
     return this._id
@@ -41,9 +51,7 @@ export class Procedure {
   set medicalServ(value: IMedicalServs) {
     this._medicalServ = value
   }
-  get deathReasonID(): string {
-    return this._deathReasonID
-  }
+
   timeStr(): string {
     if (this._effectiveTime === undefined) return ""
     return this._effectiveTime?.toLocaleString(
