@@ -2,22 +2,24 @@ import { IAuthenticator } from "../IAuthenticator"
 import { IChildInfo } from "../IChildInfo"
 import { INullFlavorable } from "../INullFlavorable"
 import { IPatient } from "../IPatient"
-import { IReference } from "../IReference"
+import { IReferenceId } from "../IReference"
 import { IAddress } from "./IAddress"
 import { IDeathReason } from "./IDeathReason"
 
 export interface ICertificate extends INullFlavorable {
   id: number
-  series: string
-  number: string
+  series?: string
+  number?: string
   eff_time: Date
-  cert_type: IReference
+  cert_type?: number
   series_prev?: string
   number_prev?: string
   eff_time_prev?: Date
   death_addr?: IAddress
+  death_addr_attributes?: IAddress
   policy_OMS?: string
   patient?: IPatient
+  patient_attributes?: IPatient
   lifeAreaType?: number
   deathAreaType?: number
   death_datetime?: Date
@@ -38,13 +40,19 @@ export interface ICertificate extends INullFlavorable {
   c_reason?: IDeathReason
   d_reason?: IDeathReason
   death_reasons?: IDeathReason[]
+  death_reasons_attributes?: IDeathReason[]
   reason_ACME?: string
   child_info?: IChildInfo | undefined
+  child_info_attributes?: IChildInfo
   traffic_accident?: number
   pregnancy_connection?: number
   author?: IAuthenticator
+  author_attributes?: IAuthenticator
   authenticator?: IAuthenticator
+  authenticator_attributes?: IAuthenticator
   legal_authenticator?: IAuthenticator
-  custodian?: number
+  legal_authenticator_attributes?: IAuthenticator
+  custodian: IReferenceId
+  custodian_id?: number
   guid: string
 }
