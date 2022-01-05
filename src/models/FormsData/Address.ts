@@ -27,7 +27,7 @@ export default class Address {
     if (props.id) this._id = props.id
     this._oldOne = props
     this._streetAddressLine = props.streetAddressLine
-    this._nullFlavors = props.null_flavors || []
+    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
     this._aoGUID = props.aoGUID
     this._houseGUID = props.houseGUID
     this._postalCode = props.postalCode
