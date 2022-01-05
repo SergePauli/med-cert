@@ -1,7 +1,8 @@
 import { makeAutoObservable } from "mobx"
+import { ISerializable } from "../common/ISerializabale"
 import { IAuthenticator } from "../IAuthenticator"
 
-export default class Authenticator {
+export default class Authenticator implements ISerializable {
   private _id: string | undefined
   private _time?: Date | undefined
   private _doctor?: { id: number; name: string } | undefined
@@ -29,5 +30,12 @@ export default class Authenticator {
   }
   get id(): string | undefined {
     return this._id
+  }
+
+  getAttributes(): IAuthenticator {
+    let _authenticator = { time: this._time } as IAuthenticator
+    if (this._id) _authenticator.id = this._id
+    if (this._doctor) _authenticator.doctor_id = this._doctor.id
+    return _authenticator
   }
 }
