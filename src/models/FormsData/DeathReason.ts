@@ -2,12 +2,12 @@ import { makeAutoObservable } from "mobx"
 import { INullFlavor } from "../INullFlavor"
 import { IDeathReason } from "../responses/IDeathReason"
 import { IDiagnosis } from "../responses/IDiagnosis"
-import { v4 as uuidv4 } from "uuid"
 import { Procedure } from "./Procedure"
+import { ISerializable } from "../common/ISerializabale"
 
-export class DeathReason {
-  private _id: string
-  private _certificateId: number
+export class DeathReason implements ISerializable {
+  private _id?: string
+  private _certificateId?: number
   private _diagnosis?: IDiagnosis | undefined
   private _effectiveTime?: Date | undefined
   private _years?: number | undefined
@@ -20,19 +20,21 @@ export class DeathReason {
   private _nullFlavors: INullFlavor[]
 
   constructor(props: IDeathReason) {
-    this._id = props.id || uuidv4()
+    this._id = props.id
     this._certificateId = props.certificate_id
     this._diagnosis = props.diagnosis
     this._effectiveTime = props.effective_time
-    this._procedures = props.procedures?.map((proc) => new Procedure(proc)) || []
-    this._nullFlavors = props.null_flavors || []
+    this._procedures = props.procedures
+      ? props.procedures.map((proc) => new Procedure(proc))
+      : props.procedures_attributes?.map((proc) => new Procedure(proc)) || []
+    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
     makeAutoObservable(this)
   }
-  get id(): string {
+  get id(): string | undefined {
     return this._id
   }
 
-  get certificateId(): number {
+  get certificateId(): number | undefined {
     return this._certificateId
   }
   get diagnosis(): IDiagnosis | undefined {
@@ -103,5 +105,19 @@ export class DeathReason {
       _result += ";"
     })
     return _result
+  }
+  getAttributes(): IDeathReason {
+    let _dr = {} as IDeathReason
+    if (this._id) _dr.id = this._id
+    if (this._certificateId) _dr.certificate_id = this._certificateId
+    if (this._effectiveTime) _dr.effective_time = this._effectiveTime
+    if (this._diagnosis) {
+      _dr.diagnosis = this._diagnosis
+      _dr.diagnosis_id = Number.parseInt(this._diagnosis.id)
+    }
+    if (this._nullFlavors.length > 0) _dr.null_flavors_attributes = this._nullFlavors
+    if (this._procedures.length > 0) _dr.procedures_attributes = this._procedures.map((item) => item.getAttributes())
+
+    return _dr
   }
 }
