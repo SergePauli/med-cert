@@ -54,6 +54,7 @@ const InputAddress: FC<InputAddressProps> = (props: InputAddressProps) =>{
         if (value.id) _addr.id = value.id
         if (value.parent_guid) _addr.parent_guid = value.parent_guid
         if (value.null_flavors) _addr.null_flavors = value.null_flavors
+        if (value.null_flavors_attributes) _addr.null_flavors = value.null_flavors_attributes
         props.onClear(_addr)
         addressStore.address = new Address(_addr)}}
       />
