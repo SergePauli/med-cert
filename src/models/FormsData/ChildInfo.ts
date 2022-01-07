@@ -11,12 +11,14 @@ export class ChildInfo implements ISerializable {
   private _relatedSubject?: RelatedSubject | undefined
   private _nullFlavors: INullFlavor[]
 
-  constructor(props: IChildInfo) {
-    this._termPregnancy = props.term_pregnancy
-    this._weight = props.weight
-    this._whichAccount = props.which_account
-    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
-    if (props.related_subject) this._relatedSubject = new RelatedSubject(props.related_subject)
+  constructor(props: IChildInfo | undefined = undefined) {
+    if (props) {
+      this._termPregnancy = props.term_pregnancy
+      this._weight = props.weight
+      this._whichAccount = props.which_account
+      this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
+      if (props.related_subject) this._relatedSubject = new RelatedSubject(props.related_subject)
+    } else this._nullFlavors = []
     makeAutoObservable(this)
   }
 

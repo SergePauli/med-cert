@@ -21,17 +21,17 @@ export default class Person implements ISerializable {
     this._address = props.address || props.address_attributes
     this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
     this._contacts = props.contacts || props.contacts_attributes || []
-    makeAutoObservable(this)
+    makeAutoObservable(this, undefined, { deep: false })
   }
 
   getAttributes(): IPerson {
     let _person = {} as IPerson
     if (this._id) _person.id = this._id
     if (this._SNILS) _person.SNILS = this._SNILS
-    if (this._address) _person.address_attributes = this._address
-    if (this._contacts.length > 0) _person.contacts_attributes = this._contacts
-    if (this._nullFlavors.length > 0) _person.null_flavors_attributes = this._nullFlavors
-    if (this._personName) _person.person_name_attributes = this._personName
+    if (this._address) _person.address_attributes = { ...this._address }
+    if (this._contacts.length > 0) _person.contacts_attributes = [...this._contacts]
+    if (this._nullFlavors.length > 0) _person.null_flavors_attributes = [...this._nullFlavors]
+    if (this._personName) _person.person_name_attributes = { ...this._personName }
     return _person
   }
 

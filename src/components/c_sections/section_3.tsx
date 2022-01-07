@@ -68,6 +68,7 @@ const Section3: FC = () => {
                       }}
                       onChange={()=>{
                         patient.person.address = addressStore.addressProps()
+                        console.log('patient.person.address', patient.person.address)
                         setAddressLife(patient.person.address)
                       }}  
                     />}

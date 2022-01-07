@@ -70,7 +70,8 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             label: 'Сохранить',
             icon: 'pi pi-pencil',
             command: () => {
-               
+              const rp = certificateStore.cert.getAttributes()
+              console.log('rp', rp) 
             }
         },
         {

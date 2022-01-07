@@ -58,13 +58,13 @@ export default class Certificate implements ISerializable {
   disposers: (() => void)[]
 
   constructor(props: ICertificate) {
+    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
     this._oldOne = { ...props }
     this._audits = []
     this._id = props.id || -1
     this._guid = props.guid || uuidv4()
     this._patient = props.patient ? new Patient(props.patient) : new Patient()
     this._effTime = props.eff_time || new Date()
-    this._nullFlavors = props.null_flavors || []
     this._certType = props.cert_type
     this._series = props.series
     this._number = props.number
@@ -111,6 +111,20 @@ export default class Certificate implements ISerializable {
     this.disposers[0] = autorun(() => checkFieldNullFlavor("b_reason", this.reasonB, this._nullFlavors, NA))
     this.disposers[1] = autorun(() => checkFieldNullFlavor("c_reason", this._reasonC, this._nullFlavors, NA))
     this.disposers[2] = autorun(() => checkFieldNullFlavor("d_reason", this.reasonD, this._nullFlavors, NA))
+  }
+
+  get nullFlavors() {
+    return this._nullFlavors
+  }
+
+  set nullFlavors(nullFlavors: INullFlavor[]) {
+    this._nullFlavors = nullFlavors
+  }
+
+  null_flavors_attributes() {
+    return this._nullFlavors.map((el) => {
+      return { ...el }
+    })
   }
   get id() {
     return this._id
@@ -212,12 +226,7 @@ export default class Certificate implements ISerializable {
   set pregnancyConnection(value: number | undefined) {
     this._pregnancyConnection = value
   }
-  get nullFlavors() {
-    return this._nullFlavors
-  }
-  set nullFlavors(nullFlavors: INullFlavor[]) {
-    this._nullFlavors = nullFlavors
-  }
+
   get patient() {
     return this._patient
   }
@@ -374,7 +383,6 @@ export default class Certificate implements ISerializable {
   yearsAge() {
     const dd = this._deathDatetime as Date
     const db = this._patient.birth_date as Date
-    console.log(dd.getFullYear() - db.getFullYear())
     if (dd !== undefined && db !== undefined) return dd.getFullYear() - db.getFullYear()
     else return false
   }
@@ -424,7 +432,7 @@ export default class Certificate implements ISerializable {
     if (this._basisDetermining) _cert.basis_determining = this._basisDetermining
     if (this._certType) _cert.cert_type = this._certType
     if (this._childInfo) _cert.child_info_attributes = this._childInfo.getAttributes()
-    if (this._deathAddr) _cert.death_addr_attributes = this._deathAddr
+    if (this._deathAddr) _cert.death_addr_attributes = { ...this._deathAddr } as IAddress
     if (this._deathAreaType) _cert.deathAreaType = this._deathAreaType
     if (this._deathDatetime) _cert.death_datetime = this._deathDatetime
     if (this._deathKind) _cert.death_kind = this._deathKind
@@ -441,7 +449,7 @@ export default class Certificate implements ISerializable {
     if (this._policyOMS) _cert.policy_OMS = this._policyOMS
     if (this._pregnancyConnection) _cert.pregnancy_connection = this.pregnancyConnection
     if (this._maritalStatus) _cert.marital_status = this._maritalStatus
-    if (this._nullFlavors.length > 0) _cert.null_flavors_attributes = this._nullFlavors
+    if (this.nullFlavors.length > 0) _cert.null_flavors_attributes = this.null_flavors_attributes()
     if (this._number) _cert.number = this._number
     if (this._numberPrev) _cert.number_prev = this._numberPrev
     if (this._reasonA) _cert.a_reason = this._reasonA.getAttributes()

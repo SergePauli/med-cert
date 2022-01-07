@@ -7,7 +7,6 @@ import { ISerializable } from "../common/ISerializabale"
 
 export class DeathReason implements ISerializable {
   private _id?: string
-  private _certificateId?: number
   private _diagnosis?: IDiagnosis | undefined
   private _effectiveTime?: Date | undefined
   private _years?: number | undefined
@@ -21,7 +20,6 @@ export class DeathReason implements ISerializable {
 
   constructor(props: IDeathReason) {
     this._id = props.id
-    this._certificateId = props.certificate_id
     this._diagnosis = props.diagnosis
     this._effectiveTime = props.effective_time
     this._procedures = props.procedures
@@ -34,9 +32,6 @@ export class DeathReason implements ISerializable {
     return this._id
   }
 
-  get certificateId(): number | undefined {
-    return this._certificateId
-  }
   get diagnosis(): IDiagnosis | undefined {
     return this._diagnosis
   }
@@ -109,7 +104,6 @@ export class DeathReason implements ISerializable {
   getAttributes(): IDeathReason {
     let _dr = {} as IDeathReason
     if (this._id) _dr.id = this._id
-    if (this._certificateId) _dr.certificate_id = this._certificateId
     if (this._effectiveTime) _dr.effective_time = this._effectiveTime
     if (this._diagnosis) {
       _dr.diagnosis = this._diagnosis

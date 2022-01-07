@@ -1,12 +1,12 @@
 import { makeAutoObservable } from "mobx"
 import Address from "../models/FormsData/Address"
-import { getCleanNullFlavor, INullFlavor } from "../models/INullFlavor"
+import { checkFieldNullFlavor, INullFlavor } from "../models/INullFlavor"
 import { IReference } from "../models/IReference"
 import { DEFAULT_ADDRESS, IAddress } from "../models/responses/IAddress"
 import { IFiasItem } from "../models/responses/IFiasItem"
 import FiasService from "../services/FiasService"
-import { DESTROY_OPTION } from "../utils/consts"
-import { HOME_REGION_CODE, UNK } from "../utils/defaults"
+import { HOME_REGION_CODE } from "../utils/defaults"
+import { removeEmpty } from "../utils/functions"
 export default class AddressStore {
   private _address: Address
   private _isLoding: boolean
@@ -85,33 +85,15 @@ export default class AddressStore {
       addr.postalCode ? ", " + addr.postalCode : ""
     }`
   }
-
   createNullFlavors(): INullFlavor[] {
     const addr = this._address
-    let _nullFlafors = [] as INullFlavor[]
     //check postalcode
-    let _nullFlavor = addr.nullFlavors.find((item) => item.parent_attr === "postalCode")
-    if (addr.postalCode && _nullFlavor) _nullFlafors.push({ ..._nullFlavor, ...DESTROY_OPTION })
-    else if (!addr.postalCode && _nullFlavor) {
-      const candidat = getCleanNullFlavor(_nullFlavor)
-      if (candidat) _nullFlafors.push(candidat)
-    } else if (!addr.postalCode && _nullFlavor === undefined)
-      _nullFlafors.push({ code: UNK, parent_attr: "postalCode" })
+    checkFieldNullFlavor("postalCode", addr.postalCode, addr.nullFlavors)
     //check aoGUID
-    _nullFlavor = addr.nullFlavors.find((item) => item.parent_attr === "aoGUID")
-    if (addr.aoGUID && _nullFlavor) _nullFlafors.push({ ..._nullFlavor, ...DESTROY_OPTION })
-    else if (!addr.aoGUID && _nullFlavor) {
-      const candidat = getCleanNullFlavor(_nullFlavor)
-      if (candidat) _nullFlafors.push(candidat)
-    } else if (!addr.aoGUID && _nullFlavor === undefined) _nullFlafors.push({ code: UNK, parent_attr: "aoGUID" })
+    checkFieldNullFlavor("aoGUID", addr.aoGUID, addr.nullFlavors)
     //check houseGUID
-    _nullFlavor = addr.nullFlavors.find((item) => item.parent_attr === "houseGUID")
-    if (addr.houseGUID && _nullFlavor) _nullFlafors.push({ ..._nullFlavor, ...DESTROY_OPTION })
-    else if (!addr.houseGUID && _nullFlavor) {
-      const candidat = getCleanNullFlavor(_nullFlavor)
-      if (candidat) _nullFlafors.push(candidat)
-    } else if (!addr.houseGUID && _nullFlavor === undefined) _nullFlafors.push({ code: UNK, parent_attr: "houseGUID" })
-    return _nullFlafors
+    checkFieldNullFlavor("houseGUID", addr.houseGUID, addr.nullFlavors)
+    return addr.null_flavors_attributes()
   }
   // Check address for FIAS requarens
   isNotStrictly(): boolean {
@@ -122,7 +104,7 @@ export default class AddressStore {
   // Возвращает POJO объект адреса
   addressProps(): IAddress {
     const addr = this._address
-    const result = {
+    const _result = {
       id: addr.id,
       state: addr.state?.code,
       streetAddressLine: this.streetAddressLine(),
@@ -134,10 +116,9 @@ export default class AddressStore {
       building_number: addr.buildnum,
       flat_number: addr.flat,
       parent_guid: addr.parent,
-      null_flavors_attributes: this.createNullFlavors(),
+      null_flavors_attributes: [...this.createNullFlavors()],
     } as IAddress
-
-    return result
+    return removeEmpty(_result)
   }
 
   set history(history: any) {

@@ -19,7 +19,6 @@ import { SOCIAL_STATUSES } from '../../NSI/1.2.643.5.1.13.13.11.1038'
 import { checkFieldNullFlavor, INullFlavor } from '../../models/INullFlavor'
 import { TERMS_PREGNANCY } from '../../NSI/1.2.643.5.1.13.13.99.2.18'
 import { ChildInfo } from '../../models/FormsData/ChildInfo'
-import { IChildInfo } from '../../models/IChildInfo'
 import { MotherInfo } from '../MotherInfo'
 
  const Section5: FC = () => {
@@ -38,7 +37,7 @@ import { MotherInfo } from '../MotherInfo'
   
   useEffect(()=>{
     if (isChildInfo && certificate.childInfo===undefined) 
-     certificate.childInfo = new ChildInfo({certificate_id: certificate.id} as IChildInfo)
+     certificate.childInfo = new ChildInfo()
     else if (!isChildInfo && certificate.childInfo!==undefined) certificate.childInfo = undefined
   },[isChildInfo, certificate]) 
   

@@ -136,8 +136,7 @@ export default class CertificateStore {
       const isCODE =
         this._cert.patient.identity === undefined ||
         ((code === undefined || code.length < 1) &&
-          this._cert.patient.identity.nullFlavors().findIndex((element) => element.parent_attr === "issueOrgCode") ===
-            -1)
+          this._cert.patient.identity.nullFlavors.findIndex((element) => element.parent_attr === "issueOrgCode") === -1)
       this._suggestions[IORGCODE_SUG].done = !isCODE
     })
     this.disposers[8] = autorun(() => {

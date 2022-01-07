@@ -28,8 +28,7 @@ import { InputText } from 'primereact/inputtext'
   const mainCSSClass = (isACME: boolean) => isACME  ? "p-fluid p-d-flex p-jc-start ACME-reason" : "p-fluid p-d-flex p-jc-start"
   const reasonBckecked = !!certificate.reasonB
   const reasonCckecked = !!certificate.reasonC
-  const reasonDckecked = !!certificate.reasonD
-  console.log('reasonCckecked', reasonCckecked, certificate.reasonC)
+  const reasonDckecked = !!certificate.reasonD  
       
   return (<>    
     <Card className="c-section p-mr-2 p-mb-2" header={header}>        
