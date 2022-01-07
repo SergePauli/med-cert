@@ -24,10 +24,14 @@ export default class Address {
   private _nullFlavors: INullFlavor[]
   private _parent?: string
   constructor(props: IAddress) {
+    this._nullFlavors = !!props.null_flavors
+      ? [...props.null_flavors]
+      : !!props.null_flavors_attributes && props.null_flavors_attributes.length > 0
+      ? [...props.null_flavors_attributes]
+      : []
     if (props.id) this._id = props.id
     this._oldOne = props
     this._streetAddressLine = props.streetAddressLine
-    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
     this._aoGUID = props.aoGUID
     this._houseGUID = props.houseGUID
     this._postalCode = props.postalCode
@@ -134,12 +138,18 @@ export default class Address {
   get parent() {
     return this._parent
   }
-
   get nullFlavors() {
     return this._nullFlavors
   }
+
   set nullFlavors(nullFlavors: INullFlavor[]) {
     this._nullFlavors = nullFlavors
+  }
+
+  null_flavors_attributes(): INullFlavor[] {
+    let _result = [] as INullFlavor[]
+    this._nullFlavors.forEach((item) => _result.push({ ...item } as INullFlavor))
+    return _result
   }
 
   //рекурсивный парсинг структуры адресного объекта
