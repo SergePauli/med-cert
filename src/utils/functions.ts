@@ -58,6 +58,10 @@ export const timeDiff = (d1: Date, d2: Date) => {
 // to remove the indefined items from nested objects as well, using a recursive
 // используем рекурсивную функцию очистки объектов от undefined свойств
 export const removeEmpty = (obj: any) => {
+  let candidat = obj as Object
+  if (Array.prototype.isPrototypeOf(candidat)) {
+    return obj
+  }
   let newObj = {} as any
   Object.keys(obj).forEach((key) => {
     if (obj[key] === Object(obj[key])) newObj[key] = removeEmpty(obj[key])
