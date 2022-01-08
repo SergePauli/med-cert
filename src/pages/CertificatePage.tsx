@@ -72,6 +72,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             command: () => {
               const rp = certificateStore.cert.getAttributes()
               console.log('rp', rp) 
+              certificateStore.cert.id=1
             }
         },
         {
