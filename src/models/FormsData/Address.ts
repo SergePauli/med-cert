@@ -146,10 +146,11 @@ export default class Address {
     this._nullFlavors = nullFlavors
   }
 
+  // получение копии массива заполнителей из Observable.array
   null_flavors_attributes(): INullFlavor[] {
-    let _result = [] as INullFlavor[]
-    this._nullFlavors.forEach((item) => _result.push({ ...item } as INullFlavor))
-    return _result
+    return this._nullFlavors.map((el) => {
+      return { ...el }
+    })
   }
 
   //рекурсивный парсинг структуры адресного объекта
