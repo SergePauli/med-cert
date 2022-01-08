@@ -106,7 +106,7 @@ export default class Certificate implements ISerializable {
     if (props.d_reason) this._reasonD = this.createDeathReason(props.d_reason)
     if (props.death_reasons) this._deathReasons = props.death_reasons.map((reason) => this.createDeathReason(reason))
     else this._deathReasons = []
-    makeAutoObservable(this)
+    makeAutoObservable(this, undefined, { deep: false })
     this.disposers = []
     this.disposers[0] = autorun(() => checkFieldNullFlavor("b_reason", this.reasonB, this._nullFlavors, NA))
     this.disposers[1] = autorun(() => checkFieldNullFlavor("c_reason", this._reasonC, this._nullFlavors, NA))
