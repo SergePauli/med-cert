@@ -27,7 +27,8 @@ export const checkFieldNullFlavor = (
   code = UNK
 ) => {
   const idx = nullFlavors.findIndex((item) => item.parent_attr === key)
-  if (field && idx !== -1) nullFlavors[idx]._destroy = "1"
+  if (field && idx !== -1 && nullFlavors[idx].id) nullFlavors[idx]._destroy = "1"
+  else if (field && idx !== -1) nullFlavors.splice(idx, 1)
   else if (!field && idx !== -1 && nullFlavors[idx]._destroy === "1") {
     nullFlavors[idx] = { ...getCleanNullFlavor(nullFlavors[idx]) } as INullFlavor
   } else if (!field && idx === -1) nullFlavors.push({ code: code, parent_attr: key })
