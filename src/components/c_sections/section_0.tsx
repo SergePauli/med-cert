@@ -5,9 +5,9 @@ import { Dropdown } from 'primereact/dropdown'
 import { InputText } from 'primereact/inputtext'
 import { Calendar } from 'primereact/calendar'
 import { Divider } from 'primereact/divider'
-import { CERT_TYPE } from '../../utils/consts'
 import { Card } from 'primereact/card'
 import '../../styles/pages/CertificatePage.css'
+import { CERT_TYPES } from '../../NSI/1.2.643.5.1.13.13.99.2.19'
  const Section0: FC = () => {
    const { certificateStore } = useContext(Context)
    const cert =  certificateStore.cert  
@@ -20,17 +20,17 @@ import '../../styles/pages/CertificatePage.css'
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="firstname6">Серия</label>
             <InputText id="firstname6" value={cert.series} type="text" 
-              placeholder='Заполняется автоматически' />
+              placeholder='Заполняется автоматически' disabled/>
           </div>
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="lastname6">Номер</label>
             <InputText id="lastname6" value={cert.number} disabled type="text" placeholder='Заполняется автоматически'/>
           </div>
           <div className="p-field p-col-12 p-md-6">
-            <label htmlFor="state">Вид свидетельства</label>
-            <Dropdown inputId="state"  placeholder="Выбрать" autoFocus 
-              options={CERT_TYPE.filter((item)=>"1 2".includes(item.code))} optionLabel="name"
-              value={cert.certType} onChange={(e) =>certificateStore.cert.certType = e.value} />
+            <label htmlFor="cert_type">Вид свидетельства</label>
+            <Dropdown inputId="cert_type"  placeholder="Выбрать" autoFocus 
+              options={CERT_TYPES.filter((item)=>[1,2].includes(item.code))} optionLabel="name"
+              value={CERT_TYPES.find(el=>el.code===cert.certType)} onChange={(e) =>certificateStore.cert.certType = e.value.code} disabled={cert.id > -1} />
           </div>
           <div className="p-field p-col-12 p-md-6">                    
             <label htmlFor="icon">Дата</label>
