@@ -132,52 +132,58 @@ export default class CertificateStore {
       this._suggestions[OMS_SUG].done = !isOMS
     })
     this.disposers[7] = autorun(() => {
-      const code = this._cert.patient.identity?.issueOrgCode
+      const patient = this._cert.patient
+      const identity = patient.identity
+      const code = identity?.issueOrgCode
       const isCODE =
-        this._cert.patient.identity === undefined ||
-        ((code === undefined || code.length < 1) &&
-          this._cert.patient.identity.nullFlavors.findIndex((element) => element.parent_attr === "issueOrgCode") === -1)
+        (!identity && patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1) ||
+        (identity &&
+          (!code || code.length < 1) &&
+          identity.nullFlavors.findIndex((element) => element.parent_attr === "issueOrgCode") === -1)
       this._suggestions[IORGCODE_SUG].done = !isCODE
     })
     this.disposers[8] = autorun(() => {
       const patient = this._cert.patient
       const isIORGDate =
-        (!patient.identity === undefined &&
-          patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1) ||
-        patient.identity?.issueOrgDate === undefined
+        (!patient.identity && patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1) ||
+        (patient.identity && !patient.identity?.issueOrgDate)
       this._suggestions[IORGDATE_SUG].done = !isIORGDate
     })
     this.disposers[9] = autorun(() => {
       const patient = this._cert.patient
       const isIORGName =
-        (patient.identity?.issueOrgName === undefined || patient.identity?.issueOrgName.length < 15) &&
-        patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1
+        (!patient.identity && patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1) ||
+        (patient.identity && (!patient.identity?.issueOrgName || patient.identity.issueOrgName.length < 15))
       this._suggestions[IORGNAME_SUG].done = !isIORGName
     })
     this.disposers[10] = autorun(() => {
       const patient = this._cert.patient
+      const identity = patient.identity
+      const series = patient.identity?.series
       const isIDSeries =
-        (patient.identity?.series === undefined || patient.identity?.series.length < 1) &&
-        patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1
+        (!identity && patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1) ||
+        (identity &&
+          (!series || series.length < 1) &&
+          identity.nullFlavors.findIndex((element) => element.parent_attr === "series") === -1)
       this._suggestions[IDSERIES_SUG].done = !isIDSeries
     })
     this.disposers[11] = autorun(() => {
       const patient = this._cert.patient
       const isIDNumber =
-        (patient.identity?.number === undefined || patient.identity?.number.length < 1) &&
-        patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1
+        (!patient.identity && patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1) ||
+        (patient.identity && !patient.identity?.number)
       this._suggestions[IDNUMBER_SUG].done = !isIDNumber
     })
     this.disposers[12] = autorun(() => {
       const person = this._cert.patient.person
       const isLifeArea =
-        (!person.address || !person.address.aoGUID || !person.address.postalCode || !person.address.houseGUID) &&
+        (!person.address || person.address.streetAddressLine.split(",").length < 3) &&
         person.nullFlavors.findIndex((element) => element.parent_attr === "address") === -1
       this._suggestions[LIFE_PLACE_SUG].done = !isLifeArea
     })
     this.disposers[13] = autorun(() => {
       const isDeathArea =
-        (!this._cert.deathAddr || !this._cert.deathAddr.houseGUID) &&
+        (!this._cert.deathAddr || this._cert.deathAddr.streetAddressLine.split(",").length < 3) &&
         this._cert.nullFlavors.findIndex((element) => element.parent_attr === "death_addr") === -1
       this._suggestions[DEATH_PLACE_SUG].done = !isDeathArea
     })
