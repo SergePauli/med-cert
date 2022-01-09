@@ -1,7 +1,8 @@
 import { HOME_REGION_CODE } from "../../utils/defaults"
+import { IDestroyble } from "../IDestroyble"
 import { INullFlavorable } from "../INullFlavorable"
 
-export interface IAddress extends INullFlavorable {
+export interface IAddress extends INullFlavorable, IDestroyble {
   id?: string
   state: string
   streetAddressLine: string
