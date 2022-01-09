@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import React, { FC, useContext } from 'react'
+import React, { FC, useContext, useState } from 'react'
 import { Context } from '../..'
 import { InputText } from 'primereact/inputtext'
 import { Card } from 'primereact/card'
@@ -25,64 +25,74 @@ import IIdentity from '../../models/IIdentity'
   const header = () => {
       return <span>Документы умершего</span>
     }
+    
   const certificate = certificateStore.cert   
   const patient = certificate.patient
   const identity = patient.identity 
-  const docChecked = identity !== undefined   
-  const dul_value = ID_CARD_TYPES.find((item)=>item.code === identity?.identityCardType)
+  const [docChecked, setDocChecked] = useState(identified)    
+  const [dulValue, setDulValue]  = useState(ID_CARD_TYPES.find((item)=>item.code === identity?.identityCardType))
   const person =  patient.person   
-  const nullFlavorOption =  docChecked ? "UNK" : "ASKU" 
+  const nullFlavorOption =  docChecked ? "UNK" : "UNK ASKU NA" 
   const seriesProps = {type:"text", id:"series", value:identity?.series,                  
       onChange:(e:any)=>{if (identity) identity.series = e.target.value }}  
-  const seriesField = dul_value?.s_mask ? <InputMask {...{mask:dul_value?.s_mask,...seriesProps} as InputMaskProps }/>
+  const seriesField = dulValue?.s_mask ? <InputMask {...{mask:dulValue?.s_mask,...seriesProps} as InputMaskProps }/>
     : <InputText {...seriesProps}/>   
   const numberProps = {type:"text", id:"docNumber", value:identity?.number,                  
       onChange:(e:any)=>{if (identity) identity.number = e.target.value }}  
-  const numberField = dul_value?.n_mask ? <InputMask {...{mask:dul_value?.n_mask,...numberProps} as InputMaskProps }/>
+  const numberField = dulValue?.n_mask ? <InputMask {...{mask:dulValue?.n_mask,...numberProps} as InputMaskProps }/>
     : <InputText {...numberProps}/> 
   const depCodeProps = {type:"text", id:"depCode", value:identity?.issueOrgCode,                  
       onChange:(e:any)=>{if (identity) identity.issueOrgCode = e.target.value}}  
-  const depCodeField = dul_value?.c_mask ? <InputMask {...{mask:dul_value?.c_mask,...depCodeProps} as InputMaskProps }/>
+  const depCodeField = dulValue?.c_mask ? <InputMask {...{mask:dulValue?.c_mask,...depCodeProps} as InputMaskProps }/>
     : <InputText {...depCodeProps}/>    
   return (<>    
       <Card className="c-section p-mr-2 p-mb-2" header={header}>        
           <div className="p-fluid p-formgrid p-grid">            
             <div className="p-field p-d-flex p-flex-wrap p-jc-start">
               <div className='paragraph p-mr-1'>4. </div>
-              <div className='p-paragraph-field p-mr-2 p-mb-2' key={`pdiv1_${docChecked}`}>
+              <div className='p-paragraph-field p-mr-2 p-mb-2'>
                 <NullFlavorWrapper 
-                  disabled paraNum                              
+                  disabled={!identified} paraNum                              
                   checked={docChecked} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
-                    { if (e.checked) patient.identity = new Identity({
-                        identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,          
-                      } as IIdentity)
-                      else patient.identity = undefined 
+                    { if (e.checked) {patient.identity = new Identity({
+                        identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,                                  
+                          } as IIdentity)
+                        if (!identified) certificateStore.identified = true
+                      } else patient.identity = undefined 
                       if (nullFlavors) patient.nullFlavors = nullFlavors
+                      setDocChecked(e.checked)
                     }}
                   nullFlavors={patient.nullFlavors}
                   field_name="identity"
                   label={<label htmlFor="identity_card_type">Документ, удостоверяющей личность умершего: </label>}
-                  field={<Dropdown  id="identity_card_type" value={dul_value} 
+                  field={<Dropdown  id="identity_card_type" value={dulValue} 
                   autoFocus options={ID_CARD_TYPES} optionLabel='name'
-                  onChange={(e)=>{if (identity) identity.identityCardType = e.value.code}}
+                  onChange={(e)=>{
+                    if (identity) identity.identityCardType = e.value.code
+                    setDulValue(ID_CARD_TYPES.find((item)=>item.code === e.value.code))
+                  }}
                   />}                  
                   options={NULL_FLAVORS.filter((item:IReference)=>nullFlavorOption.includes(item.code))} 
                   value={docChecked ? UNK : ASKU}                                    
                 />             
               </div>
-              <div className="p-paragraph-field p-mr-2 p-mb-2" key={`pdiv2_${docChecked}_${dul_value?.s_mask}`} 
+              <div className="p-paragraph-field p-mr-2 p-mb-2" key={`ser_${docChecked}`} 
                 style={{marginLeft:'1.5rem'}}>
                 <NullFlavorWrapper                   
                   label={<label htmlFor="series">Серия</label>}
-                  checked={docChecked}                  
+                  checked={docChecked && patient.identity?.nullFlavors.findIndex(nf=>nf.parent_attr==='series')===-1} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+                    if (patient.identity) patient.identity.nullFlavors = nullFlavors || []                   
+                  }}                 
                   field={seriesField}
+                  field_name='series'
                   options={identified ? [NULL_FLAVORS[NA]] : [NULL_FLAVORS[ASKU]]}
-                  value={docChecked ? NA : ASKU}
+                  value={NA}
+                  nullFlavors={patient.identity?.nullFlavors}
                   lincked={!docChecked}                                   
                 />  
               </div>
-              <div className="p-paragraph-field p-mr-2 p-mb-2" 
-                style={{marginLeft:'1.5rem'}} key={`pdiv3_${docChecked}`}>
+              <div className="p-paragraph-field p-mr-2 p-mb-2" key={`num_${docChecked}`}
+                style={{marginLeft:'1.5rem'}} >
                 <NullFlavorWrapper                   
                   label={<label htmlFor="docNumber">Номер</label>}
                   checked={docChecked}                 
@@ -92,7 +102,7 @@ import IIdentity from '../../models/IIdentity'
                   lincked                                      
                 />                    
               </div>
-              <div className="p-paragraph-field p-mr-3 p-mb-2" style={{marginLeft:'1.5rem'}} key={`pdiv4_${docChecked}`}>
+              <div className="p-paragraph-field p-mr-3 p-mb-2" key={`org_${docChecked}`} style={{marginLeft:'1.5rem'}} >
                 <NullFlavorWrapper                   
                   label={<label htmlFor="issueOrgName">Кем выдан</label>}
                   checked={docChecked}                   
@@ -120,14 +130,16 @@ import IIdentity from '../../models/IIdentity'
                   lincked                                       
                 /> 
               </div>  
-              <div className="p-paragraph-field p-mr-2 p-mb-2" style={{marginLeft:'1.5rem'}} 
-              key={`pdiv6_${docChecked}`}>
+              <div className="p-paragraph-field p-mr-2 p-mb-2" key={`code_${docChecked}`} style={{marginLeft:'1.5rem'}}> 
                 <NullFlavorWrapper                   
                   label={<label htmlFor="depCode">Код подразделения</label>}
-                  checked={docChecked}                   
+                  checked={docChecked && patient.identity?.nullFlavors.findIndex(nf=>nf.parent_attr==='issueOrgCode')===-1} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+                    if (patient.identity) patient.identity.nullFlavors = nullFlavors || []                   
+                  }}                   
                   field={depCodeField}
                   options={identified ? [NULL_FLAVORS[NA]] : [NULL_FLAVORS[ASKU]]}
-                  value={identified ? NA : ASKU}  
+                  value={identified ? NA : ASKU} 
+                  nullFlavors={patient.identity?.nullFlavors} 
                   lincked={!docChecked}
                   field_name="issueOrgCode"                                     
                 />                    
