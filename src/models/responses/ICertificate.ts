@@ -36,9 +36,13 @@ export interface ICertificate extends INullFlavorable {
   established_medic?: number | undefined
   basis_determining?: number | undefined
   a_reason?: IDeathReason
+  a_reason_attributes?: IDeathReason
   b_reason?: IDeathReason
+  b_reason_attributes?: IDeathReason
   c_reason?: IDeathReason
+  c_reason_attributes?: IDeathReason
   d_reason?: IDeathReason
+  d_reason_attributes?: IDeathReason
   death_reasons?: IDeathReason[]
   death_reasons_attributes?: IDeathReason[]
   reason_ACME?: string
