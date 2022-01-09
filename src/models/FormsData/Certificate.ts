@@ -4,6 +4,7 @@ import { NA } from "../../utils/defaults"
 import { timeDiff } from "../../utils/functions"
 import { ISerializable } from "../common/ISerializabale"
 import { IAudit } from "../IAudit"
+import { IChildInfo } from "../IChildInfo"
 import { checkFieldNullFlavor, INullFlavor } from "../INullFlavor"
 import { IAddress } from "../responses/IAddress"
 import { ICertificate } from "../responses/ICertificate"
@@ -121,6 +122,7 @@ export default class Certificate implements ISerializable {
     this._nullFlavors = nullFlavors
   }
 
+  // получение копии массива заполнителей из Observable.array
   null_flavors_attributes() {
     return this._nullFlavors.map((el) => {
       return { ...el }
@@ -428,17 +430,41 @@ export default class Certificate implements ISerializable {
     let _cert = { eff_time: this._effTime, guid: this.guid } as ICertificate
     if (this._id !== -1) _cert.id = this._id
     if (this._authenticator) _cert.authenticator_attributes = this._authenticator.getAttributes()
+    else if (this._oldOne && this._oldOne.authenticator)
+      _cert.authenticator_attributes = { id: this._oldOne.authenticator.id, _destroy: "1" }
     if (this._author) _cert.author_attributes = this._author.getAttributes()
+    else if (this._oldOne && this._oldOne.author)
+      _cert.author_attributes = { id: this._oldOne.author.id, _destroy: "1" }
+    if (this._legalAuthenticator) _cert.legal_authenticator_attributes = this._legalAuthenticator.getAttributes()
+    else if (this._oldOne && this._oldOne.legal_authenticator)
+      _cert.legal_authenticator_attributes = { id: this._oldOne.legal_authenticator.id, _destroy: "1" }
     if (this._basisDetermining) _cert.basis_determining = this._basisDetermining
     if (this._certType) _cert.cert_type = this._certType
     if (this._childInfo) _cert.child_info_attributes = this._childInfo.getAttributes()
+    else if (this._oldOne && this._oldOne.child_info) _cert.child_info_attributes = { _destroy: "1" } as IChildInfo
     if (this._deathAddr) _cert.death_addr_attributes = { ...this._deathAddr } as IAddress
+    else if (this._oldOne && this._oldOne.death_addr)
+      _cert.death_addr_attributes = { id: this._oldOne.death_addr.id, _destroy: "1" } as IAddress
     if (this._deathAreaType) _cert.deathAreaType = this._deathAreaType
     if (this._deathDatetime) _cert.death_datetime = this._deathDatetime
+    if (this._deathYear) _cert.death_year = this._deathYear
     if (this._deathKind) _cert.death_kind = this._deathKind
     if (this._deathPlace) _cert.death_place = this.deathPlace
     if (this._deathReasons.length > 0)
       _cert.death_reasons_attributes = this._deathReasons.map((item) => item.getAttributes())
+    if (this._oldOne?.death_reasons && this._oldOne.death_reasons.length > 0) {
+      let _temp = [] as IDeathReason[]
+      this._oldOne.death_reasons.forEach((item) => {
+        if (
+          !_cert.death_reasons_attributes ||
+          _cert.death_reasons_attributes.findIndex((el) => el.id === item.id) === -1
+        )
+          _temp.push({ id: item.id, _destroy: "1" } as IDeathReason)
+      })
+      if (_cert.death_reasons_attributes && _temp.length > 0)
+        _cert.death_reasons_attributes = _cert.death_reasons_attributes.concat(_temp)
+      else if (_temp.length > 0) _cert.death_reasons_attributes = _temp
+    }
     if (this._educationLevel) _cert.education_level = this._educationLevel
     if (this._effTime) _cert.eff_time = this._effTime
     if (this._effTimePrev) _cert.eff_time_prev = this._effTimePrev
@@ -453,10 +479,18 @@ export default class Certificate implements ISerializable {
     if (this._number) _cert.number = this._number
     if (this._numberPrev) _cert.number_prev = this._numberPrev
     if (this._reasonA) _cert.a_reason = this._reasonA.getAttributes()
+    else if (this._oldOne && this._oldOne.a_reason)
+      _cert.a_reason_attributes = { id: this._oldOne.a_reason.id, _destroy: "1" } as IDeathReason
     if (this._reasonACME) _cert.reason_ACME = this._reasonACME.diagnosis?.ICD10
-    if (this._reasonB) _cert.b_reason = this._reasonB.getAttributes()
+    if (this._reasonB) _cert.b_reason_attributes = this._reasonB.getAttributes()
+    else if (this._oldOne && this._oldOne.b_reason)
+      _cert.b_reason_attributes = { id: this._oldOne.b_reason.id, _destroy: "1" } as IDeathReason
     if (this._reasonC) _cert.c_reason = this._reasonC.getAttributes()
+    else if (this._oldOne && this._oldOne.c_reason)
+      _cert.c_reason_attributes = { id: this._oldOne.c_reason.id, _destroy: "1" } as IDeathReason
     if (this._reasonD) _cert.d_reason = this._reasonD.getAttributes()
+    else if (this._oldOne && this._oldOne.d_reason)
+      _cert.d_reason_attributes = { id: this._oldOne.d_reason.id, _destroy: "1" } as IDeathReason
     if (this._series) _cert.series = this._series
     if (this._seriesPrev) _cert.series_prev = this._seriesPrev
     if (this._socialStatus) _cert.social_status = this._socialStatus
