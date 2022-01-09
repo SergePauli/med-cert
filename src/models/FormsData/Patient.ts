@@ -28,7 +28,7 @@ export default class Patient implements ISerializable {
     if (props.identity) this._identity = new Identity(props.identity)
     this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
 
-    makeAutoObservable(this)
+    makeAutoObservable(this, undefined, { deep: false })
   }
   getAttributes(): IPatient {
     let _patient = { guid: this._guid } as IPatient
@@ -40,6 +40,7 @@ export default class Patient implements ISerializable {
     if (this._identity) _patient.identity_attributes = this._identity.getAttributes()
     if (this._provider_organization) _patient.organization_id = this._provider_organization
     if (this._person) _patient.person_attributes = this._person.getAttributes()
+    if (this.nullFlavors.length > 0) _patient.null_flavors_attributes = this.null_flavors_attributes()
     return _patient
   }
   get id() {
@@ -73,6 +74,14 @@ export default class Patient implements ISerializable {
   set nullFlavors(nullFlavors: INullFlavor[]) {
     this._nullFlavors = nullFlavors
   }
+
+  // получение копии массива заполнителей из Observable.array
+  null_flavors_attributes() {
+    return this._nullFlavors.map((el) => {
+      return { ...el }
+    })
+  }
+
   get addr_type() {
     return this._addr_type
   }

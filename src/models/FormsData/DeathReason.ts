@@ -4,8 +4,10 @@ import { IDeathReason } from "../responses/IDeathReason"
 import { IDiagnosis } from "../responses/IDiagnosis"
 import { Procedure } from "./Procedure"
 import { ISerializable } from "../common/ISerializabale"
+import { IProcedure } from "../responses/IProcedure"
 
 export class DeathReason implements ISerializable {
+  private _oldOne: IDeathReason
   private _id?: string
   private _diagnosis?: IDiagnosis | undefined
   private _effectiveTime?: Date | undefined
@@ -19,6 +21,7 @@ export class DeathReason implements ISerializable {
   private _nullFlavors: INullFlavor[]
 
   constructor(props: IDeathReason) {
+    this._oldOne = { ...props }
     this._id = props.id
     this._diagnosis = props.diagnosis
     this._effectiveTime = props.effective_time
@@ -26,7 +29,7 @@ export class DeathReason implements ISerializable {
       ? props.procedures.map((proc) => new Procedure(proc))
       : props.procedures_attributes?.map((proc) => new Procedure(proc)) || []
     this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
-    makeAutoObservable(this)
+    makeAutoObservable(this, undefined, { deep: false })
   }
   get id(): string | undefined {
     return this._id
@@ -92,6 +95,13 @@ export class DeathReason implements ISerializable {
   set nullFlavors(value: INullFlavor[]) {
     this._nullFlavors = value
   }
+
+  // получение копии массива заполнителей из Observable.array
+  null_flavors_attributes() {
+    return this._nullFlavors.map((el) => {
+      return { ...el }
+    })
+  }
   procNames(): string {
     let _result = ""
     this._procedures.forEach((proc) => {
@@ -109,9 +119,18 @@ export class DeathReason implements ISerializable {
       _dr.diagnosis = this._diagnosis
       _dr.diagnosis_id = Number.parseInt(this._diagnosis.id)
     }
-    if (this._nullFlavors.length > 0) _dr.null_flavors_attributes = this._nullFlavors
+    if (this._nullFlavors.length > 0) _dr.null_flavors_attributes = this.null_flavors_attributes()
     if (this._procedures.length > 0) _dr.procedures_attributes = this._procedures.map((item) => item.getAttributes())
-
+    if (this._oldOne.procedures && this._oldOne.procedures.length > 0) {
+      let _temp = [] as IProcedure[]
+      this._oldOne.procedures.forEach((item) => {
+        if (!_dr.procedures_attributes || _dr.procedures_attributes.findIndex((pr) => pr.id === item.id) === -1)
+          _temp.push({ id: item.id, _destroy: "1" } as IProcedure)
+      })
+      if (_dr.procedures_attributes && _temp.length > 0)
+        _dr.procedures_attributes = _dr.procedures_attributes.concat(_temp)
+      else if (_temp.length > 0) _dr.procedures_attributes = _temp
+    }
     return _dr
   }
 }

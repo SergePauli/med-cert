@@ -19,7 +19,7 @@ export class ChildInfo implements ISerializable {
       this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
       if (props.related_subject) this._relatedSubject = new RelatedSubject(props.related_subject)
     } else this._nullFlavors = []
-    makeAutoObservable(this)
+    makeAutoObservable(this, undefined, { deep: false })
   }
 
   get termPregnancy(): number | undefined {
@@ -53,9 +53,16 @@ export class ChildInfo implements ISerializable {
     this._nullFlavors = value
   }
 
+  // получение копии массива заполнителей из Observable.array
+  null_flavors_attributes() {
+    return this._nullFlavors.map((el) => {
+      return { ...el }
+    })
+  }
+
   getAttributes(): IChildInfo {
     let _chInfo = {} as IChildInfo
-    if (this._nullFlavors.length > 0) _chInfo.null_flavors_attributes = this._nullFlavors
+    if (this._nullFlavors.length > 0) _chInfo.null_flavors_attributes = this.null_flavors_attributes()
     if (this._relatedSubject) _chInfo.related_subject_attributes = this._relatedSubject.getAttributes()
     if (this._termPregnancy) _chInfo.term_pregnancy = this._termPregnancy
     if (this._weight) _chInfo.weight = this._weight

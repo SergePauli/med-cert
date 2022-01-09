@@ -21,10 +21,11 @@ export class Procedure implements ISerializable {
     if (this._id) _pr.id = this._id
     if (this._effectiveTime) _pr.effective_time = this._effectiveTime
     if (this._medicalServ) {
-      _pr.medical_serv = this._medicalServ
+      _pr.medical_serv = { ...this._medicalServ }
       _pr.medical_serv_id = this._medicalServ.id
     }
     if (this._textValue) _pr.text_value = this._textValue
+
     return _pr
   }
   get id(): number | undefined {

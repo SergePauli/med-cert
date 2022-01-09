@@ -30,7 +30,7 @@ export default class Person implements ISerializable {
     if (this._SNILS) _person.SNILS = this._SNILS
     if (this._address) _person.address_attributes = { ...this._address }
     if (this._contacts.length > 0) _person.contacts_attributes = [...this._contacts]
-    if (this._nullFlavors.length > 0) _person.null_flavors_attributes = [...this._nullFlavors]
+    if (this._nullFlavors.length > 0) _person.null_flavors_attributes = this.null_flavors_attributes()
     if (this._personName) _person.person_name_attributes = { ...this._personName }
     return _person
   }
@@ -49,6 +49,14 @@ export default class Person implements ISerializable {
   set nullFlavors(nullFlavors: INullFlavor[]) {
     this._nullFlavors = nullFlavors
   }
+
+  // получение копии массива заполнителей из Observable.array
+  null_flavors_attributes() {
+    return this._nullFlavors.map((el) => {
+      return { ...el }
+    })
+  }
+
   get SNILS() {
     return this._SNILS
   }

@@ -22,7 +22,7 @@ export default class RelatedSubject implements ISerializable {
     this._fio = props.person_name
     this._birthTime = props.birthTime
     this._addr = props.addr
-    makeAutoObservable(this)
+    makeAutoObservable(this, undefined, { deep: false })
   }
   get id(): string | undefined {
     return this._id
@@ -53,12 +53,19 @@ export default class RelatedSubject implements ISerializable {
     this._nullFlavors = value
   }
 
+  // получение копии массива заполнителей из Observable.array
+  null_flavors_attributes() {
+    return this._nullFlavors.map((el) => {
+      return { ...el }
+    })
+  }
+
   getAttributes(): IRelatedSubject {
     let _rs = { family_connection: this._familyConnection } as IRelatedSubject
-    if (this._nullFlavors.length > 0) _rs.null_flavors_attributes = this._nullFlavors
+    if (this._nullFlavors.length > 0) _rs.null_flavors_attributes = this.null_flavors_attributes()
     if (this._addr) _rs.addr_attributes = this._addr
     if (this._birthTime) _rs.birthTime = this._birthTime
-    if (this._fio) _rs.person_name_attributes = this._fio
+    if (this._fio) _rs.person_name_attributes = { ...this._fio }
     return _rs
   }
 }

@@ -23,7 +23,7 @@ export default class Identity implements ISerializable {
     this._issueOrgDate = props.issueOrgDate
     this._parentGUID = props.parentGUID
     this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
-    makeAutoObservable(this)
+    makeAutoObservable(this, undefined, { deep: false })
   }
   getAttributes(): IIdentity {
     let _identity = {} as IIdentity
@@ -32,7 +32,7 @@ export default class Identity implements ISerializable {
     if (this._issueOrgCode) _identity.issueOrgCode = this._issueOrgCode
     if (this._issueOrgDate) _identity.issueOrgDate = this._issueOrgDate
     if (this._issueOrgName) _identity.issueOrgName = this._issueOrgName
-    if (this._nullFlavors.length > 0) _identity.null_flavors_attributes = this._nullFlavors
+    if (this._nullFlavors.length > 0) _identity.null_flavors_attributes = this.null_flavors_attributes()
     if (this._number) _identity.number = this._number
     if (this._parentGUID) _identity.parentGUID = this._parentGUID
     if (this._series) _identity.series = this._series
@@ -82,5 +82,11 @@ export default class Identity implements ISerializable {
   }
   set nullFlavors(nullFlavors: INullFlavor[]) {
     this._nullFlavors = nullFlavors
+  }
+  // получение копии массива заполнителей из Observable.array
+  null_flavors_attributes() {
+    return this._nullFlavors.map((el) => {
+      return { ...el }
+    })
   }
 }
