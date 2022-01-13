@@ -5,7 +5,7 @@ import { INullFlavor } from "../INullFlavor"
 
 export default class Identity implements ISerializable {
   private _id?: string
-  private _identityCardType: string
+  private _identityCardType: number
   private _series?: string
   private _number: string | undefined
   private _issueOrgName: string | undefined
@@ -15,7 +15,7 @@ export default class Identity implements ISerializable {
   private _nullFlavors: INullFlavor[]
   constructor(props: IIdentity) {
     this._id = props.id
-    this._identityCardType = props.identityCardType
+    this._identityCardType = props.identity_card_type_id
     if (props.series) this._series = props.series
     this._number = props.number
     this._issueOrgName = props.issueOrgName
@@ -28,7 +28,7 @@ export default class Identity implements ISerializable {
   getAttributes(): IIdentity {
     let _identity = {} as IIdentity
     if (this._id) _identity.id = this._id
-    if (this._identityCardType) _identity.identityCardType = this._identityCardType
+    if (this._identityCardType) _identity.identity_card_type_id = this._identityCardType
     if (this._issueOrgCode) _identity.issueOrgCode = this._issueOrgCode
     if (this._issueOrgDate) _identity.issueOrgDate = this._issueOrgDate
     if (this._issueOrgName) _identity.issueOrgName = this._issueOrgName
@@ -41,7 +41,7 @@ export default class Identity implements ISerializable {
   get identityCardType() {
     return this._identityCardType
   }
-  set identityCardType(ct: string) {
+  set identityCardType(ct: number) {
     this._identityCardType = ct
   }
   get series() {
