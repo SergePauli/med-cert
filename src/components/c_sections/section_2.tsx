@@ -55,7 +55,7 @@ import IIdentity from '../../models/IIdentity'
                   disabled={!identified} paraNum                              
                   checked={docChecked} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
                     { if (e.checked) {patient.identity = new Identity({
-                        identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,                                  
+                        identity_card_type_id: ID_CARD_TYPES[PASSPORT_RF].code,                                  
                           } as IIdentity)
                         if (!identified) certificateStore.identified = true
                       } else patient.identity = undefined 
