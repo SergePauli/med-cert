@@ -18,10 +18,12 @@ export default class Patient implements ISerializable {
   private _identity?: Identity
   private _nullFlavors: INullFlavor[]
   constructor(props = {} as IPatient) {
+    const MAIN_REGISTRATION_ADDRESS = 1
     this._guid = props.guid || uuidv4()
     this._person = props.person ? new Person(props.person) : new Person()
+    this._provider_organization = props.organization_id
     if (props.gender) this._gender = props.gender
-    if (props.addr_type) this._addr_type = props.addr_type
+    if (props.addr_type) this._addr_type = props.addr_type || MAIN_REGISTRATION_ADDRESS
     if (props.birth_date) this._birth_date = props.birth_date
     if (props.id) this._id = props.id
     if (props.birth_year) this._birth_year = props.birth_year
