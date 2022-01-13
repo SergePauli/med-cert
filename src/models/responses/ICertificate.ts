@@ -20,8 +20,8 @@ export interface ICertificate extends INullFlavorable {
   policy_OMS?: string
   patient?: IPatient
   patient_attributes?: IPatient
-  lifeAreaType?: number
-  deathAreaType?: number
+  life_area_type?: number
+  death_area_type?: number
   death_datetime?: Date
   death_year?: number
   death_month?: number
