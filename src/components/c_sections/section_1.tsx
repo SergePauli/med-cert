@@ -65,7 +65,7 @@ import Identity from '../../models/FormsData/Identity'
                   patient.identity = undefined  
                   patient.nullFlavors.push({parent_attr:'identity', code:ASKU})                 
                 } else 
-                  patient.identity = new Identity({identityCardType: ID_CARD_TYPES[PASSPORT_RF].code} as IIdentity)                
+                  patient.identity = new Identity({identity_card_type_id: ID_CARD_TYPES[PASSPORT_RF].code} as IIdentity)                
                 }}/>
               <label htmlFor="fromRelatives">Внесено со слов родственников</label>
             </div>
