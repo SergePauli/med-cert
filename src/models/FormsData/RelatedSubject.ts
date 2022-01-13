@@ -63,7 +63,7 @@ export default class RelatedSubject implements ISerializable {
   getAttributes(): IRelatedSubject {
     let _rs = { family_connection: this._familyConnection } as IRelatedSubject
     if (this._nullFlavors.length > 0) _rs.null_flavors_attributes = this.null_flavors_attributes()
-    if (this._addr) _rs.addr_attributes = this._addr
+    if (this._addr) _rs.addr_attributes = { ...this._addr }
     if (this._birthTime) _rs.birthTime = this._birthTime
     if (this._fio) _rs.person_name_attributes = { ...this._fio }
     return _rs
