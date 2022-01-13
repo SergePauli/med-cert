@@ -59,4 +59,5 @@ export interface ICertificate extends INullFlavorable {
   custodian: IReferenceId
   custodian_id?: number
   guid: string
+  latest_one?: ICertificate
 }
