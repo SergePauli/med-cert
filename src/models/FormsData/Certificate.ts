@@ -1,6 +1,6 @@
 import { autorun, makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
-import { NA } from "../../utils/defaults"
+import { NA, REGION_OKATO } from "../../utils/defaults"
 import { timeDiff } from "../../utils/functions"
 import { ISerializable } from "../common/ISerializabale"
 import { IAudit } from "../IAudit"
@@ -67,15 +67,15 @@ export default class Certificate implements ISerializable {
     this._patient = props.patient ? new Patient(props.patient) : new Patient()
     this._effTime = props.eff_time || new Date()
     this._certType = props.cert_type
-    this._series = props.series
+    this._series = props.series || REGION_OKATO
     this._number = props.number
     this._deathDatetime = props.death_datetime
     this._deathYear = props.death_year
     this._numberPrev = props.number_prev
     this._seriesPrev = props.series_prev
     this._policyOMS = props.policy_OMS
-    this._lifeAreaType = props.lifeAreaType
-    this._deathAreaType = props.deathAreaType
+    this._lifeAreaType = props.life_area_type
+    this._deathAreaType = props.death_area_type
     this._deathAddr = props.death_addr || props.death_addr_attributes
     this._deathPlace = props.death_place
     this._deathKind = props.death_kind
@@ -445,7 +445,7 @@ export default class Certificate implements ISerializable {
     if (this._deathAddr) _cert.death_addr_attributes = { ...this._deathAddr } as IAddress
     else if (this._oldOne && this._oldOne.death_addr)
       _cert.death_addr_attributes = { id: this._oldOne.death_addr.id, _destroy: "1" } as IAddress
-    if (this._deathAreaType) _cert.deathAreaType = this._deathAreaType
+    if (this._deathAreaType) _cert.death_area_type = this._deathAreaType
     if (this._deathDatetime) _cert.death_datetime = this._deathDatetime
     if (this._deathYear) _cert.death_year = this._deathYear
     if (this._deathKind) _cert.death_kind = this._deathKind
@@ -471,7 +471,7 @@ export default class Certificate implements ISerializable {
     if (this._establishedMedic) _cert.established_medic = this._establishedMedic
     if (this._extReasonDescription) _cert.ext_reason_description = this.extReasonDescription
     if (this._extReasonTime) _cert.ext_reason_time = this._extReasonTime
-    if (this._lifeAreaType) _cert.lifeAreaType = this._lifeAreaType
+    if (this._lifeAreaType) _cert.life_area_type = this._lifeAreaType
     if (this._policyOMS) _cert.policy_OMS = this._policyOMS
     if (this._pregnancyConnection) _cert.pregnancy_connection = this.pregnancyConnection
     if (this._maritalStatus) _cert.marital_status = this._maritalStatus
@@ -496,6 +496,7 @@ export default class Certificate implements ISerializable {
     if (this._socialStatus) _cert.social_status = this._socialStatus
     if (this._trafficAccident) _cert.traffic_accident = this._trafficAccident
     if (this._patient) _cert.patient_attributes = this._patient.getAttributes()
+    if (_cert.patient_attributes) _cert.custodian_id = _cert.patient_attributes.organization_id
     return _cert
   }
 
