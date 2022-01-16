@@ -337,6 +337,43 @@ export const NULL_FLAVORS = [
   { code: "QS", name: "Достаточное количество" },
   { code: "TRC", name: "Трудноразличимо" },
 ]
+export type NULL_FLAVOR_CODES =
+  | "NI"
+  | "INV"
+  | "DER"
+  | "OTH"
+  | "NINF"
+  | "PINF"
+  | "UNC"
+  | "MSK"
+  | "NA"
+  | "UNK"
+  | "ASKU"
+  | "NAV"
+  | "NASK"
+  | "QS"
+  | "TRC"
+
+export type INullFlavorIdx = {
+  [index in NULL_FLAVOR_CODES]: number
+}
+export const NULL_FLAVOR_IDX: INullFlavorIdx = {
+  NI: 0,
+  INV: 1,
+  DER: 2,
+  OTH: 3,
+  NINF: 4,
+  PINF: 5,
+  UNC: 6,
+  MSK: 7,
+  NA: 8,
+  UNK: 9,
+  ASKU: 10,
+  NAV: 11,
+  NASK: 12,
+  QS: 13,
+  TRC: 14,
+}
 export const ASKU = 10
 export const NA = 8
 export const UNK = 9
@@ -353,7 +390,7 @@ export const ID_CARD_TYPES = [
   { code: 2, name: "Заграничный паспорт гр. РФ", s_mask: "99", n_mask: "9999999", c_mask: "ФМС 99999" },
   { code: 3, name: "Служебный паспорт" },
   { code: 4, name: "Врем. уд. личности(форма № 2П)" },
-  { code: 6, name: "Свидетельство о рождении" },
+  { code: 6, name: "Свидетельство о рождении", n_mask: "999999" },
   { code: 8, name: "Удостоверение личности военнослужащего" },
   { code: 9, name: "Военный билет" },
   { code: 10, name: "Паспорт иностранного гражданина" },
