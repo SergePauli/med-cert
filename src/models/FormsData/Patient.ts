@@ -1,41 +1,45 @@
 import { makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
+import { NULL_FLAVOR_IDX } from "../../utils/defaults"
 import { ISerializable } from "../common/ISerializabale"
-import { INullFlavor } from "../INullFlavor"
+import { INullFlavorR } from "../INullFlavor"
 import { IPatient } from "../IPatient"
+import { IPatientR } from "../requests/IPatientR"
 import Identity from "./Identity"
 import Person from "./Person"
-
+export const MAIN_REGISTRATION_ADDRESS = 1
 export default class Patient implements ISerializable {
   private _id?: string | undefined
   private _person: Person
   private _gender?: number | undefined
-  private _birth_date: Date | Date[] | undefined
+  private _birth_date: Date | undefined
   private _birth_year?: number
   private _provider_organization?: number
-  private _addr_type?: number
+  private _addrType?: number
   private _guid: string
   private _identity?: Identity
-  private _nullFlavors: INullFlavor[]
+  private _nullFlavors: INullFlavorR[]
   constructor(props = {} as IPatient) {
-    const MAIN_REGISTRATION_ADDRESS = 1
     this._guid = props.guid || uuidv4()
     this._person = props.person ? new Person(props.person) : new Person()
     this._provider_organization = props.organization_id
     if (props.gender) this._gender = props.gender
-    if (props.addr_type) this._addr_type = props.addr_type || MAIN_REGISTRATION_ADDRESS
-    if (props.birth_date) this._birth_date = props.birth_date
+    this._addrType = props.addr_type || MAIN_REGISTRATION_ADDRESS
+    if (props.birth_date) this._birth_date = new Date(props.birth_date)
     if (props.id) this._id = props.id
     if (props.birth_year) this._birth_year = props.birth_year
     if (props.identity) this._identity = new Identity(props.identity)
-    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
+    this._nullFlavors =
+      props.null_flavors?.map((item) => {
+        return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
+      }) || []
 
     makeAutoObservable(this, undefined, { deep: false })
   }
-  getAttributes(): IPatient {
-    let _patient = { guid: this._guid } as IPatient
+  getAttributes(): IPatientR {
+    let _patient = { guid: this._guid } as IPatientR
     if (this._id) _patient.id = this.id
-    if (this._addr_type) _patient.addr_type = this._addr_type
+    if (this._addrType) _patient.addr_type = this._addrType
     if (this._birth_date) _patient.birth_date = this._birth_date
     if (this._birth_year) _patient.birth_year = this._birth_year
     if (this._gender) _patient.gender = this._gender
@@ -63,7 +67,7 @@ export default class Patient implements ISerializable {
   get birth_date() {
     return this._birth_date
   }
-  set birth_date(birth_date: Date | Date[] | undefined) {
+  set birth_date(birth_date: Date | undefined) {
     this._birth_date = birth_date
   }
   get guid() {
@@ -73,7 +77,7 @@ export default class Patient implements ISerializable {
   get nullFlavors() {
     return this._nullFlavors
   }
-  set nullFlavors(nullFlavors: INullFlavor[]) {
+  set nullFlavors(nullFlavors: INullFlavorR[]) {
     this._nullFlavors = nullFlavors
   }
 
@@ -85,10 +89,10 @@ export default class Patient implements ISerializable {
   }
 
   get addr_type() {
-    return this._addr_type
+    return this._addrType
   }
   set addr_type(addr_type: number | undefined) {
-    this._addr_type = addr_type
+    this._addrType = addr_type
   }
   get provider_organization() {
     return this._provider_organization

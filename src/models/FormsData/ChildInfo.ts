@@ -1,7 +1,9 @@
 import { makeAutoObservable } from "mobx"
+import { NULL_FLAVOR_IDX } from "../../utils/defaults"
 import { ISerializable } from "../common/ISerializabale"
 import { IChildInfo } from "../IChildInfo"
-import { INullFlavor } from "../INullFlavor"
+import { INullFlavorR } from "../INullFlavor"
+import { IChildInfoR } from "../requests/IChildInfoR"
 import RelatedSubject from "./RelatedSubject"
 
 export class ChildInfo implements ISerializable {
@@ -9,14 +11,17 @@ export class ChildInfo implements ISerializable {
   private _weight?: number | undefined
   private _whichAccount?: number | undefined
   private _relatedSubject?: RelatedSubject | undefined
-  private _nullFlavors: INullFlavor[]
+  private _nullFlavors: INullFlavorR[]
 
   constructor(props: IChildInfo | undefined = undefined) {
     if (props) {
       this._termPregnancy = props.term_pregnancy
       this._weight = props.weight
       this._whichAccount = props.which_account
-      this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
+      this._nullFlavors =
+        props.null_flavors?.map((item) => {
+          return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
+        }) || []
       if (props.related_subject) this._relatedSubject = new RelatedSubject(props.related_subject)
     } else this._nullFlavors = []
     makeAutoObservable(this, undefined, { deep: false })
@@ -46,10 +51,10 @@ export class ChildInfo implements ISerializable {
   set relatedSubject(value: RelatedSubject | undefined) {
     this._relatedSubject = value
   }
-  get nullFlavors(): INullFlavor[] {
+  get nullFlavors(): INullFlavorR[] {
     return this._nullFlavors
   }
-  set nullFlavors(value: INullFlavor[]) {
+  set nullFlavors(value: INullFlavorR[]) {
     this._nullFlavors = value
   }
 
@@ -60,8 +65,8 @@ export class ChildInfo implements ISerializable {
     })
   }
 
-  getAttributes(): IChildInfo {
-    let _chInfo = {} as IChildInfo
+  getAttributes(): IChildInfoR {
+    let _chInfo = {} as IChildInfoR
     if (this._nullFlavors.length > 0) _chInfo.null_flavors_attributes = this.null_flavors_attributes()
     if (this._relatedSubject) _chInfo.related_subject_attributes = this._relatedSubject.getAttributes()
     if (this._termPregnancy) _chInfo.term_pregnancy = this._termPregnancy

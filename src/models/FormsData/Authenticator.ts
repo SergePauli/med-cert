@@ -1,19 +1,17 @@
 import { makeAutoObservable } from "mobx"
 import { ISerializable } from "../common/ISerializabale"
-import { IAuthenticator } from "../IAuthenticator"
+import { IAuthenticatorR } from "../requests/IAuthenticatorR"
+import { IAuthenticator } from "../responses/IAuthenticator"
 
 export default class Authenticator implements ISerializable {
-  private _id: string | undefined
+  private _id?: number | undefined
   private _time?: Date | undefined
-  private _doctor?: { id: number; name: string } | undefined
+  private _doctorID?: number | undefined
   constructor(props: IAuthenticator) {
     this._id = props.id
-    if (props.doctor)
-      this._doctor = {
-        id: props.doctor.id,
-        name: props.doctor.name,
-      }
-    this._time = props.time
+    this._doctorID = props.doctor_id
+    if (props.time) this._time = new Date(props.time)
+    else new Date()
     makeAutoObservable(this)
   }
   get time(): Date | undefined {
@@ -22,20 +20,20 @@ export default class Authenticator implements ISerializable {
   set time(value: Date | undefined) {
     this._time = value
   }
-  get doctor(): { id: number; name: string } | undefined {
-    return this._doctor
+  get doctorID(): number | undefined {
+    return this._doctorID
   }
-  set doctor(value: { id: number; name: string } | undefined) {
-    this._doctor = value
+  set doctorID(value: number | undefined) {
+    this._doctorID = value
   }
-  get id(): string | undefined {
+  get id(): number | undefined {
     return this._id
   }
 
-  getAttributes(): IAuthenticator {
-    let _authenticator = { time: this._time } as IAuthenticator
+  getAttributes(): IAuthenticatorR {
+    let _authenticator = { time: this._time } as IAuthenticatorR
     if (this._id) _authenticator.id = this._id
-    if (this._doctor) _authenticator.doctor_id = this._doctor.id
+    if (this._doctorID) _authenticator.doctor_id = this._doctorID
     return _authenticator
   }
 }
