@@ -1,12 +1,12 @@
 import { makeAutoObservable } from "mobx"
 import FiasService from "../../services/FiasService"
-import { INullFlavor } from "../INullFlavor"
+import { INullFlavorR } from "../INullFlavor"
 import { IReference } from "../IReference"
-import { IAddress } from "../responses/IAddress"
+import { IAddressR } from "../requests/IAddressR"
 import { IFiasItem } from "../responses/IFiasItem"
 
 export default class Address {
-  private _oldOne: IAddress
+  private _oldOne: IAddressR
   private _id?: string
   private _streetAddressLine: string
   private _state?: IReference
@@ -21,14 +21,13 @@ export default class Address {
   private _strucnum?: string
   private _flat?: string
   private _postalCode?: string
-  private _nullFlavors: INullFlavor[]
+  private _nullFlavors: INullFlavorR[]
   private _parent?: string
-  constructor(props: IAddress) {
-    this._nullFlavors = !!props.null_flavors
-      ? [...props.null_flavors]
-      : !!props.null_flavors_attributes && props.null_flavors_attributes.length > 0
-      ? [...props.null_flavors_attributes]
-      : []
+  constructor(props: IAddressR) {
+    this._nullFlavors =
+      !!props.null_flavors_attributes && props.null_flavors_attributes.length > 0
+        ? [...props.null_flavors_attributes]
+        : []
     if (props.id) this._id = props.id
     this._oldOne = props
     this._streetAddressLine = props.streetAddressLine
@@ -41,10 +40,10 @@ export default class Address {
     this._flat = props.flat_number
     this._parent = props.parent_guid
     this.fetchAddressHierarchy()
-    makeAutoObservable(this)
+    makeAutoObservable(this, undefined, { deep: false })
   }
 
-  get oldOne(): IAddress {
+  get oldOne(): IAddressR {
     return this._oldOne
   }
 
@@ -142,12 +141,12 @@ export default class Address {
     return this._nullFlavors
   }
 
-  set nullFlavors(nullFlavors: INullFlavor[]) {
+  set nullFlavors(nullFlavors: INullFlavorR[]) {
     this._nullFlavors = nullFlavors
   }
 
   // получение копии массива заполнителей из Observable.array
-  null_flavors_attributes(): INullFlavor[] {
+  null_flavors_attributes(): INullFlavorR[] {
     return this._nullFlavors.map((el) => {
       return { ...el }
     })

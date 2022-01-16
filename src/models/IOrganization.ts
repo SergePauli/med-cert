@@ -1,5 +1,5 @@
 import { IContact } from "./IContact"
-import { IAddress } from "./responses/IAddress"
+import { IAddressR } from "./requests/IAddressR"
 
 export interface IOrganization {
   create_date: string
@@ -18,6 +18,6 @@ export interface IOrganization {
   osp_oid: string | null
   parent_id: number | null
   parent_oid: string | null
-  address: IAddress
+  address: IAddressR
   contacts: IContact[]
 }

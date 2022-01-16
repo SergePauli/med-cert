@@ -7,6 +7,6 @@ export default interface IIdentity extends INullFlavorable {
   number: string
   issueOrgName: string
   issueOrgCode?: string
-  issueOrgDate: Date
+  issueDate: string
   parentGUID: string
 }
