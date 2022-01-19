@@ -4,7 +4,8 @@ import { INullFlavorableR } from "./INullFlavorableR"
 import { IPersonName } from "../IPersonName"
 
 export interface IRelatedSubjectR extends INullFlavorableR, IDestroyble {
-  id: string
+  id: number
+  guid: string
   family_connection: number
   addr_attributes?: IAddressR
   person_name_attributes?: IPersonName
