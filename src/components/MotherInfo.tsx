@@ -5,17 +5,17 @@ import NullFlavorWrapper from './NullFlavorWrapper'
 import { ChildInfo } from '../models/FormsData/ChildInfo'
 import RelatedSubject from '../models/FormsData/RelatedSubject'
 import { IChildInfo } from '../models/IChildInfo'
-import { INullFlavor } from '../models/INullFlavor'
+import {  INullFlavorR } from '../models/INullFlavor'
 import { IPersonName } from '../models/IPersonName'
 import { IReference } from '../models/IReference'
 import { IRelatedSubject } from '../models/IRelatedSubject'
 import { CheckboxChangeParams } from 'primereact/checkbox'
 import { Calendar } from 'primereact/calendar'
 import { Context } from '..'
-import { DEFAULT_ADDRESS, IAddress } from '../models/responses/IAddress'
 import AddressFC2 from './inputs/InputAddress'
 import { NULL_FLAVORS, UNK } from '../utils/defaults'
 import AddressDialog from './dialogs/AddressDialog'
+import { DEFAULT_ADDRESS, IAddressR } from '../models/requests/IAddressR'
 
 type MotherInfoProps = {
   childInfo?: ChildInfo
@@ -62,7 +62,7 @@ export const MotherInfo = (props: MotherInfoProps) => {
       </div> 
       <div className='p-paragraph-field p-mr-2 p-mb-2'>
         <NullFlavorWrapper                           
-          setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
+          setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>
             { if (e.checked)  { 
               } else { 
                 relatedSubject.fio = undefined                
@@ -92,15 +92,15 @@ export const MotherInfo = (props: MotherInfoProps) => {
       <div className='p-paragraph-field p-mr-2 p-mb-2'>                     
         <NullFlavorWrapper                                       
           label={<label htmlFor="dateBirth">Дата рождения матери</label>}
-          setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{                      
+          setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{                      
                       if (!e.checked) {                        
                         relatedSubject.birthTime = undefined                        
                       } 
-                      if (nullFlavors) relatedSubject.nullFlavors = nullFlavors
+                      //if (nullFlavors) relatedSubject.nullFlavors = nullFlavors
                     }} 
-          onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{
+          onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{
             if (nullFlavors) relatedSubject.nullFlavors = nullFlavors}}
-          field={<Calendar id="dateBirth" showIcon                                            
+          field={<Calendar id="dateBirth" showIcon dateFormat='dd.mm.yy'                                           
                   value={relatedSubject.birthTime} 
                   onChange={(e)=>{
                     relatedSubject.birthTime = e.target.value as Date | undefined
@@ -116,14 +116,14 @@ export const MotherInfo = (props: MotherInfoProps) => {
         <NullFlavorWrapper                      
               label={<label htmlFor="mother_addr">Место жительства матери</label>}
               checked={checked}  
-              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                 if (nullFlavors) relatedSubject.nullFlavors = nullFlavors
                 if (!e.checked) relatedSubject.addr = undefined                
               }}               
               field={<AddressFC2  submitted={submitted} 
                       id='mother_addr'            
                       value={address || DEFAULT_ADDRESS} 
-                      onClear={(value: IAddress)=>{                                               
+                      onClear={(value: IAddressR)=>{                                               
                         relatedSubject.addr = value
                         setAddress(relatedSubject.addr)
                       }}
