@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite'
 import RightSideBarLayout  from './RightSideBarLayout'
 import { IUserInfo } from '../../models/responses/IUserInfo'
 import { ActionButtonLayout, IActionItem } from './ActionButtonLayout'
+import { ProgressSpinner } from 'primereact/progressspinner'
 
 type MainLayoutProps = {
   title: string,
@@ -36,12 +37,12 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
      setUserInfo(userStore.userInfo)     
     },[userId, userInfo, userStore.userInfo]
   )
-    
+  const content =  layoutStore.isLoading ? <ProgressSpinner/> : props.content 
   return (
   <div className={wrapperClass} data-theme='light'>    
     <div className='layout-content-wrapper' onClick={()=>onClickOutside()}>  
       <TopBarLayout  title = {props.title}  userInfo={userInfo} />        
-      <div className='layout-content' >{props.content}
+      <div className='layout-content'>{content}
         <ActionButtonLayout items={props.actionItems}/>
       </div>
       <FooterLayout userInfo={userInfo} />
@@ -51,7 +52,7 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
     <div className="layout-search"></div>        
     <div className='layout-mask modal-in' onClick={()=>{layoutStore.setTabletOrMobile(false)}}></div>
   </div>  
-  )
+  ) 
 }
 export default observer(MainLayout)
 
