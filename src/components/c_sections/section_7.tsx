@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { FC, useContext, useEffect} from 'react'
+import { FC, useContext} from 'react'
 import { Context } from '../..'
 import { Card } from 'primereact/card'
 import '../../styles/components/RadioButton.css'
@@ -9,7 +9,6 @@ import '../../styles/pages/CertificatePage.css'
 //import { IReference } from '../../models/IReference'
 
 import { DeathReason } from '../../models/FormsData/DeathReason'
-import { IDeathReason } from '../../models/responses/IDeathReason'
 import Reason from '../inputs/Reason'
 import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
@@ -21,10 +20,7 @@ import { InputText } from 'primereact/inputtext'
   const header = () => {
       return <span> <span className='paragraph p-mr-1'>22(I).</span>  Причины смерти.</span>
     }
-  const certificate = certificateStore.cert  
-  useEffect(()=>{
-    if (certificate.reasonA === undefined) certificate.reasonA = certificate.createDeathReason({} as IDeathReason) 
-  })  
+  const certificate = certificateStore.cert     
   const mainCSSClass = (isACME: boolean) => isACME  ? "p-fluid p-d-flex p-jc-start ACME-reason" : "p-fluid p-d-flex p-jc-start"
   const reasonBckecked = !!certificate.reasonB
   const reasonCckecked = !!certificate.reasonC
