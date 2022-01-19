@@ -1,8 +1,8 @@
 import { makeAutoObservable } from "mobx"
 import Address from "../models/FormsData/Address"
-import { checkFieldNullFlavor, INullFlavor } from "../models/INullFlavor"
+import { checkFieldNullFlavor, INullFlavorR } from "../models/INullFlavor"
 import { IReference } from "../models/IReference"
-import { DEFAULT_ADDRESS, IAddress } from "../models/responses/IAddress"
+import { DEFAULT_ADDRESS, IAddressR } from "../models/requests/IAddressR"
 import { IFiasItem } from "../models/responses/IFiasItem"
 import FiasService from "../services/FiasService"
 import { HOME_REGION_CODE } from "../utils/defaults"
@@ -85,7 +85,7 @@ export default class AddressStore {
       addr.postalCode ? ", " + addr.postalCode : ""
     }`
   }
-  createNullFlavors(): INullFlavor[] {
+  createNullFlavors(): INullFlavorR[] {
     const addr = this._address
     //check postalcode
     checkFieldNullFlavor("postalCode", addr.postalCode, addr.nullFlavors)
@@ -102,7 +102,7 @@ export default class AddressStore {
   }
   // Returned POJO address data
   // Возвращает POJO объект адреса
-  addressProps(): IAddress {
+  addressProps(): IAddressR {
     const addr = this._address
     const _result = {
       id: addr.id,
@@ -117,7 +117,7 @@ export default class AddressStore {
       flat_number: addr.flat,
       parent_guid: addr.parent,
       null_flavors_attributes: [...this.createNullFlavors()],
-    } as IAddress
+    } as IAddressR
     return removeEmpty(_result)
   }
 
