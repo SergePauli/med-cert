@@ -6,12 +6,15 @@ export default class LayoutStore {
   private _isRightSidebarActive: boolean
   private _isProfileMenuActive: boolean
   private _isNotificationsMenuActive: boolean
+  private _isLoading: boolean
+
   constructor() {
     this._isTabletOrMobile = false
     this._isLayoutStaticInactive = false
     this._isRightSidebarActive = false
     this._isProfileMenuActive = false
     this._isNotificationsMenuActive = false
+    this._isLoading = false
     makeAutoObservable(this)
   }
   setTabletOrMobile(visible: boolean) {
@@ -46,5 +49,11 @@ export default class LayoutStore {
   }
   setNotificationsMenuActive(notificationsMenuActive: boolean) {
     this._isNotificationsMenuActive = notificationsMenuActive
+  }
+  get isLoading(): boolean {
+    return this._isLoading
+  }
+  set isLoading(value: boolean) {
+    this._isLoading = value
   }
 }
