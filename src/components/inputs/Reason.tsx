@@ -8,7 +8,7 @@ import { InputText } from 'primereact/inputtext'
 import { FC, useState } from 'react'
 import Certificate from '../../models/FormsData/Certificate'
 import { DeathReason } from '../../models/FormsData/DeathReason'
-import { INullFlavor } from '../../models/INullFlavor'
+import { INullFlavorR } from '../../models/INullFlavor'
 import { IReference } from '../../models/IReference'
 import { IDeathReason } from '../../models/responses/IDeathReason'
 import { IDiagnosis } from '../../models/responses/IDiagnosis'
@@ -29,7 +29,7 @@ type ReasonProps = {
   onUp?: ()=>void
   onDown?: ()=>void
   onTimeChecked?: (checked: boolean)=>void 
-  onDiagnosisChecked?: (checked: boolean, nullFlavors: INullFlavor[] | undefined)=>void
+  onDiagnosisChecked?: (checked: boolean, nullFlavors: INullFlavorR[] | undefined)=>void
 }
 
 const Reason: FC<ReasonProps> = (props: ReasonProps) => { 
@@ -43,7 +43,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
   const  getDiagnoses = (event: { query: string })=>{
   const option = {} as any
   if (event.query.trim().length>0) option.s_name_cont = event.query.trim()
-  if (diagnosisCode.trim().length>0) option.ICD10_start =  diagnosisCode    
+  if (diagnosisCode && diagnosisCode.trim().length>0) option.ICD10_start =  diagnosisCode    
   if (props.isExt) DiagnosisService.fetchExtDiagnoses(option).then(response=>{
         if (response.data.length>0) setDiagnoses(response.data)
         else setDiagnoses([])        
@@ -83,13 +83,13 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
       label={<label>Период времени между началом патол. состояния и смертью</label>} 
       options={options}  paraNum value={UNK}
       nullFlavors={deathReason.nullFlavors}
-      setCheck={(e: CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+      setCheck={(e: CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
         if (!e.checked) deathReason.effectiveTime = undefined 
         if (nullFlavors) deathReason.nullFlavors = nullFlavors
         props.onChange(deathReason)
         if (props.onTimeChecked) props.onTimeChecked(e.checked)
       }}
-      onChange={(e: IReference, nullFlavors: INullFlavor[] | undefined)=>{        
+      onChange={(e: IReference, nullFlavors: INullFlavorR[] | undefined)=>{        
         if (nullFlavors) deathReason.nullFlavors = nullFlavors}}
       field_name="effective_time"
       field={
@@ -163,7 +163,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
     />) : <></>        
   return (<div className="p-paragraph-field"  style={{width: '100%'}}>  
     <NullFlavorWrapper disabled={props.disabled} checked={checked} key={`rs2_${deathReason?.id}_${deathReason?.diagnosis}`}
-      setCheck={(e: CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+      setCheck={(e: CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
         setChecked(e.checked)        
         if (e.checked) {
           const reason = props.certificate.createDeathReason({certificate_id: props.certificate.id} as IDeathReason)
@@ -174,8 +174,8 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
             deathReason.nullFlavors = []
             deathReason.effectiveTime = undefined  
             deathReason.diagnosis = undefined
-            deathReason.nullFlavors.push({parent_attr:'effective_time', code: NA} as INullFlavor)   
-            deathReason.nullFlavors.push({parent_attr:'diagnosis', code: NA} as INullFlavor)       
+            deathReason.nullFlavors.push({parent_attr:'effective_time', code: NA} as INullFlavorR)   
+            deathReason.nullFlavors.push({parent_attr:'diagnosis', code: NA} as INullFlavorR)       
           } 
           props.onChange(undefined)   
         }

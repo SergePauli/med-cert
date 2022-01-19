@@ -11,7 +11,7 @@ import { NA, NULL_FLAVORS } from '../../utils/defaults'
 import { IReference } from '../../models/IReference'
 import { Dropdown } from 'primereact/dropdown'
 
-import { INullFlavor } from '../../models/INullFlavor'
+import { INullFlavorR } from '../../models/INullFlavor'
 import { DEATH_KINDS, DISEASE_DEADTH_KIND } from '../../NSI/1.2.643.5.1.13.13.99.2.21'
 import { Calendar } from 'primereact/calendar'
 import { InputTextarea } from 'primereact/inputtextarea'
@@ -55,13 +55,13 @@ import { BASIS_DERMINING } from '../../NSI/1.2.643.5.1.13.13.99.2.23'
               <div className="p-paragraph-field p-mr-2 p-mb-2" key={`pdivdt_${isExtReason}`} style={{width: '90%'}}>                                  
                 <NullFlavorWrapper paraNum disabled checked={isExtReason}                                      
                   label={<label htmlFor="extReasonTime"> В случае смерти от несчастного случая, убийства, самоубийства, от военных и террористических действий, при неустановленном роде смерти - указать дату, время и обстоятельства травмы (отравления)</label>}
-                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{                      
+                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{                      
                       if (!e.checked) {                        
                         certificate.extReasonTime = undefined                        
                       } 
                       if (nullFlavors) certificate.nullFlavors = nullFlavors
                     }} 
-                  onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{
+                  onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{
                       if (nullFlavors) certificate.nullFlavors = nullFlavors}}
                   field={<div className="p-d-flex p-flex-wrap p-jc-start">
                           <Calendar id="extReasonTime" showIcon className="p-mr-3 p-mb-2" placeholder='дата'                                          
