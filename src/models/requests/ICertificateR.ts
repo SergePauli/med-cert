@@ -8,7 +8,7 @@ import { IPatientR } from "./IPatientR"
 export interface ICertificateR {
   id?: number
   series: string
-  eff_time: Date
+  issue_date?: Date
   cert_type?: number
   death_addr_attributes?: IAddressR
   policy_OMS?: string

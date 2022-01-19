@@ -4,13 +4,11 @@ import { NA, NULL_FLAVOR_IDX, REGION_OKATO } from "../../utils/defaults"
 import { timeDiff } from "../../utils/functions"
 import { ISerializable } from "../common/ISerializabale"
 import { IAudit } from "../IAudit"
-import { IChildInfo } from "../IChildInfo"
 import { checkFieldNullFlavor, INullFlavorR } from "../INullFlavor"
 import { IAddressR } from "../requests/IAddressR"
 import { ICertificateR } from "../requests/ICertificateR"
 import { IChildInfoR } from "../requests/IChildInfoR"
 import { IDeathReasonR } from "../requests/IDeathReasonR"
-import { IAddress } from "../responses/IAddress"
 import { ICertificate } from "../responses/ICertificate"
 import { IDeathReason } from "../responses/IDeathReason"
 import Authenticator from "./Authenticator"
@@ -22,7 +20,7 @@ export default class Certificate implements ISerializable {
   private _id: number
   private _series?: string
   private _number?: string
-  private _effTime: Date
+  private _issueDate?: Date
   private _certType?: number
   private _seriesPrev?: string
   private _numberPrev?: string
@@ -63,16 +61,17 @@ export default class Certificate implements ISerializable {
   disposers: (() => void)[]
 
   constructor(props: ICertificate) {
-    this._nullFlavors =
-      props.null_flavors?.map((item) => {
+    if (props.null_flavors && props.null_flavors.length > 0)
+      this._nullFlavors = props.null_flavors.map((item) => {
         return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
-      }) || []
+      })
+    else this._nullFlavors = []
     this._oldOne = { ...props }
     this._audits = []
     this._id = props.id || -1
     this._guid = props.guid || uuidv4()
     this._patient = props.patient ? new Patient(props.patient) : new Patient()
-    this._effTime = new Date(props.eff_time) || new Date()
+    if (props.issue_date) this._issueDate = new Date(props.issue_date)
     this._certType = props.cert_type
     this._series = props.series || REGION_OKATO
     this._number = props.number
@@ -159,11 +158,11 @@ export default class Certificate implements ISerializable {
   set number(number: string | undefined) {
     this._number = number
   }
-  get effTime() {
-    return this._effTime
+  get issueDate() {
+    return this._issueDate
   }
-  set effTime(eff_time: Date) {
-    this._effTime = eff_time
+  set issueDate(issueDate: Date | undefined) {
+    this._issueDate = issueDate
   }
   get deathDatetime() {
     return this._deathDatetime
@@ -440,8 +439,9 @@ export default class Certificate implements ISerializable {
   }
 
   getAttributes(): ICertificateR {
-    let _cert = { eff_time: this._effTime, guid: this._guid } as ICertificateR
+    let _cert = { guid: this._guid } as ICertificateR
     if (this._id !== -1) _cert.id = this._id
+    if (this._issueDate) _cert.issue_date = this._issueDate
     if (this._authenticator) _cert.authenticator_attributes = this._authenticator.getAttributes()
     else if (this._oldOne && this._oldOne.authenticator)
       _cert.authenticator_attributes = { id: this._oldOne.authenticator.id, _destroy: "1" }
@@ -479,7 +479,6 @@ export default class Certificate implements ISerializable {
       else if (_temp.length > 0) _cert.death_reasons_attributes = _temp
     }
     if (this._educationLevel) _cert.education_level = this._educationLevel
-    if (this._effTime) _cert.eff_time = this._effTime
     if (this._establishedMedic) _cert.established_medic = this._establishedMedic
     if (this._extReasonDescription) _cert.ext_reason_description = this.extReasonDescription
     if (this._extReasonTime) _cert.ext_reason_time = this._extReasonTime
