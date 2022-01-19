@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx"
+import { v4 as uuidv4 } from "uuid"
 import { NULL_FLAVOR_IDX } from "../../utils/defaults"
 import { ISerializable } from "../common/ISerializabale"
 import { INullFlavorR } from "../INullFlavor"
@@ -10,7 +11,8 @@ import { IRelatedSubjectR } from "../requests/IRelatedSubjectR"
 const MATHER = 1
 
 export default class RelatedSubject implements ISerializable {
-  private _id?: string
+  private _id?: number
+  private _guid: string
   private _familyConnection: number
   private _addr?: IAddressR | undefined
   private _fio?: IPersonName | undefined
@@ -18,11 +20,12 @@ export default class RelatedSubject implements ISerializable {
   private _nullFlavors: INullFlavorR[]
 
   constructor(props: IRelatedSubject) {
+    this._guid = props.guid || uuidv4()
     this._nullFlavors =
       props.null_flavors?.map((item) => {
         return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
       }) || []
-
+    this._id = props.id
     this._familyConnection = props.family_connection || MATHER
     this._fio = props.person_name
     if (props.birthTime) this._birthTime = new Date(props.birthTime)
@@ -35,9 +38,7 @@ export default class RelatedSubject implements ISerializable {
     } as IAddressR
     makeAutoObservable(this, undefined, { deep: false })
   }
-  get id(): string | undefined {
-    return this._id
-  }
+
   get addr(): IAddressR | undefined {
     return this._addr
   }
@@ -72,11 +73,12 @@ export default class RelatedSubject implements ISerializable {
   }
 
   getAttributes(): IRelatedSubjectR {
-    let _rs = { family_connection: this._familyConnection } as IRelatedSubjectR
+    let _rs = { family_connection: this._familyConnection, guid: this._guid } as IRelatedSubjectR
     if (this._nullFlavors.length > 0) _rs.null_flavors_attributes = this.null_flavors_attributes()
     if (this._addr) _rs.addr_attributes = { ...this._addr }
     if (this._birthTime) _rs.birthTime = this._birthTime
     if (this._fio) _rs.person_name_attributes = { ...this._fio }
+    if (this._id) _rs.id = this._id
     return _rs
   }
 }
