@@ -1,14 +1,16 @@
 import { makeAutoObservable } from "mobx"
-import { INullFlavor } from "../INullFlavor"
+import { INullFlavorR } from "../INullFlavor"
 import { IDeathReason } from "../responses/IDeathReason"
 import { IDiagnosis } from "../responses/IDiagnosis"
 import { Procedure } from "./Procedure"
 import { ISerializable } from "../common/ISerializabale"
-import { IProcedure } from "../responses/IProcedure"
-
+import { v4 as uuidv4 } from "uuid"
+import { NULL_FLAVOR_IDX } from "../../utils/defaults"
+import { IDeathReasonR } from "../requests/IDeathReasonR"
+import { IProcedureR } from "../requests/IProcedureR"
 export class DeathReason implements ISerializable {
   private _oldOne: IDeathReason
-  private _id?: string
+  private _id?: number
   private _diagnosis?: IDiagnosis | undefined
   private _effectiveTime?: Date | undefined
   private _years?: number | undefined
@@ -17,21 +19,24 @@ export class DeathReason implements ISerializable {
   private _days?: number | undefined
   private _hours?: number | undefined
   private _minutes?: number | undefined
+  private _guid: string
   private _procedures: Procedure[]
-  private _nullFlavors: INullFlavor[]
+  private _nullFlavors: INullFlavorR[]
 
   constructor(props: IDeathReason) {
     this._oldOne = { ...props }
     this._id = props.id
+    this._guid = props.guid || uuidv4()
     this._diagnosis = props.diagnosis
-    this._effectiveTime = props.effective_time
-    this._procedures = props.procedures
-      ? props.procedures.map((proc) => new Procedure(proc))
-      : props.procedures_attributes?.map((proc) => new Procedure(proc)) || []
-    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
+    if (props.effective_time) this._effectiveTime = new Date(props.effective_time)
+    this._procedures = props.procedures?.map((proc) => new Procedure(proc)) || []
+    this._nullFlavors =
+      props.null_flavors?.map((item) => {
+        return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
+      }) || []
     makeAutoObservable(this, undefined, { deep: false })
   }
-  get id(): string | undefined {
+  get id(): number | undefined {
     return this._id
   }
 
@@ -89,10 +94,10 @@ export class DeathReason implements ISerializable {
   set procedures(value: Procedure[]) {
     this._procedures = value
   }
-  get nullFlavors(): INullFlavor[] {
+  get nullFlavors(): INullFlavorR[] {
     return this._nullFlavors
   }
-  set nullFlavors(value: INullFlavor[]) {
+  set nullFlavors(value: INullFlavorR[]) {
     this._nullFlavors = value
   }
 
@@ -111,8 +116,8 @@ export class DeathReason implements ISerializable {
     })
     return _result
   }
-  getAttributes(): IDeathReason {
-    let _dr = {} as IDeathReason
+  getAttributes(): IDeathReasonR {
+    let _dr = { guid: this._guid } as IDeathReasonR
     if (this._id) _dr.id = this._id
     if (this._effectiveTime) _dr.effective_time = this._effectiveTime
     if (this._diagnosis) {
@@ -122,10 +127,10 @@ export class DeathReason implements ISerializable {
     if (this._nullFlavors.length > 0) _dr.null_flavors_attributes = this.null_flavors_attributes()
     if (this._procedures.length > 0) _dr.procedures_attributes = this._procedures.map((item) => item.getAttributes())
     if (this._oldOne.procedures && this._oldOne.procedures.length > 0) {
-      let _temp = [] as IProcedure[]
+      let _temp = [] as IProcedureR[]
       this._oldOne.procedures.forEach((item) => {
         if (!_dr.procedures_attributes || _dr.procedures_attributes.findIndex((pr) => pr.id === item.id) === -1)
-          _temp.push({ id: item.id, _destroy: "1" } as IProcedure)
+          _temp.push({ id: item.id, _destroy: "1" } as IProcedureR)
       })
       if (_dr.procedures_attributes && _temp.length > 0)
         _dr.procedures_attributes = _dr.procedures_attributes.concat(_temp)

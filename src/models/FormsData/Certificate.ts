@@ -1,12 +1,14 @@
 import { autorun, makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
-import { NA } from "../../utils/defaults"
+import { NA, NULL_FLAVOR_IDX, REGION_OKATO } from "../../utils/defaults"
 import { timeDiff } from "../../utils/functions"
 import { ISerializable } from "../common/ISerializabale"
 import { IAudit } from "../IAudit"
-import { IChildInfo } from "../IChildInfo"
-import { checkFieldNullFlavor, INullFlavor } from "../INullFlavor"
-import { IAddress } from "../responses/IAddress"
+import { checkFieldNullFlavor, INullFlavorR } from "../INullFlavor"
+import { IAddressR } from "../requests/IAddressR"
+import { ICertificateR } from "../requests/ICertificateR"
+import { IChildInfoR } from "../requests/IChildInfoR"
+import { IDeathReasonR } from "../requests/IDeathReasonR"
 import { ICertificate } from "../responses/ICertificate"
 import { IDeathReason } from "../responses/IDeathReason"
 import Authenticator from "./Authenticator"
@@ -18,7 +20,7 @@ export default class Certificate implements ISerializable {
   private _id: number
   private _series?: string
   private _number?: string
-  private _effTime: Date
+  private _issueDate?: Date
   private _certType?: number
   private _seriesPrev?: string
   private _numberPrev?: string
@@ -42,8 +44,8 @@ export default class Certificate implements ISerializable {
   private _reasonD?: DeathReason
   private _deathReasons: DeathReason[]
   private _reasonACME?: DeathReason | undefined
-  private _deathAddr?: IAddress
-  private _guid: string
+  private _deathAddr?: IAddressR
+  private _guid?: string
   private _policyOMS?: string | undefined
   private _childInfo?: ChildInfo | undefined
   private _establishedMedic?: number | undefined
@@ -53,41 +55,50 @@ export default class Certificate implements ISerializable {
   private _author?: Authenticator | undefined
   private _authenticator?: Authenticator | undefined
   private _legalAuthenticator?: Authenticator | undefined
-  private _nullFlavors: INullFlavor[]
+  private _nullFlavors: INullFlavorR[]
   private _audits: IAudit[]
   private _oldOne?: ICertificate
   disposers: (() => void)[]
 
   constructor(props: ICertificate) {
-    this._nullFlavors = props.null_flavors || props.null_flavors_attributes || []
+    if (props.null_flavors && props.null_flavors.length > 0)
+      this._nullFlavors = props.null_flavors.map((item) => {
+        return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
+      })
+    else this._nullFlavors = []
     this._oldOne = { ...props }
     this._audits = []
     this._id = props.id || -1
     this._guid = props.guid || uuidv4()
     this._patient = props.patient ? new Patient(props.patient) : new Patient()
-    this._effTime = props.eff_time || new Date()
+    if (props.issue_date) this._issueDate = new Date(props.issue_date)
     this._certType = props.cert_type
-    this._series = props.series
+    this._series = props.series || REGION_OKATO
     this._number = props.number
-    this._deathDatetime = props.death_datetime
+    if (!!props.death_datetime) this._deathDatetime = new Date(props.death_datetime)
     this._deathYear = props.death_year
     this._numberPrev = props.number_prev
     this._seriesPrev = props.series_prev
     this._policyOMS = props.policy_OMS
-    this._lifeAreaType = props.lifeAreaType
-    this._deathAreaType = props.deathAreaType
-    this._deathAddr = props.death_addr || props.death_addr_attributes
+    this._lifeAreaType = props.life_area_type
+    this._deathAreaType = props.death_area_type
+    this._deathAddr = {
+      ...props.death_addr,
+      null_flavors_attributes:
+        props.death_addr?.null_flavors?.map((item) => {
+          return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
+        }) || [],
+    } as IAddressR
     this._deathPlace = props.death_place
     this._deathKind = props.death_kind
     this._educationLevel = props.education_level
     this._maritalStatus = props.marital_status
     this._socialStatus = props.social_status
     if (props.child_info) this._childInfo = new ChildInfo(props.child_info)
-    else if (props.child_info_attributes) this._childInfo = new ChildInfo(props.child_info_attributes)
     if (props.author) this._author = new Authenticator(props.author)
     if (props.authenticator) this._authenticator = new Authenticator(props.authenticator)
     if (props.legal_authenticator) this._legalAuthenticator = new Authenticator(props.legal_authenticator)
-    this._extReasonTime = props.ext_reason_time
+    if (props.ext_reason_time) this._extReasonTime = new Date(props.ext_reason_time)
     this._extReasonDescription = props.ext_reason_description
     this._establishedMedic = props.established_medic
     this._basisDetermining = props.basis_determining
@@ -102,6 +113,7 @@ export default class Certificate implements ISerializable {
       this._reasonACME = this._reasonD
 
     if (props.a_reason) this._reasonA = this.createDeathReason(props.a_reason)
+    else this._reasonA = this.createDeathReason({} as IDeathReason)
     if (props.b_reason) this._reasonB = this.createDeathReason(props.b_reason)
     if (props.c_reason) this._reasonC = this.createDeathReason(props.c_reason)
     if (props.d_reason) this._reasonD = this.createDeathReason(props.d_reason)
@@ -118,7 +130,7 @@ export default class Certificate implements ISerializable {
     return this._nullFlavors
   }
 
-  set nullFlavors(nullFlavors: INullFlavor[]) {
+  set nullFlavors(nullFlavors: INullFlavorR[]) {
     this._nullFlavors = nullFlavors
   }
 
@@ -146,11 +158,11 @@ export default class Certificate implements ISerializable {
   set number(number: string | undefined) {
     this._number = number
   }
-  get effTime() {
-    return this._effTime
+  get issueDate() {
+    return this._issueDate
   }
-  set effTime(eff_time: Date) {
-    this._effTime = eff_time
+  set issueDate(issueDate: Date | undefined) {
+    this._issueDate = issueDate
   }
   get deathDatetime() {
     return this._deathDatetime
@@ -269,7 +281,7 @@ export default class Certificate implements ISerializable {
   get deathAddr() {
     return this._deathAddr
   }
-  set deathAddr(value: IAddress | undefined) {
+  set deathAddr(value: IAddressR | undefined) {
     this._deathAddr = value
   }
   get deathKind(): number | undefined {
@@ -401,8 +413,8 @@ export default class Certificate implements ISerializable {
     }
   }
   createDeathReason(props: IDeathReason): DeathReason {
-    const newReason = new DeathReason({ ...props, certificate_id: this._id } as IDeathReason)
-    if (newReason.effectiveTime && this._deathDatetime !== undefined) {
+    const newReason = new DeathReason(props)
+    if (newReason.effectiveTime && !!this._deathDatetime) {
       const diff = timeDiff(newReason.effectiveTime, this._deathDatetime)
       if (diff.days && diff.days > 0) newReason.days = diff.days
       if (diff.hours) newReason.hours = diff.hours
@@ -426,9 +438,10 @@ export default class Certificate implements ISerializable {
     return true
   }
 
-  getAttributes(): ICertificate {
-    let _cert = { eff_time: this._effTime, guid: this.guid } as ICertificate
+  getAttributes(): ICertificateR {
+    let _cert = { guid: this._guid } as ICertificateR
     if (this._id !== -1) _cert.id = this._id
+    if (this._issueDate) _cert.issue_date = this._issueDate
     if (this._authenticator) _cert.authenticator_attributes = this._authenticator.getAttributes()
     else if (this._oldOne && this._oldOne.authenticator)
       _cert.authenticator_attributes = { id: this._oldOne.authenticator.id, _destroy: "1" }
@@ -441,11 +454,11 @@ export default class Certificate implements ISerializable {
     if (this._basisDetermining) _cert.basis_determining = this._basisDetermining
     if (this._certType) _cert.cert_type = this._certType
     if (this._childInfo) _cert.child_info_attributes = this._childInfo.getAttributes()
-    else if (this._oldOne && this._oldOne.child_info) _cert.child_info_attributes = { _destroy: "1" } as IChildInfo
-    if (this._deathAddr) _cert.death_addr_attributes = { ...this._deathAddr } as IAddress
+    else if (this._oldOne && this._oldOne.child_info) _cert.child_info_attributes = { _destroy: "1" } as IChildInfoR
+    if (this._deathAddr) _cert.death_addr_attributes = { ...this._deathAddr } as IAddressR
     else if (this._oldOne && this._oldOne.death_addr)
-      _cert.death_addr_attributes = { id: this._oldOne.death_addr.id, _destroy: "1" } as IAddress
-    if (this._deathAreaType) _cert.deathAreaType = this._deathAreaType
+      _cert.death_addr_attributes = { id: this._oldOne.death_addr.id, _destroy: "1" } as IAddressR
+    if (this._deathAreaType) _cert.death_area_type = this._deathAreaType
     if (this._deathDatetime) _cert.death_datetime = this._deathDatetime
     if (this._deathYear) _cert.death_year = this._deathYear
     if (this._deathKind) _cert.death_kind = this._deathKind
@@ -453,49 +466,45 @@ export default class Certificate implements ISerializable {
     if (this._deathReasons.length > 0)
       _cert.death_reasons_attributes = this._deathReasons.map((item) => item.getAttributes())
     if (this._oldOne?.death_reasons && this._oldOne.death_reasons.length > 0) {
-      let _temp = [] as IDeathReason[]
+      let _temp = [] as IDeathReasonR[]
       this._oldOne.death_reasons.forEach((item) => {
         if (
           !_cert.death_reasons_attributes ||
           _cert.death_reasons_attributes.findIndex((el) => el.id === item.id) === -1
         )
-          _temp.push({ id: item.id, _destroy: "1" } as IDeathReason)
+          _temp.push({ id: item.id, _destroy: "1" } as IDeathReasonR)
       })
       if (_cert.death_reasons_attributes && _temp.length > 0)
         _cert.death_reasons_attributes = _cert.death_reasons_attributes.concat(_temp)
       else if (_temp.length > 0) _cert.death_reasons_attributes = _temp
     }
     if (this._educationLevel) _cert.education_level = this._educationLevel
-    if (this._effTime) _cert.eff_time = this._effTime
-    if (this._effTimePrev) _cert.eff_time_prev = this._effTimePrev
     if (this._establishedMedic) _cert.established_medic = this._establishedMedic
     if (this._extReasonDescription) _cert.ext_reason_description = this.extReasonDescription
     if (this._extReasonTime) _cert.ext_reason_time = this._extReasonTime
-    if (this._lifeAreaType) _cert.lifeAreaType = this._lifeAreaType
+    if (this._lifeAreaType) _cert.life_area_type = this._lifeAreaType
     if (this._policyOMS) _cert.policy_OMS = this._policyOMS
     if (this._pregnancyConnection) _cert.pregnancy_connection = this.pregnancyConnection
     if (this._maritalStatus) _cert.marital_status = this._maritalStatus
     if (this.nullFlavors.length > 0) _cert.null_flavors_attributes = this.null_flavors_attributes()
-    if (this._number) _cert.number = this._number
-    if (this._numberPrev) _cert.number_prev = this._numberPrev
-    if (this._reasonA) _cert.a_reason = this._reasonA.getAttributes()
+    if (this._reasonA) _cert.a_reason_attributes = this._reasonA.getAttributes()
     else if (this._oldOne && this._oldOne.a_reason)
-      _cert.a_reason_attributes = { id: this._oldOne.a_reason.id, _destroy: "1" } as IDeathReason
+      _cert.a_reason_attributes = { id: this._oldOne.a_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._reasonACME) _cert.reason_ACME = this._reasonACME.diagnosis?.ICD10
     if (this._reasonB) _cert.b_reason_attributes = this._reasonB.getAttributes()
     else if (this._oldOne && this._oldOne.b_reason)
-      _cert.b_reason_attributes = { id: this._oldOne.b_reason.id, _destroy: "1" } as IDeathReason
-    if (this._reasonC) _cert.c_reason = this._reasonC.getAttributes()
+      _cert.b_reason_attributes = { id: this._oldOne.b_reason.id, _destroy: "1" } as IDeathReasonR
+    if (this._reasonC) _cert.c_reason_attributes = this._reasonC.getAttributes()
     else if (this._oldOne && this._oldOne.c_reason)
-      _cert.c_reason_attributes = { id: this._oldOne.c_reason.id, _destroy: "1" } as IDeathReason
-    if (this._reasonD) _cert.d_reason = this._reasonD.getAttributes()
+      _cert.c_reason_attributes = { id: this._oldOne.c_reason.id, _destroy: "1" } as IDeathReasonR
+    if (this._reasonD) _cert.d_reason_attributes = this._reasonD.getAttributes()
     else if (this._oldOne && this._oldOne.d_reason)
-      _cert.d_reason_attributes = { id: this._oldOne.d_reason.id, _destroy: "1" } as IDeathReason
+      _cert.d_reason_attributes = { id: this._oldOne.d_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._series) _cert.series = this._series
-    if (this._seriesPrev) _cert.series_prev = this._seriesPrev
     if (this._socialStatus) _cert.social_status = this._socialStatus
     if (this._trafficAccident) _cert.traffic_accident = this._trafficAccident
     if (this._patient) _cert.patient_attributes = this._patient.getAttributes()
+    if (_cert.patient_attributes) _cert.custodian_id = _cert.patient_attributes.organization_id
     return _cert
   }
 

@@ -22,8 +22,8 @@ import { Dropdown } from 'primereact/dropdown'
 import { IReferenceId } from '../models/IReference'
 import AddressDialog from '../components/dialogs/AddressDialog'
 import { observer } from 'mobx-react-lite'
-import { IAddress } from '../models/responses/IAddress'
 import AddressFC2 from '../components/inputs/InputAddress'
+import { IAddressR } from '../models/requests/IAddressR'
 
 // страница настроек профиля организации
 // Organization profile page
@@ -278,7 +278,7 @@ const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>{
           <AddressFC2 className="p-col-12" submitted={submitted} 
             label='Адрес медорганизации'
             value={organization.address} strictly 
-            onClear={(value: IAddress)=>setOrganization({...organization, address: {...value}})}
+            onClear={(value: IAddressR)=>setOrganization({...organization, address: {...value}})}
             onChange={()=>{        
               let _organization = {...organization, address: addressStore.addressProps()}                
               changesAudit("Адрес", "address", organization.address?.streetAddressLine || '', _organization.address?.streetAddressLine || '')                 

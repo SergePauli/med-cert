@@ -5,13 +5,13 @@ import { classNames } from 'primereact/utils'
 import { FC, useContext, useEffect } from 'react'
 import { Context } from '../..'
 import Address from '../../models/FormsData/Address'
-import { DEFAULT_ADDRESS, IAddress } from '../../models/responses/IAddress'
+import { DEFAULT_ADDRESS, IAddressR } from '../../models/requests/IAddressR'
 
 
 type InputAddressProps = { 
   submitted: boolean // is it form submitted already
-  value: IAddress // object, containing address
-  onClear: (value: IAddress)=>void // setter to state value in the form>
+  value: IAddressR // object, containing address
+  onClear: (value: IAddressR)=>void // setter to state value in the form>
   onChange: ()=>void // setter to state new value from dialog to form 
   label?: string
   strictly?: boolean // if address need to be all from FIAS
@@ -25,7 +25,7 @@ const InputAddress: FC<InputAddressProps> = (props: InputAddressProps) =>{
   const {addressStore} = useContext(Context)
 
   const invalid = props.strictly ? !value || !value.houseGUID
-     : !value || value.streetAddressLine.split(',').length < 3
+     : !value || (value.streetAddressLine && value.streetAddressLine.split(',').length < 3)
   
   const bt_id = `bt_addr_${props.id}`   
   
@@ -53,8 +53,7 @@ const InputAddress: FC<InputAddressProps> = (props: InputAddressProps) =>{
         let _addr = DEFAULT_ADDRESS
         if (value.id) _addr.id = value.id
         if (value.parent_guid) _addr.parent_guid = value.parent_guid
-        if (value.null_flavors) _addr.null_flavors = value.null_flavors
-        if (value.null_flavors_attributes) _addr.null_flavors = value.null_flavors_attributes
+        if (value.null_flavors_attributes) _addr.null_flavors_attributes = value.null_flavors_attributes       
         props.onClear(_addr)
         addressStore.address = new Address(_addr)}}
       />

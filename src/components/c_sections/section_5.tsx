@@ -16,7 +16,7 @@ import { DEAD_PLACE_TYPES } from '../../NSI/1.2.643.5.1.13.13.99.2.20'
 import { MARITAL_STATUSES } from '../../NSI/1.2.643.5.1.13.13.99.2.15'
 import { EDUCATION_LEVELS } from '../../NSI/1.2.643.5.1.13.13.99.2.16'
 import { SOCIAL_STATUSES } from '../../NSI/1.2.643.5.1.13.13.11.1038'
-import { checkFieldNullFlavor, INullFlavor } from '../../models/INullFlavor'
+import { checkFieldNullFlavor, INullFlavorR } from '../../models/INullFlavor'
 import { TERMS_PREGNANCY } from '../../NSI/1.2.643.5.1.13.13.99.2.18'
 import { ChildInfo } from '../../models/FormsData/ChildInfo'
 import { MotherInfo } from '../MotherInfo'
@@ -77,7 +77,7 @@ import { MotherInfo } from '../MotherInfo'
               <div className="p-paragraph-field p-mr-2 p-mb-2" style={{width: '90%'}}>
                 <NullFlavorWrapper  checked={isMonthChild}  key={`MonthChild_${isMonthChild}`} 
                   disabled
-                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                             if (nullFlavors && certificate.childInfo) certificate.childInfo.nullFlavors = nullFlavors                  
                             if (!e.checked)  certificate.childInfo = undefined                              
                             }}            
@@ -101,7 +101,7 @@ import { MotherInfo } from '../MotherInfo'
               <div className="p-paragraph-field p-mr-2 p-mb-2" style={{width: '90%'}}>
                 <NullFlavorWrapper  checked={isChildInfo}  key={`YearChild_${isChildInfo}`} 
                   disabled
-                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                             if (nullFlavors) certificate.nullFlavors = nullFlavors                  
                               certificate.maritalStatus = undefined
                             }}            

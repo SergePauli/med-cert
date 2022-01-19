@@ -20,12 +20,7 @@ export const ROLES: IObjectKeys = {
   ADMIN: "АДМИНИСТРАТОР",
   STATS: "СТАТИСТИК",
 }
-export const CERT_TYPE = [
-  { code: "1", name: "окончательное" },
-  { code: "2", name: "предварительное" },
-  { code: "3", name: "взамен предварительного" },
-  { code: "4", name: "взамен окончательного" },
-]
+
 // маркер удаления для использования в запросах на обновление
 // destroy-marker for using in nested_attributes
 export const DESTROY_OPTION = { _destroy: "1" }

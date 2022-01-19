@@ -4,15 +4,15 @@ import { Card } from "primereact/card"
 import { CheckboxChangeParams } from "primereact/checkbox"
 import { FC, useContext, useState} from "react"
 import { Context } from "../.."
-import { INullFlavor } from "../../models/INullFlavor"
 import { IReference } from "../../models/IReference"
-import { DEFAULT_ADDRESS, IAddress } from "../../models/responses/IAddress"
 import { ASKU, NULL_FLAVORS, UNK } from "../../utils/defaults"
 import { removeEmpty } from "../../utils/functions"
 import AddressDialog from "../dialogs/AddressDialog"
 import AddressFC2 from "../inputs/InputAddress"
 import { AreaType } from "../inputs/AreaType"
 import NullFlavorWrapper from "../NullFlavorWrapper"
+import { INullFlavorR } from "../../models/INullFlavor"
+import { DEFAULT_ADDRESS, IAddressR } from "../../models/requests/IAddressR"
 
 const Section3: FC = () => {
   const { addressStore, certificateStore } = useContext(Context)
@@ -38,11 +38,11 @@ const Section3: FC = () => {
     else {
       _lifeAddr.id = undefined
       _lifeAddr.parent_guid = undefined
-      _lifeAddr = removeEmpty(_lifeAddr) as IAddress
-      let _deathAddr = {} as IAddress
+      _lifeAddr = removeEmpty(_lifeAddr) as IAddressR
+      let _deathAddr = {} as IAddressR
       if (certificate.deathAddr?.id) _deathAddr.id = certificate.deathAddr?.id
       if (certificate.deathAddr?.parent_guid) _deathAddr.parent_guid = certificate.deathAddr?.parent_guid
-      certificate.deathAddr = {..._lifeAddr,...certificate.deathAddr}               
+      certificate.deathAddr = {..._lifeAddr,...certificate.deathAddr} as IAddressR              
     }    
     setAddressDeath(certificate.deathAddr)
   }
@@ -55,20 +55,19 @@ const Section3: FC = () => {
             <NullFlavorWrapper paraNum                     
               label={<label htmlFor="addr">Место постоянного жительства(регистрации)</label>}
               checked={identified || checkedLifeArea}  
-              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                 if (nullFlavors) patient.person.nullFlavors = nullFlavors
                 if (!e.checked) patient.person.address = undefined                
               }}               
               field={<AddressFC2  submitted={submitted} 
                       id='person_addr'            
                       value={addressLife || DEFAULT_ADDRESS} 
-                      onClear={(value: IAddress)=>{                                               
+                      onClear={(value: IAddressR)=>{                                               
                         patient.person.address = value
                         setAddressLife(patient.person.address)
                       }}
                       onChange={()=>{
-                        patient.person.address = addressStore.addressProps()
-                        console.log('patient.person.address', patient.person.address)
+                        patient.person.address = addressStore.addressProps()                        
                         setAddressLife(patient.person.address)
                       }}  
                     />}
@@ -84,11 +83,11 @@ const Section3: FC = () => {
           <div className='p-paragraph-field'>
             <NullFlavorWrapper                     
               label={<label htmlFor="urban">Местность</label>}
-              checked={identified || !!certificate.lifeAreaType}  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+              checked={identified || !!certificate.lifeAreaType}  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                 if (nullFlavors) certificate.nullFlavors = nullFlavors
                 if (!e.checked) certificate.lifeAreaType = undefined                
               }} 
-              onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
+              onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
               field={<AreaType value={certificate.lifeAreaType} onChange={(value: number | undefined)=>{
                 certificate.lifeAreaType = value                
               }}/>}
@@ -105,14 +104,14 @@ const Section3: FC = () => {
             <NullFlavorWrapper paraNum                     
               label={<label htmlFor="death_addr">Адрес места смерти</label>}
               checked={identified || checkedDeathArea}  
-              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                 if (nullFlavors) certificate.nullFlavors = nullFlavors
                 if (!e.checked) certificate.deathAddr = undefined                
               }}               
               field={<AddressFC2  submitted={submitted} 
                       id='death_addr'            
                       value={addressDeath || DEFAULT_ADDRESS} 
-                      onClear={(value: IAddress)=>{                                               
+                      onClear={(value: IAddressR)=>{                                               
                         certificate.deathAddr = value 
                         setAddressDeath(certificate.deathAddr)                       
                       }}
@@ -134,11 +133,11 @@ const Section3: FC = () => {
             <NullFlavorWrapper                     
               label={<label htmlFor="urban">Местность</label>}
               checked={identified || certificate.deathAddr!==undefined}  
-              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+              setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                 if (nullFlavors) certificate.nullFlavors = nullFlavors
                 if (!e.checked) certificate.deathAreaType = undefined
               }} 
-              onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
+              onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
               field={<AreaType value={certificate.deathAreaType} onChange={(value: number | undefined)=>{
                 certificate.deathAreaType = value
               }}/>}

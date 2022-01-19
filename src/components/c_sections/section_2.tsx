@@ -11,7 +11,7 @@ import NullFlavorWrapper from '../NullFlavorWrapper'
 import { ASKU, ID_CARD_TYPES, NA, NULL_FLAVORS, PASSPORT_RF, UNK } from '../../utils/defaults'
 import { IReference } from '../../models/IReference'
 import { Calendar } from 'primereact/calendar'
-import { INullFlavor } from '../../models/INullFlavor'
+import { checkFieldNullFlavor, INullFlavorR } from '../../models/INullFlavor'
 import { Dropdown } from 'primereact/dropdown'
 import { InputMask, InputMaskProps } from 'primereact/inputmask'
 import { InputTextarea } from 'primereact/inputtextarea'
@@ -19,13 +19,13 @@ import Identity from '../../models/FormsData/Identity'
 import IIdentity from '../../models/IIdentity'
 
 
+
  const Section2: FC = () => {
   const { certificateStore } = useContext(Context)   
   const identified = certificateStore.identified  
   const header = () => {
       return <span>Документы умершего</span>
-    }
-    
+    }    
   const certificate = certificateStore.cert   
   const patient = certificate.patient
   const identity = patient.identity 
@@ -53,9 +53,10 @@ import IIdentity from '../../models/IIdentity'
               <div className='p-paragraph-field p-mr-2 p-mb-2'>
                 <NullFlavorWrapper 
                   disabled={!identified} paraNum                              
-                  checked={docChecked} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
-                    { if (e.checked) {patient.identity = new Identity({
-                        identityCardType: ID_CARD_TYPES[PASSPORT_RF].code,                                  
+                  checked={docChecked} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>
+                    { if (e.checked) {
+                      patient.identity = new Identity({
+                        identity_card_type_id: ID_CARD_TYPES[PASSPORT_RF].code,                                  
                           } as IIdentity)
                         if (!identified) certificateStore.identified = true
                       } else patient.identity = undefined 
@@ -69,6 +70,10 @@ import IIdentity from '../../models/IIdentity'
                   autoFocus options={ID_CARD_TYPES} optionLabel='name'
                   onChange={(e)=>{
                     if (identity) identity.identityCardType = e.value.code
+                    else {
+                      patient.identity = new Identity({identity_card_type_id: e.value.code} as IIdentity)
+                      checkFieldNullFlavor("identity",patient.identity,patient.nullFlavors)
+                    }  
                     setDulValue(ID_CARD_TYPES.find((item)=>item.code === e.value.code))
                   }}
                   />}                  
@@ -80,8 +85,9 @@ import IIdentity from '../../models/IIdentity'
                 style={{marginLeft:'1.5rem'}}>
                 <NullFlavorWrapper                   
                   label={<label htmlFor="series">Серия</label>}
-                  checked={docChecked && patient.identity?.nullFlavors.findIndex(nf=>nf.parent_attr==='series')===-1} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                    if (patient.identity) patient.identity.nullFlavors = nullFlavors || []                   
+                  checked={docChecked && patient.identity?.nullFlavors.findIndex(nf=>nf.parent_attr==='series')===-1} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
+                    if (e.checked && patient.identity) patient.identity.series = ''
+                    else if (patient.identity) patient.identity.series = undefined                                    
                   }}                 
                   field={seriesField}
                   field_name='series'
@@ -133,8 +139,10 @@ import IIdentity from '../../models/IIdentity'
               <div className="p-paragraph-field p-mr-2 p-mb-2" key={`code_${docChecked}`} style={{marginLeft:'1.5rem'}}> 
                 <NullFlavorWrapper                   
                   label={<label htmlFor="depCode">Код подразделения</label>}
-                  checked={docChecked && patient.identity?.nullFlavors.findIndex(nf=>nf.parent_attr==='issueOrgCode')===-1} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
-                    if (patient.identity) patient.identity.nullFlavors = nullFlavors || []                   
+                  checked={docChecked && patient.identity?.nullFlavors.findIndex(nf=>nf.parent_attr==='issueOrgCode')===-1} 
+                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
+                    if (e.checked && patient.identity) patient.identity.issueOrgCode = ''
+                    else if (patient.identity) patient.identity.issueOrgCode = undefined               
                   }}                   
                   field={depCodeField}
                   options={identified ? [NULL_FLAVORS[NA]] : [NULL_FLAVORS[ASKU]]}
@@ -150,11 +158,11 @@ import IIdentity from '../../models/IIdentity'
               <div className='p-paragraph-field'>                    
                 <NullFlavorWrapper paraNum                    
                     label={<label htmlFor="snils">СНИЛС</label>}
-                    checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+                    checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                       if (nullFlavors) person.nullFlavors = nullFlavors
                       if (!e.checked) person.SNILS = undefined                      
                     }} 
-                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) person.nullFlavors = nullFlavors}}
+                    onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) person.nullFlavors = nullFlavors}}
                     field={<InputMask id="snils"  
                       type="text" mask="999-999-999 99"
                       value={person.SNILS} 
@@ -172,11 +180,11 @@ import IIdentity from '../../models/IIdentity'
               <div className='p-paragraph-field p-mr-3 p-mb-2'>
                 <NullFlavorWrapper  paraNum                   
                     label={<label htmlFor="policyOMS">Серия и номер полиса ОМС</label>}
-                    checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{
+                    checked={identified} setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                       if (nullFlavors) certificate.nullFlavors = nullFlavors
                       if (!e.checked) certificate.policyOMS = undefined                      
                     }} 
-                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
+                    onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
                     field={<InputText id="policyOMS"  
                       type="text" 
                       value={certificate.policyOMS} 

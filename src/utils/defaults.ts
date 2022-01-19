@@ -337,6 +337,43 @@ export const NULL_FLAVORS = [
   { code: "QS", name: "Достаточное количество" },
   { code: "TRC", name: "Трудноразличимо" },
 ]
+export type NULL_FLAVOR_CODES =
+  | "NI"
+  | "INV"
+  | "DER"
+  | "OTH"
+  | "NINF"
+  | "PINF"
+  | "UNC"
+  | "MSK"
+  | "NA"
+  | "UNK"
+  | "ASKU"
+  | "NAV"
+  | "NASK"
+  | "QS"
+  | "TRC"
+
+export type INullFlavorIdx = {
+  [index in NULL_FLAVOR_CODES]: number
+}
+export const NULL_FLAVOR_IDX: INullFlavorIdx = {
+  NI: 0,
+  INV: 1,
+  DER: 2,
+  OTH: 3,
+  NINF: 4,
+  PINF: 5,
+  UNC: 6,
+  MSK: 7,
+  NA: 8,
+  UNK: 9,
+  ASKU: 10,
+  NAV: 11,
+  NASK: 12,
+  QS: 13,
+  TRC: 14,
+}
 export const ASKU = 10
 export const NA = 8
 export const UNK = 9
@@ -349,22 +386,23 @@ export const URBAN_AREA_TYPE = 1
 export const VILAGE_AREA_TYPE = 2
 
 export const ID_CARD_TYPES = [
-  { code: "1", name: "Паспорт гр. РФ", s_mask: "99 99", n_mask: "999999", c_mask: "999-999" },
-  { code: "2", name: "Заграничный паспорт гр. РФ", s_mask: "99", n_mask: "9999999", c_mask: "ФМС 99999" },
-  { code: "3", name: "Служебный паспорт" },
-  { code: "4", name: "Врем. уд. личности(форма № 2П)" },
-  { code: "6", name: "Свидетельство о рождении" },
-  { code: "8", name: "Удостоверение личности военнослужащего" },
-  { code: "9", name: "Военный билет" },
-  { code: "10", name: "Паспорт иностранного гражданина" },
-  { code: "11", name: "Вид на жительство" },
-  { code: "17", name: "Разрешение на временное проживание в РФ" },
-  { code: "25", name: "Справка об освобождении из места лишения свободы" },
-  { code: "36", name: "Водительское удостоверение" },
-  { code: "38", name: "Охотничий билет" },
+  { code: 1, name: "Паспорт гр. РФ", s_mask: "99 99", n_mask: "999999", c_mask: "999-999" },
+  { code: 2, name: "Заграничный паспорт гр. РФ", s_mask: "99", n_mask: "9999999", c_mask: "ФМС 99999" },
+  { code: 3, name: "Служебный паспорт" },
+  { code: 4, name: "Врем. уд. личности(форма № 2П)" },
+  { code: 6, name: "Свидетельство о рождении", n_mask: "999999" },
+  { code: 8, name: "Удостоверение личности военнослужащего" },
+  { code: 9, name: "Военный билет" },
+  { code: 10, name: "Паспорт иностранного гражданина" },
+  { code: 11, name: "Вид на жительство" },
+  { code: 17, name: "Разрешение на временное проживание в РФ" },
+  { code: 25, name: "Справка об освобождении из места лишения свободы" },
+  { code: 36, name: "Водительское удостоверение" },
+  { code: 38, name: "Охотничий билет" },
 ]
 export const PASSPORT_RF = 0
 export const REGION = { code: "28", name: "Амурская область" }
+export const REGION_OKATO = "10"
 export const DEFAULT_ERROR_TOAST = {
   severity: "error",
   summary: "Сбой",

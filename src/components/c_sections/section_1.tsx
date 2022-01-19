@@ -12,7 +12,7 @@ import NullFlavorWrapper from '../NullFlavorWrapper'
 import { ASKU, FEMALE, ID_CARD_TYPES, MALE, NA, NOGENDER, NULL_FLAVORS, PASSPORT_RF, UNK } from '../../utils/defaults'
 import { IReference } from '../../models/IReference'
 import { Calendar } from 'primereact/calendar'
-import { INullFlavor } from '../../models/INullFlavor'
+import { INullFlavorR } from '../../models/INullFlavor'
 import { IPersonName } from '../../models/IPersonName'
 import IIdentity from '../../models/IIdentity'
 import Identity from '../../models/FormsData/Identity'
@@ -23,8 +23,8 @@ import Identity from '../../models/FormsData/Identity'
   const certificate = certificateStore.cert   
   const patient = certificate.patient
   const person =  patient.person     
-  const [yearBTChecked, setYearBTChecked] = useState<boolean>(patient.birth_year!==undefined)   
-  const [yearDTChecked, setYearDTChecked] = useState<boolean>(certificate.deathYear!==undefined) 
+  const [yearBTChecked, setYearBTChecked] = useState<boolean>(!!patient.birth_year)   
+  const [yearDTChecked, setYearDTChecked] = useState<boolean>(!!certificate.deathYear) 
    
   const fioChecked = true
   const header = () => {
@@ -65,7 +65,7 @@ import Identity from '../../models/FormsData/Identity'
                   patient.identity = undefined  
                   patient.nullFlavors.push({parent_attr:'identity', code:ASKU})                 
                 } else 
-                  patient.identity = new Identity({identityCardType: ID_CARD_TYPES[PASSPORT_RF].code} as IIdentity)                
+                  patient.identity = new Identity({identity_card_type_id: ID_CARD_TYPES[PASSPORT_RF].code} as IIdentity)                
                 }}/>
               <label htmlFor="fromRelatives">Внесено со слов родственников</label>
             </div>
@@ -77,11 +77,11 @@ import Identity from '../../models/FormsData/Identity'
                   disabled={!certificateStore.fromRelatives}               
                   checked={identified} 
                   paraNum
-                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>
+                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>
                     { 
                       if (e.checked)  person.fio = fio
                       else person.fio = undefined 
-                      if (nullFlavors) person.nullFlavors = nullFlavors
+                      //if (nullFlavors) person.nullFlavors = nullFlavors
                     }}                 
                   label={<label htmlFor="family">Фамилия</label>}
                   field={<InputText  id="family" value={fio.family} 
@@ -178,17 +178,17 @@ import Identity from '../../models/FormsData/Identity'
                 <NullFlavorWrapper paraNum
                     disabled={certificateStore.identified}                    
                     label={<label htmlFor="dateBirth">Дата рождения</label>}
-                    checked={certificateStore.identified || yearBTChecked } setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{                      
+                    checked={certificateStore.identified || yearBTChecked } setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{                      
                       if (!e.checked) {                        
                         patient.birth_date = undefined
                         patient.birth_year = undefined 
                       } 
                       if (nullFlavors) patient.nullFlavors = nullFlavors 
                     }} 
-                    onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) patient.nullFlavors = nullFlavors}}
+                    onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) patient.nullFlavors = nullFlavors}}
                     field={<div className="p-d-flex p-jc-start p-ai-center">              
                       <Calendar id="dateBirth" className="p-mr-2" 
-                        view={yearBTChecked ? "month" : "date"} dateFormat={yearBTChecked ? "yy" : "dd/mm/yy"}                          
+                        view={yearBTChecked ? "month" : "date"} dateFormat={yearBTChecked ? "yy" : "dd.mm.yy"}                          
                         value={patient.birth_date} 
                         onChange={(e)=>patient.setBirthDay(e.target.value as Date | undefined, yearBTChecked)                          
                         }
@@ -214,15 +214,15 @@ import Identity from '../../models/FormsData/Identity'
               <div className='p-paragraph-field p-mr-3 p-mb-2'>
                 <NullFlavorWrapper paraNum                   
                   label={<label htmlFor="dateDeath">Дата смерти</label>}                  
-                  checked={certificate.deathDatetime!==undefined} setCheck={(e:CheckboxChangeParams, nullFlavors:      INullFlavor[] | undefined)=>{                   
+                  checked={certificate.deathDatetime!==undefined} setCheck={(e:CheckboxChangeParams, nullFlavors:      INullFlavorR[] | undefined)=>{                   
                     if (!e.checked) certificate.setDeathDay(undefined, false)                      
                     else certificate.setDeathDay(new Date(), false)                         
                     if (nullFlavors) certificate.nullFlavors = nullFlavors  
                   }} 
-                  onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
+                  onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
                   field={<div className="p-d-flex p-jc-start p-ai-center">              
                       <Calendar id="dateDeath" className="p-mr-2" 
-                        view={yearDTChecked ? "month" : "date"} dateFormat={yearDTChecked ? "yy" : "dd/mm/yy"} 
+                        view={yearDTChecked ? "month" : "date"} dateFormat={yearDTChecked ? "yy" : "dd.mm.yy"} 
                         value={certificate.deathDatetime}
                         onChange={(e)=>certificate.setDeathDay(e.target.value as Date | undefined, yearDTChecked) 
                         } 
@@ -246,10 +246,10 @@ import Identity from '../../models/FormsData/Identity'
                   disabled={yearDTChecked}                   
                   label={<label htmlFor="timeDeath">Время смерти</label>}
                   checked={isDeathTime && !yearDTChecked} 
-                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavor[] | undefined)=>{                   
+                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{                   
                     if (nullFlavors) certificate.nullFlavors = nullFlavors  
                   }}
-                  onChange={(e:IReference,  nullFlavors: INullFlavor[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}} 
+                  onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}} 
                   field={ <Calendar id="timeDeath"  
                     timeOnly hourFormat="24"             
                     value={certificate.deathDatetime} 

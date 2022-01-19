@@ -1,8 +1,6 @@
-import { HOME_REGION_CODE } from "../../utils/defaults"
-import { IDestroyble } from "../IDestroyble"
 import { INullFlavorable } from "../INullFlavorable"
 
-export interface IAddress extends INullFlavorable, IDestroyble {
+export interface IAddress extends INullFlavorable {
   id?: string
   state: string
   streetAddressLine: string
@@ -17,4 +15,3 @@ export interface IAddress extends INullFlavorable, IDestroyble {
   building_number?: string
   flat_number?: string
 }
-export const DEFAULT_ADDRESS = { state: HOME_REGION_CODE, streetAddressLine: "" } as IAddress

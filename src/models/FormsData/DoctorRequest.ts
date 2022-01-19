@@ -1,6 +1,7 @@
 import { removeEmpty } from "../../utils/functions"
 import { IAudit } from "../IAudit"
 import { IDoctor } from "../IDoctor"
+import Doctor from "./Doctor"
 
 //генерит API запрос на добавление врача
 export const genCreateDoctorRequest = (doctor: IDoctor) => {
@@ -36,7 +37,7 @@ export const DOCTOR_RENDER_OPTIONS = {
 }
 
 //генерит API запрос на обновление врача
-export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: IDoctor) => {
+export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: Doctor) => {
   if (oldValue.id !== newValue.id) return false
   let _request = { Doctor: {}, audits: [] as IAudit[] } as any
   const createAudit = (audit: IAudit) => {
@@ -69,7 +70,7 @@ export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: IDoctor) => 
   }
   let _person_name_attributes = {} as any
   const oldFIO = oldPerson?.person_name
-  const newFIO = newValue.person?.person_name
+  const newFIO = newValue.person?.fio
   if (!!oldFIO && !!newFIO) {
     if (oldFIO.family !== newFIO.family) {
       _person_name_attributes.family = newFIO.family
@@ -100,8 +101,8 @@ export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: IDoctor) => 
     }
   }
   if (Object.keys(_person_name_attributes).length > 0)
-    if (newValue.person.person_name)
-      _person_attributes.person_name_attributes = { id: newValue.person.person_name.id, ..._person_name_attributes }
+    if (newValue.person.fio)
+      _person_attributes.person_name_attributes = { id: newValue.person.fio.id, ..._person_name_attributes }
   const oldAddress = oldPerson.address?.streetAddressLine
   const newAddress = newPerson.address?.streetAddressLine
   if (oldAddress !== newAddress) {
@@ -127,11 +128,11 @@ export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: IDoctor) => 
   const oldNullFlavors = oldPerson.null_flavors
     ?.reduce<string>((u, item) => `${u} ${item.parent_attr}${item.code}`, "")
     .trim()
-  const newNullFlavors = newPerson.null_flavors
+  const newNullFlavors = newPerson.nullFlavors
     ?.reduce<string>((u, item) => `${u} ${item.parent_attr}${item.code}`, "")
     .trim()
   if (oldNullFlavors !== newNullFlavors) {
-    _person_attributes.contacts = newPerson.null_flavors
+    _person_attributes.null_flavor_attributes = newPerson.null_flavors_attributes()
     createAudit({
       field: "person.nullFlavors",
       before: oldNullFlavors,

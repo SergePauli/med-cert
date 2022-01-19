@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx"
 import { DATE_FORMAT, TIME_FORMAT } from "../../utils/consts"
 import { ISerializable } from "../common/ISerializabale"
+import { IProcedureR } from "../requests/IProcedureR"
 import { IMedicalServs } from "../responses/IMedservs"
 import { IProcedure } from "../responses/IProcedure"
 
@@ -13,19 +14,15 @@ export class Procedure implements ISerializable {
     this._id = props.id
     this._medicalServ = props.medical_serv
     this._textValue = props.text_value
-    this._effectiveTime = props.effective_time
-    makeAutoObservable(this)
+    if (props.effective_time) this._effectiveTime = new Date(props.effective_time)
+    makeAutoObservable(this, undefined, { deep: false })
   }
-  getAttributes(): IProcedure {
-    let _pr = {} as IProcedure
+  getAttributes(): IProcedureR {
+    let _pr = {} as IProcedureR
     if (this._id) _pr.id = this._id
     if (this._effectiveTime) _pr.effective_time = this._effectiveTime
-    if (this._medicalServ) {
-      _pr.medical_serv = { ...this._medicalServ }
-      _pr.medical_serv_id = this._medicalServ.id
-    }
+    if (this._medicalServ) _pr.medical_serv_id = this._medicalServ.id
     if (this._textValue) _pr.text_value = this._textValue
-
     return _pr
   }
   get id(): number | undefined {

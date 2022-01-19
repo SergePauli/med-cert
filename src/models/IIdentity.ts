@@ -2,11 +2,11 @@ import { INullFlavorable } from "./INullFlavorable"
 
 export default interface IIdentity extends INullFlavorable {
   id?: string
-  identityCardType: string
+  identity_card_type_id: number
   series?: string
   number: string
   issueOrgName: string
   issueOrgCode?: string
-  issueOrgDate: Date
+  issueDate: string
   parentGUID: string
 }
