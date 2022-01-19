@@ -9,7 +9,7 @@ export interface ICertificate extends INullFlavorable {
   id: number
   series?: string
   number?: string
-  eff_time: string
+  issue_date?: string
   cert_type?: number
   series_prev?: string
   number_prev?: string
@@ -45,4 +45,5 @@ export interface ICertificate extends INullFlavorable {
   custodian_id?: number
   guid: string
   latest_one?: ICertificate
+  create_at: string
 }
