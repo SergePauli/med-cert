@@ -7,7 +7,7 @@ import '../styles/components/Divider.css'
 import '../styles/components/Button.css'
 import '../styles/pages/CertificatePage.css'
 
-import { useContext, FC } from 'react'
+import { useContext, FC, useEffect } from 'react'
 import MainLayout from '../components/layouts/MainLayout'
 import { CERTIFICATE_ROUTE } from '../utils/consts'
 import { Avatar } from 'primereact/avatar'
@@ -26,6 +26,7 @@ import Section9 from '../components/c_sections/section_9'
 import { Context } from '..'
 import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
+import Certificate from '../models/FormsData/Certificate'
 
 
 interface IMatch extends IRouteMatch {  
@@ -36,7 +37,11 @@ interface CertificatePageProps extends IRouteProps {
 }
 
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
-  const { certificateStore, userStore } = useContext(Context)
+  const { certificateStore, userStore, layoutStore } = useContext(Context)
+  useEffect(()=>{
+    if (userStore.userInfo) certificateStore.userInfo = userStore.userInfo
+    certificateStore.getList()      
+  },[certificateStore, userStore.userInfo])
   const secton_router = ()=>{
     switch (props.location.search) {
       case "?q=0": return <Section0 />
@@ -53,27 +58,56 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
   }    
   const items = [        
         {
-            label: 'Обновить',
-            icon: 'pi pi-refresh',
+            label: 'Назад',
+            icon: 'pi pi-chevron-left',
             command: () => {
-                
+              const section = Number.parseInt(props.location.search[props.location.search.length-1])-1             
+                if (section > -1) {               
+                userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=${section}`)
+              }
             }
         },
         {
             label: 'Удалить',
             icon: 'pi pi-trash',
             command: () => {
-                
+              layoutStore.isLoading = true
+              const result = certificateStore.delete()
+              if (!result) {
+                layoutStore.isLoading = false
+              } else {
+                result
+                .then(response=>{
+                  certificateStore.clean()
+                  certificateStore.select()
+                })
+                .catch(reason=>console.log(reason))
+                .finally(()=>layoutStore.isLoading = false)
+              }
             }
         },
         {
             label: 'Сохранить',
-            icon: 'pi pi-pencil',
-            command: () => {
-              const rp = certificateStore.cert.getAttributes()
-              console.log('rp', rp) 
-              certificateStore.cert.id=1
+            icon: 'pi pi-save',
+            command: () => { 
+              layoutStore.isLoading = true
+              const result = certificateStore.save()
+              if (!result) {
+                console.log('нет юзера')
+                layoutStore.isLoading = false
+              } else {
+                result.then(response=>{
+                  console.log(response.data)
+                  certificateStore.cert = new Certificate(response.data)
+                }).catch(err=>console.log(err)).finally(()=>layoutStore.isLoading = false )
+              }
+                            
             }
+        },
+        {
+            label: 'Создать',
+            icon: 'pi pi-plus',
+            command: () => certificateStore.createNew()
         },
         {
             label: 'Далее',
@@ -84,18 +118,8 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
                 userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=${section}`)
               } 
             }
-        }, 
-        {
-            label: 'Назад',
-            icon: 'pi pi-chevron-left',
-            command: () => {
-              const section = Number.parseInt(props.location.search[props.location.search.length-1])-1             
-                if (section > -1) {
-                console.log('section',section)
-                userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=${section}`)
-              }
-            }
-        },
+        },        
+        
 
     ]
   const doneBodyTemplate = (rowData:any) => {
