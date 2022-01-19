@@ -4,21 +4,21 @@ import { Checkbox, CheckboxChangeParams } from "primereact/checkbox"
 import { Dropdown, DropdownChangeParams } from "primereact/dropdown"
 import { useState } from 'react'
 import { NULL_FLAVORS } from '../utils/defaults'
-import { INullFlavor } from '../models/INullFlavor'
+import { INullFlavorR } from '../models/INullFlavor'
 import { useEffect } from 'react'
 
 type NullFlavorWrapperProps = {
   paraNum?: boolean,  
   label: React.ReactElement,  
   checked?: boolean, 
-  setCheck?: ((e: CheckboxChangeParams, nullFlavors?: INullFlavor[]) => void), 
+  setCheck?: ((e: CheckboxChangeParams, nullFlavors?: INullFlavorR[]) => void), 
   disabled?: boolean,
   field: React.ReactElement,
   field_name?: string,
   options: IReference[],
-  nullFlavors?: INullFlavor[], 
+  nullFlavors?: INullFlavorR[], 
   value?: number, 
-  onChange?: ((e: IReference, nullFlavors: INullFlavor[] | undefined) => void),
+  onChange?: ((e: IReference, nullFlavors: INullFlavorR[] | undefined) => void),
   lincked?: boolean
 }
 
@@ -27,7 +27,7 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
   const [checked, setChecked] = useState<boolean>(props.checked || false) 
   const fieldStyle = props.paraNum ? {marginLeft: '-0.76rem'} : {}
   const ddStyle = {width: '200px'}
-  const nullFlavors = (props.nullFlavors && props.nullFlavors.length>0 && props.field_name ) ? props.nullFlavors.filter((element: INullFlavor)=>element.parent_attr!==props.field_name) : []
+  const nullFlavors = (props.nullFlavors && props.nullFlavors.length>0 && props.field_name ) ? props.nullFlavors.filter((element: INullFlavorR)=>element.parent_attr!==props.field_name) : []
   useEffect(()=>{   
     if (props.nullFlavors) {
       const nullFlavor = props.nullFlavors.find(item=>item.parent_attr===props.field_name && !item._destroy)
@@ -75,7 +75,7 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
         if (props.onChange) { // for not in MobX nullflavors
           const nullFlavor = {parent_attr: props.field_name, code: NULL_FLAVORS.findIndex((element)=>element.code===e.value.code)}
           let _nullFlavors = nullFlavors
-          _nullFlavors.push(nullFlavor as INullFlavor)
+          _nullFlavors.push(nullFlavor as INullFlavorR)
           props.onChange(e.value, _nullFlavors)
         } else if (!!props.nullFlavors) { //standart case nullFlavor
             const idx = props.nullFlavors.findIndex(item=>item.parent_attr===props.field_name)
