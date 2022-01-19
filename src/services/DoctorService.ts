@@ -5,7 +5,8 @@ import { AxiosResponse } from "axios"
 import $api, { API_URL } from "../http"
 import { IDoctor } from "../models/IDoctor"
 import { IReferenceId } from "../models/IReference"
-import { DOCTOR_RENDER_OPTIONS, genCreateDoctorRequest } from "../models/FormsData/DoctorRequest"
+import { DOCTOR_RENDER_OPTIONS } from "../models/FormsData/DoctorRequest"
+import { IDoctorR } from "../models/requests/IDoctorR"
 
 export default class DoctorService {
   //POST request for get doctor's list
@@ -17,9 +18,9 @@ export default class DoctorService {
     return $api.post(`${API_URL}model/Position/`, { q: query, offset: 0, limit: 200 })
   }
   //POST request for add Doctor /REST_API/v1/model/Doctor/add
-  static async addDoctor(doctor: IDoctor): Promise<AxiosResponse<IDoctor>> {
+  static async addDoctor(doctor: IDoctorR): Promise<AxiosResponse<IDoctor>> {
     return $api.post(`${API_URL}model/Doctor/add`, {
-      Doctor: genCreateDoctorRequest(doctor),
+      Doctor: doctor,
       ...DOCTOR_RENDER_OPTIONS,
     })
   }
