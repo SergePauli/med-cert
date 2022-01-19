@@ -15,16 +15,20 @@ import { CERT_TYPES } from '../../NSI/1.2.643.5.1.13.13.99.2.19'
       return <span>Сведения о документе</span>
     }
   return (<>    
-      <Card className="c-section p-mr-2 p-mb-2" header={header}>
+      <Card className="c-section p-mr-2 p-mb-2" header={header} key={certificateStore.cert.id}>
         <div className="p-fluid p-formgrid p-grid">
-          <div className="p-field p-col-12 p-md-6">
-            <label htmlFor="firstname6">Серия</label>
-            <InputText id="firstname6" value={cert.series} type="text" 
+          <div className="p-field p-col-6 p-md-2">
+            <label htmlFor="series">Серия</label>
+            <InputText id="series" value={cert.series} type="text" 
               placeholder='Заполняется автоматически' disabled/>
           </div>
-          <div className="p-field p-col-12 p-md-6">
-            <label htmlFor="lastname6">Номер</label>
-            <InputText id="lastname6" value={cert.number} disabled type="text" placeholder='Заполняется автоматически'/>
+          <div className="p-field p-col-6 p-md-4">
+            <label htmlFor="number">Номер</label>
+            <InputText id="number" value={cert.number} disabled type="text" placeholder='Заполняется автоматически'/>
+          </div>
+          <div className="p-field p-col-12 p-md-6">                    
+            <label htmlFor="icon">Дата</label>
+            <Calendar id="icon"  dateFormat="dd.mm.yy" value={cert.issueDate} disabled />
           </div>
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="cert_type">Вид свидетельства</label>
@@ -32,10 +36,7 @@ import { CERT_TYPES } from '../../NSI/1.2.643.5.1.13.13.99.2.19'
               options={CERT_TYPES.filter((item)=>[1,2].includes(item.code))} optionLabel="name"
               value={CERT_TYPES.find(el=>el.code===cert.certType)} onChange={(e) =>certificateStore.cert.certType = e.value.code} disabled={cert.id > -1} />
           </div>
-          <div className="p-field p-col-12 p-md-6">                    
-            <label htmlFor="icon">Дата</label>
-            <Calendar id="icon"  dateFormat="dd/mm/yy" value={cert.effTime} disabled showIcon />
-          </div>
+          
         </div>
         <Divider/>
         <div className="p-grid p-mt-2">              
