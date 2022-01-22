@@ -36,7 +36,7 @@ export interface ICertificateR {
   traffic_accident?: number
   pregnancy_connection?: number
   author_attributes?: IAuthenticatorR
-  authenticator_attributes?: IAuthenticatorR
+  audithor_attributes?: IAuthenticatorR
   legal_authenticator_attributes?: IAuthenticatorR
   custodian_id?: number
   guid: string
