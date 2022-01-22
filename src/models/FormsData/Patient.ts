@@ -40,7 +40,7 @@ export default class Patient implements ISerializable {
     let _patient = { guid: this._guid } as IPatientR
     if (this._id) _patient.id = this.id
     if (this._addrType) _patient.addr_type = this._addrType
-    if (this._birth_date) _patient.birth_date = this._birth_date
+    if (this._birth_date) _patient.birth_date = this._birth_date.toDateString()
     if (this._birth_year) _patient.birth_year = this._birth_year
     if (this._gender) _patient.gender = this._gender
     if (this._identity) _patient.identity_attributes = this._identity.getAttributes()

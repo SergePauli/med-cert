@@ -59,7 +59,7 @@ import { IAuthenticator } from '../../models/responses/IAuthenticator'
                   label={<label htmlFor="trafficAccident">В случае смерти в результате ДТП: смерть наступила –</label>}
                   setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{                      
                       if (!e.checked) certificate.trafficAccident = undefined                        
-                        //if (nullFlavors) certificate.nullFlavors = nullFlavors
+                      if (nullFlavors) certificate.nullFlavors = nullFlavors
                     }} 
                   field={
                     <Dropdown inputId="trafficAccident" style={nullFlavorDropdnStyle} placeholder="Выбрать"  

@@ -108,8 +108,16 @@
   text-decoration: none;
   width: 3rem;
   height: 3rem;
-  background: #495057;
-  color: #fff;
+  background: #fafbfd3d;
+  color: #3f51b5;
+}
+
+.p-speeddial-action.p-danger {
+  color: #ad0000;
+}
+
+.p-speeddial-action.p-success {
+  color: #2cbb00;
 }
 
 .p-speeddial-button.p-button.p-button-icon-only {

@@ -69,7 +69,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
         },
         {
             label: 'Удалить',
-            icon: 'pi pi-trash',
+            icon: 'pi pi-trash p-danger',
             command: () => {
               layoutStore.isLoading = true
               const result = certificateStore.delete()
@@ -88,7 +88,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
         },
         {
             label: 'Сохранить',
-            icon: 'pi pi-save',
+            icon: 'pi pi-save p-success',
             command: () => { 
               layoutStore.isLoading = true
               const result = certificateStore.save()
