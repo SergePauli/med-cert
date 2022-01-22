@@ -40,6 +40,10 @@ export class DeathReason implements ISerializable {
     return this._id
   }
 
+  set id(id: number | undefined) {
+    this._id = id
+  }
+
   get diagnosis(): IDiagnosis | undefined {
     return this._diagnosis
   }
@@ -120,10 +124,8 @@ export class DeathReason implements ISerializable {
     let _dr = { guid: this._guid } as IDeathReasonR
     if (this._id) _dr.id = this._id
     if (this._effectiveTime) _dr.effective_time = this._effectiveTime
-    if (this._diagnosis) {
-      _dr.diagnosis = this._diagnosis
-      _dr.diagnosis_id = Number.parseInt(this._diagnosis.id)
-    }
+    if (this._diagnosis) _dr.diagnosis_id = Number.parseInt(this._diagnosis.id)
+
     if (this._nullFlavors.length > 0) _dr.null_flavors_attributes = this.null_flavors_attributes()
     if (this._procedures.length > 0) _dr.procedures_attributes = this._procedures.map((item) => item.getAttributes())
     if (this._oldOne.procedures && this._oldOne.procedures.length > 0) {

@@ -24,12 +24,19 @@ import { InputText } from 'primereact/inputtext'
   const mainCSSClass = (isACME: boolean) => isACME  ? "p-fluid p-d-flex p-jc-start ACME-reason" : "p-fluid p-d-flex p-jc-start"
   const reasonBckecked = !!certificate.reasonB
   const reasonCckecked = !!certificate.reasonC
-  const reasonDckecked = !!certificate.reasonD  
+  const reasonDckecked = !!certificate.reasonD 
+
+  const reasonIDExchange = (first: DeathReason, second: DeathReason) => {
+    if (!first.id && !second.id) return
+    let _id = first.id
+    first.id = second.id
+    second.id = _id      
+  }
       
   return (<>    
     <Card className="c-section p-mr-2 p-mb-2" header={header}>        
       <div className={mainCSSClass(!!certificate.reasonA && certificate.reasonA===certificate.reasonACME)}
-       style={{width: '98%'}} key={`ra_${certificate.reasonA?.id}`}> 
+       style={{width: '98%'}} key={`ra_${certificate.reasonA?.diagnosis?.ICD10}`}> 
         <div className='paragraph p-mr-1'>а) </div>           
         <Reason label="Болезнь или состояние, непосредственно приведшее к смерти" 
           deathReason={certificate.reasonA} certificate={certificate}
@@ -39,13 +46,15 @@ import { InputText } from 'primereact/inputtext'
           disabled checked
           fieldName='a_reason' 
           onDown={()=>{
+            if (!certificate.reasonA && !certificate.reasonB) return
+            reasonIDExchange(certificate.reasonA || certificate.createDeathReason(), certificate.reasonB || certificate.createDeathReason())            
             const reason = certificate.reasonA
             certificate.reasonA = certificate.reasonB
-            certificate.reasonB = reason
+            certificate.reasonB = reason           
           }}
         />
       </div>  
-      <div className={mainCSSClass(!!certificate.reasonB && certificate.reasonB===certificate.reasonACME)} style={{width: '98%'}} key={`rb_${certificate.reasonB?.id}`}>   
+      <div className={mainCSSClass(!!certificate.reasonB && certificate.reasonB===certificate.reasonACME)} style={{width: '98%'}} key={`rb_${certificate.reasonB?.diagnosis?.ICD10}`}>   
         <div className='paragraph p-mr-1'>б) </div>
         <Reason label="Патологическое состояние, которое привело к возникновению непос- редственной причины смерти" 
           deathReason={certificate.reasonB} certificate={certificate}  key={`rb2_${certificate.reasonB?.id}`}
@@ -56,11 +65,15 @@ import { InputText } from 'primereact/inputtext'
           checked={reasonBckecked} 
           fieldName='b_reason' 
           onDown={()=>{
+            if (!certificate.reasonB && !certificate.reasonC) return
+            reasonIDExchange(certificate.reasonB || certificate.createDeathReason(), certificate.reasonC || certificate.createDeathReason())
             const reason = certificate.reasonB
             certificate.reasonB = certificate.reasonC
             certificate.reasonC = reason
           }}  
           onUp={()=>{
+            if (!certificate.reasonB && !certificate.reasonC) return
+            reasonIDExchange(certificate.reasonC || certificate.createDeathReason(), certificate.reasonB || certificate.createDeathReason())
             const reason = certificate.reasonB
             certificate.reasonB = certificate.reasonA
             certificate.reasonA = reason
@@ -68,7 +81,7 @@ import { InputText } from 'primereact/inputtext'
         />
       </div>  
       <div className={mainCSSClass(!!certificate.reasonC && certificate.reasonC===certificate.reasonACME)} 
-      style={{width: '98%'}} key={`rc_${certificate.reasonC?.id}`}>  
+      style={{width: '98%'}} key={`rc_${certificate.reasonC?.diagnosis?.ICD10}`}>  
         <div className='paragraph p-mr-1'>в) </div>
         <Reason label="Первоначальная причина смерти" 
           deathReason={certificate.reasonC} certificate={certificate} 
@@ -77,6 +90,8 @@ import { InputText } from 'primereact/inputtext'
             if (reason !== certificate.reasonC) certificate.reasonC = reason            
           }} fieldName='c_reason' checked={reasonCckecked}
           onUp={()=>{
+            if (!certificate.reasonC && !certificate.reasonB) return
+            reasonIDExchange(certificate.reasonC || certificate.createDeathReason(), certificate.reasonB || certificate.createDeathReason())
             const reason = certificate.reasonC
             certificate.reasonC = certificate.reasonB
             certificate.reasonB = reason

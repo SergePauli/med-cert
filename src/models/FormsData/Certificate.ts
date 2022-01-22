@@ -412,16 +412,20 @@ export default class Certificate implements ISerializable {
       this.deathYear = undefined
     }
   }
-  createDeathReason(props: IDeathReason): DeathReason {
+  createDeathReason(props = {} as IDeathReason): DeathReason {
     const newReason = new DeathReason(props)
     if (newReason.effectiveTime && !!this._deathDatetime) {
-      const diff = timeDiff(newReason.effectiveTime, this._deathDatetime)
-      if (diff.days && diff.days > 0) newReason.days = diff.days
-      if (diff.hours) newReason.hours = diff.hours
-      if (diff.minutes && diff.minutes > 0) newReason.minutes = diff.minutes
-      if (diff.months && diff.months > 0) newReason.months = diff.months
-      if (diff.weeks && diff.weeks > 0) newReason.weeks = diff.weeks
-      if (diff.years && diff.years > 0) newReason.years = diff.years
+      try {
+        const diff = timeDiff(newReason.effectiveTime, this._deathDatetime)
+        if (diff.days && diff.days > 0) newReason.days = diff.days
+        if (diff.hours) newReason.hours = diff.hours
+        if (diff.minutes && diff.minutes > 0) newReason.minutes = diff.minutes
+        if (diff.months && diff.months > 0) newReason.months = diff.months
+        if (diff.weeks && diff.weeks > 0) newReason.weeks = diff.weeks
+        if (diff.years && diff.years > 0) newReason.years = diff.years
+      } catch {
+        newReason.effectiveTime = this._deathDatetime
+      }
     }
     return newReason
   }
