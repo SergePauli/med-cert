@@ -213,13 +213,13 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               itemTemplate={diagnosisOptionTemplate}
               completeMethod={getCodes} onChange={(e) =>{ 
                 if (!!deathReason && !!e.value.s_name) {
-                  deathReason.diagnosis = e.value
-                  if (deathReason.diagnosis) setDiagnosisCode(deathReason.diagnosis?.ICD10)
+                    deathReason.diagnosis = e.value
+                    if (deathReason.diagnosis) setDiagnosisCode(deathReason.diagnosis?.ICD10)
                 } else if(e.value) {
-                  if (deathReason) deathReason.diagnosis = undefined
-                  setDiagnosisCode(e.value)                  
+                    if (deathReason) deathReason.diagnosis = undefined
+                  setDiagnosisCode(e.value)                
                 } else {
-                  if (deathReason) deathReason.diagnosis = undefined                  
+                  if (deathReason) deathReason.diagnosis = undefined               
                   setDiagnosisCode('')
                 }  
               }}
