@@ -126,7 +126,7 @@ import IIdentity from '../../models/IIdentity'
                   label={<label htmlFor="issueDate">Когда выдан</label>}
                   checked={docChecked}                   
                   field={<Calendar  id="issueDate" className="p-mr-2" 
-                    dateFormat={"dd/mm/yy"} value={identity?.issueOrgDate}
+                    dateFormat={"dd.mm.yy"} value={identity?.issueOrgDate}
                     onChange={(e)=>{if (identity) identity.issueOrgDate = e.target.value as Date | undefined}}
                     showIcon />
                   }
@@ -142,7 +142,8 @@ import IIdentity from '../../models/IIdentity'
                   checked={docChecked && patient.identity?.nullFlavors.findIndex(nf=>nf.parent_attr==='issueOrgCode')===-1} 
                   setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                     if (e.checked && patient.identity) patient.identity.issueOrgCode = ''
-                    else if (patient.identity) patient.identity.issueOrgCode = undefined               
+                    else if (patient.identity) patient.identity.issueOrgCode = undefined  
+                    if (nullFlavors && patient.identity) patient.identity.nullFlavors =  nullFlavors            
                   }}                   
                   field={depCodeField}
                   options={identified ? [NULL_FLAVORS[NA]] : [NULL_FLAVORS[ASKU]]}
