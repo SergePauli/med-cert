@@ -15,23 +15,12 @@ import { ICertificate } from "../models/responses/ICertificate"
 
 export const CERTIFICATE_FULL_RENDER_OPTIONS = {
   render_options: {
-    except: [
-      "patient_id",
-      "author_id",
-      "legal_authenticator_id",
-      "authenticator_id",
-      "a_reason_id",
-      "b_reason_id",
-      "c_reason_id",
-      "d_reason_id",
-      "death_addr_id",
-      "child_info_id",
-    ],
+    except: ["patient_id", "updated_at"],
     include: [
       "patient",
       "author",
       "legal_authenticator",
-      "authenticator",
+      "audithor",
       "a_reason",
       "b_reason",
       "c_reason",
@@ -53,7 +42,7 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
   d_reason: EXTERNAL_DEATH_REASON_RENDER_OPTIONS,
   author: DEFAULT_RENDER_OPTIONS,
   legal_authenticator: DEFAULT_RENDER_OPTIONS,
-  authenticator: DEFAULT_RENDER_OPTIONS,
+  audithor: DEFAULT_RENDER_OPTIONS,
   death_reasons: OTHER_REASON_RENDER_OPTIONS,
   procedures: PROCEDURE_RENDER_OPTIONS,
   child_info: CHILD_INFO_RENDER_OPTIONS,
