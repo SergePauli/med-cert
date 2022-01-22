@@ -7,7 +7,7 @@ export interface IPatientR extends INullFlavorableR {
   person_attributes?: IPersonR
   identity_attributes?: IIdentityR
   gender: number | undefined
-  birth_date: Date | undefined
+  birth_date: string | undefined
   birth_year: number
   organization_id: number
   addr_type?: number

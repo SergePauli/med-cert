@@ -35,7 +35,7 @@ export default class Identity implements ISerializable {
     if (this._id) _identity.id = this._id
     if (this._identityCardType) _identity.identity_card_type_id = this._identityCardType
     if (this._issueOrgCode) _identity.issueOrgCode = this._issueOrgCode
-    if (this._issueOrgDate) _identity.issueDate = this._issueOrgDate
+    if (this._issueOrgDate) _identity.issueDate = this._issueOrgDate.toDateString()
     if (this._issueOrgName) _identity.issueOrgName = this._issueOrgName
     if (this._nullFlavors.length > 0) _identity.null_flavors_attributes = this.null_flavors_attributes()
     if (this._number) _identity.number = this._number
