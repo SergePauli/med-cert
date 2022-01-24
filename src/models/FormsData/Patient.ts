@@ -10,7 +10,7 @@ import Person from "./Person"
 export const MAIN_REGISTRATION_ADDRESS = 1
 export default class Patient implements ISerializable {
   private _id?: string | undefined
-  private _person: Person
+  private _person?: Person
   private _gender?: number | undefined
   private _birth_date: Date | undefined
   private _birth_year?: number
@@ -21,7 +21,7 @@ export default class Patient implements ISerializable {
   private _nullFlavors: INullFlavorR[]
   constructor(props = {} as IPatient) {
     this._guid = props.guid || uuidv4()
-    this._person = props.person ? new Person(props.person) : new Person()
+    this._person = new Person(props.person)
     this._provider_organization = props.organization_id
     if (props.gender) this._gender = props.gender
     this._addrType = props.addr_type || MAIN_REGISTRATION_ADDRESS
@@ -58,6 +58,11 @@ export default class Patient implements ISerializable {
   get person() {
     return this._person
   }
+
+  set person(value: Person | undefined) {
+    this._person = value
+  }
+
   get gender() {
     return this._gender
   }
