@@ -53,7 +53,7 @@ export default class Certificate implements ISerializable {
   private _trafficAccident?: number | undefined
   private _pregnancyConnection?: number | undefined
   private _author?: Authenticator | undefined
-  private _authenticator?: Authenticator | undefined
+  private _audithor?: Authenticator | undefined
   private _legalAuthenticator?: Authenticator | undefined
   private _nullFlavors: INullFlavorR[]
   private _audits: IAudit[]
@@ -96,7 +96,7 @@ export default class Certificate implements ISerializable {
     this._socialStatus = props.social_status
     if (props.child_info) this._childInfo = new ChildInfo(props.child_info)
     if (props.author) this._author = new Authenticator(props.author)
-    if (props.authenticator) this._authenticator = new Authenticator(props.authenticator)
+    if (props.audithor) this._audithor = new Authenticator(props.audithor)
     if (props.legal_authenticator) this._legalAuthenticator = new Authenticator(props.legal_authenticator)
     if (props.ext_reason_time) this._extReasonTime = new Date(props.ext_reason_time)
     this._extReasonDescription = props.ext_reason_description
@@ -198,10 +198,10 @@ export default class Certificate implements ISerializable {
     this._author = value
   }
   get authenticator(): Authenticator | undefined {
-    return this._authenticator
+    return this._audithor
   }
   set authenticator(value: Authenticator | undefined) {
-    this._authenticator = value
+    this._audithor = value
   }
   get legalAuthenticator(): Authenticator | undefined {
     return this._legalAuthenticator
@@ -446,20 +446,29 @@ export default class Certificate implements ISerializable {
     let _cert = { guid: this._guid } as ICertificateR
     if (this._id !== -1) _cert.id = this._id
     if (this._issueDate) _cert.issue_date = this._issueDate
-    if (this._authenticator) _cert.authenticator_attributes = this._authenticator.getAttributes()
-    else if (this._oldOne && this._oldOne.authenticator)
-      _cert.authenticator_attributes = { id: this._oldOne.authenticator.id, _destroy: "1" }
-    if (this._author) _cert.author_attributes = this._author.getAttributes()
-    else if (this._oldOne && this._oldOne.author)
+    if (this._audithor) {
+      _cert.audithor_attributes = this._audithor.getAttributes()
+      if (!_cert.audithor_attributes.id && !!this._oldOne?.audithor?.id)
+        _cert.audithor_attributes.id = this._oldOne.audithor.id
+    } else if (this._oldOne && this._oldOne.audithor)
+      _cert.audithor_attributes = { id: this._oldOne.audithor.id, _destroy: "1" }
+    if (this._author) {
+      _cert.author_attributes = this._author.getAttributes()
+      if (!_cert.author_attributes.id && !!this._oldOne?.author?.id) _cert.author_attributes.id = this._oldOne.author.id
+    } else if (this._oldOne && this._oldOne.author)
       _cert.author_attributes = { id: this._oldOne.author.id, _destroy: "1" }
-    if (this._legalAuthenticator) _cert.legal_authenticator_attributes = this._legalAuthenticator.getAttributes()
-    else if (this._oldOne && this._oldOne.legal_authenticator)
+    if (this._legalAuthenticator) {
+      _cert.legal_authenticator_attributes = this._legalAuthenticator.getAttributes()
+      if (!_cert.legal_authenticator_attributes.id && !!this._oldOne?.legal_authenticator?.id)
+        _cert.legal_authenticator_attributes.id = this._oldOne.legal_authenticator.id
+    } else if (this._oldOne && this._oldOne.legal_authenticator)
       _cert.legal_authenticator_attributes = { id: this._oldOne.legal_authenticator.id, _destroy: "1" }
     if (this._basisDetermining) _cert.basis_determining = this._basisDetermining
     if (this._certType) _cert.cert_type = this._certType
     if (this._childInfo) _cert.child_info_attributes = this._childInfo.getAttributes()
     else if (this._oldOne && this._oldOne.child_info) _cert.child_info_attributes = { _destroy: "1" } as IChildInfoR
-    if (this._deathAddr) _cert.death_addr_attributes = { ...this._deathAddr } as IAddressR
+    if (this._deathAddr && !!this._deathAddr.state && !!this._deathAddr.streetAddressLine)
+      _cert.death_addr_attributes = { ...this._deathAddr } as IAddressR
     else if (this._oldOne && this._oldOne.death_addr)
       _cert.death_addr_attributes = { id: this._oldOne.death_addr.id, _destroy: "1" } as IAddressR
     if (this._deathAreaType) _cert.death_area_type = this._deathAreaType
@@ -501,7 +510,7 @@ export default class Certificate implements ISerializable {
     if (this._reasonC) _cert.c_reason_attributes = this._reasonC.getAttributes()
     else if (this._oldOne && this._oldOne.c_reason)
       _cert.c_reason_attributes = { id: this._oldOne.c_reason.id, _destroy: "1" } as IDeathReasonR
-    if (this._reasonD) _cert.d_reason_attributes = this._reasonD.getAttributes()
+    if (this._reasonD) _cert.d_reason_attributes = this._reasonD.getAttributes(true)
     else if (this._oldOne && this._oldOne.d_reason)
       _cert.d_reason_attributes = { id: this._oldOne.d_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._series) _cert.series = this._series

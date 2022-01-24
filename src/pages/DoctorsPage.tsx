@@ -141,9 +141,7 @@ export const DoctorsPage: FC = () => {
                 setDoctorDialog(false)
                 if (toast!==null && toast.current!==null) 
                   toast.current.show(DEFAULT_ERROR_TOAST)
-              })           
-              
-              
+              })
             }
           
         }
@@ -254,7 +252,6 @@ export const DoctorsPage: FC = () => {
         content:
         <div>
             <Toast ref={toast} />
-
             <div className="card">
                 <Toolbar className="p-mb-4" right={rightToolbarTemplate}></Toolbar>
 

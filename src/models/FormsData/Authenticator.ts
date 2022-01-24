@@ -11,7 +11,7 @@ export default class Authenticator implements ISerializable {
     this._id = props.id
     this._doctorID = props.doctor_id
     if (props.time) this._time = new Date(props.time)
-    else new Date()
+    else this._time = new Date()
     makeAutoObservable(this)
   }
   get time(): Date | undefined {

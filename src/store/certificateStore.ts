@@ -1,8 +1,6 @@
 import { autorun, configure, makeAutoObservable } from "mobx"
 import Certificate from "../models/FormsData/Certificate"
-import { INullFlavorR } from "../models/INullFlavor"
 import { IPatient } from "../models/IPatient"
-
 import { ISuggestions } from "../models/ISuggestions"
 import { ICertificate } from "../models/responses/ICertificate"
 import { IUserInfo } from "../models/responses/IUserInfo"
@@ -38,7 +36,6 @@ import {
   MOTHER_ADDRESS_SUG,
   MOTHER_BIRTHDAY_SUG,
   MOTHER_FIO_SUG,
-  NA,
   NUMBER_PREGNANCY_SUG,
   OMS_SUG,
   PASSPORT_RF,
@@ -71,7 +68,6 @@ export default class CertificateStore {
   private _userInfo?: IUserInfo | undefined
   private _certs: ICertificate[]
   private _selected: number
-
   disposers: (() => void)[]
   constructor() {
     this._submitted = false
@@ -122,8 +118,9 @@ export default class CertificateStore {
       if (!this._cert) return
       const person = this._cert.patient.person
       const isSNILS =
-        (!person.SNILS || person.SNILS.length < 14) &&
-        person.nullFlavors.findIndex((element) => element.parent_attr === "SNILS") === -1
+        !person ||
+        ((!person.SNILS || person.SNILS.length < 14) &&
+          person.nullFlavors.findIndex((element) => element.parent_attr === "SNILS") === -1)
       this._suggestions[SNILS_SUG].done = !isSNILS
     })
     this.disposers[6] = autorun(() => {
@@ -185,10 +182,11 @@ export default class CertificateStore {
     this.disposers[12] = autorun(() => {
       const person = this._cert.patient.person
       const isLifeArea =
-        (!person.address ||
+        !person ||
+        ((!person.address ||
           !person.address.streetAddressLine ||
           person.address.streetAddressLine.split(",").length < 3) &&
-        person.nullFlavors.findIndex((element) => element.parent_attr === "address") === -1
+          person.nullFlavors.findIndex((element) => element.parent_attr === "address") === -1)
       this._suggestions[LIFE_PLACE_SUG].done = !isLifeArea
     })
     this.disposers[13] = autorun(() => {
@@ -370,20 +368,21 @@ export default class CertificateStore {
     })
     this.disposers[43] = autorun(() => {
       if (!this._cert) return
-      this._identified = !!this._cert.patient.person.fio
+      this._identified = !!this._cert.patient.person
     })
     this.disposers[44] = autorun(() => {
       if (!this._cert) return
       this._fromRelatives = this._identified && this._cert.patient && !this._cert.patient.identity
     })
     this.disposers[45] = autorun(() => {
-      if (!this._cert) return
-      const fio = this._cert.patient?.person.fio
+      const person = this._cert.patient?.person
+      const fio = person?.fio
       const isPersonNameSug =
-        !!fio &&
-        (fio.family.trim().length === 0 ||
-          fio.given_1.trim().length === 0 ||
-          (!!fio.given_2 && fio.given_2.trim().length === 0))
+        !person ||
+        (!!fio &&
+          (fio.family.trim().length === 0 ||
+            fio.given_1.trim().length === 0 ||
+            (!!fio.given_2 && fio.given_2.trim().length === 0)))
       this._suggestions[PERSON_NAME_SUG].done = !isPersonNameSug
     })
   }
@@ -398,16 +397,7 @@ export default class CertificateStore {
     return this._identified
   }
   set identified(identified: boolean) {
-    const nullFlavors = [] as INullFlavorR[]
     this._identified = identified
-    if (identified)
-      this._cert.patient.person.nullFlavors = nullFlavors.concat(
-        this._cert.patient.person.nullFlavors.filter((element: INullFlavorR) => element.parent_attr !== "person_name")
-      )
-    else {
-      this._cert.patient.person.nullFlavors.push({ parent_attr: "person_name", code: NA })
-      this.fromRelatives = false
-    }
   }
 
   get fromRelatives() {
@@ -504,7 +494,7 @@ export default class CertificateStore {
       .then((response) => {
         this._certs = response.data
         console.log("response.data", response.data)
-        this._cert = new Certificate(this._certs[0])
+        this.select()
       })
       .catch((err) => console.log(err))
   }

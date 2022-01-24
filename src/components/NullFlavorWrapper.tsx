@@ -28,6 +28,7 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
   const fieldStyle = props.paraNum ? {marginLeft: '-0.76rem'} : {}
   const ddStyle = {width: '200px'}
   const nullFlavors = (props.nullFlavors && props.nullFlavors.length>0 && props.field_name ) ? props.nullFlavors.filter((element: INullFlavorR)=>element.parent_attr!==props.field_name) : []
+  const nullFlavor = (props.nullFlavors && props.nullFlavors.length>0 && props.field_name ) ? props.nullFlavors.find((element: INullFlavorR)=>element.parent_attr===props.field_name) : false
   useEffect(()=>{   
     if (props.nullFlavors) {
       const nullFlavor = props.nullFlavors.find(item=>item.parent_attr===props.field_name && !item._destroy)
@@ -45,8 +46,14 @@ const NullFlavorWrapper: FC<NullFlavorWrapperProps>=(props: NullFlavorWrapperPro
         onChange={(e)=>{
             setChecked(e.checked)
             if (props.nullFlavors) {
-              if (props.setCheck && e.checked ) props.setCheck(e, nullFlavors)
-              else if (props.setCheck && props.value && props.field_name) { 
+              if (props.setCheck && e.checked ) { 
+                if (nullFlavor && nullFlavor.id) {
+                  props.nullFlavors.forEach(el=>{
+                    if (el.parent_attr===props.field_name) el._destroy="1"
+                  })
+                  props.setCheck(e)
+                } else  props.setCheck(e, nullFlavors)
+              } else if (props.setCheck && props.value && props.field_name) { 
                 let _nullFlavors = nullFlavors               
                 _nullFlavors.push({parent_attr: props.field_name, code: props.value })                                 
                 props.setCheck(e, _nullFlavors)                            

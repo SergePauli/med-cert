@@ -14,25 +14,27 @@ import NullFlavorWrapper from "../NullFlavorWrapper"
 import { INullFlavorR } from "../../models/INullFlavor"
 import { DEFAULT_ADDRESS, IAddressR } from "../../models/requests/IAddressR"
 
+
 const Section3: FC = () => {
   const { addressStore, certificateStore } = useContext(Context)
   const certificate = certificateStore.cert  
   const patient = certificate.patient
-  const [addressLife, setAddressLife] = useState(patient.person.address) 
+  const [addressLife, setAddressLife] = useState(patient.person?.address) 
   const [addressDeath, setAddressDeath] = useState(certificate.deathAddr) 
   const identified = certificateStore.identified
-  const checkedLifeArea = !!addressLife || patient.person.nullFlavors.findIndex((item)=>item.parent_attr==='address')===-1
+  const checkedLifeArea = !!patient.person && patient.person.nullFlavors.findIndex((item)=>item.parent_attr==='address' && !item._destroy)===-1
   const checkedDeathArea = !!addressDeath || certificate.nullFlavors.findIndex((item)=>item.parent_attr==='death_addr')===-1  
   const fromRelatives = certificateStore.fromRelatives
   const submitted = certificateStore.submitted
   
   const header = () => {
-    return <><span>Адреса мест жительства и смерти</span><Button type="button" onClick={onAddressCopy} label="СОВПАДАЮТ" className="p-button-raised p-button-success"  /></>
+    return <><span>Адреса мест жительства и смерти</span><Button type="button" onClick={onAddressCopy} label="СОВПАДАЮТ" disabled={!checkedLifeArea} className="p-button-raised p-button-success"  /></>
   }
 
   //copy info from life address to dead address objects
   const onAddressCopy = () => {
-    certificate.deathAreaType = certificate.lifeAreaType
+    if (!patient.person) return
+    certificate.deathAreaType = certificate.lifeAreaType    
     let _lifeAddr = patient.person.address 
     if (_lifeAddr === undefined) certificate.deathAddr = undefined      
     else {
@@ -54,19 +56,22 @@ const Section3: FC = () => {
           <div className='p-paragraph-field' style={{width: '98%'}}>
             <NullFlavorWrapper paraNum                     
               label={<label htmlFor="addr">Место постоянного жительства(регистрации)</label>}
-              checked={identified || checkedLifeArea}  
+              checked={identified && checkedLifeArea}  
               setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
+                if (!patient.person) return
                 if (nullFlavors) patient.person.nullFlavors = nullFlavors
                 if (!e.checked) patient.person.address = undefined                
               }}               
               field={<AddressFC2  submitted={submitted} 
                       id='person_addr'            
                       value={addressLife || DEFAULT_ADDRESS} 
-                      onClear={(value: IAddressR)=>{                                               
+                      onClear={(value: IAddressR)=>{  
+                        if (!patient.person) return                                             
                         patient.person.address = value
                         setAddressLife(patient.person.address)
                       }}
                       onChange={()=>{
+                        if (!patient.person) return
                         patient.person.address = addressStore.addressProps()                        
                         setAddressLife(patient.person.address)
                       }}  
@@ -74,7 +79,7 @@ const Section3: FC = () => {
               options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
               value={fromRelatives ? ASKU : UNK}
               field_name="address"
-              nullFlavors={patient.person.nullFlavors}
+              nullFlavors={patient.person?.nullFlavors}
             />                  
           </div>
         </div>
@@ -83,7 +88,7 @@ const Section3: FC = () => {
           <div className='p-paragraph-field'>
             <NullFlavorWrapper                     
               label={<label htmlFor="urban">Местность</label>}
-              checked={identified || !!certificate.lifeAreaType}  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
+              checked={identified && !!certificate.lifeAreaType}  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                 if (nullFlavors) certificate.nullFlavors = nullFlavors
                 if (!e.checked) certificate.lifeAreaType = undefined                
               }} 
@@ -103,7 +108,7 @@ const Section3: FC = () => {
           <div className='p-paragraph-field' style={{width: '98%'}}>
             <NullFlavorWrapper paraNum                     
               label={<label htmlFor="death_addr">Адрес места смерти</label>}
-              checked={identified || checkedDeathArea}  
+              checked={checkedDeathArea}  
               setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                 if (nullFlavors) certificate.nullFlavors = nullFlavors
                 if (!e.checked) certificate.deathAddr = undefined                
@@ -132,7 +137,8 @@ const Section3: FC = () => {
           <div className='p-paragraph-field' key={`dArea_${certificate.deathAreaType}`}>
             <NullFlavorWrapper                     
               label={<label htmlFor="urban">Местность</label>}
-              checked={identified || certificate.deathAddr!==undefined}  
+              checked={!!certificate.deathAreaType && certificate.nullFlavors.findIndex(item=>item.parent_attr==='death_area_type' && !item._destroy
+              )===-1}  
               setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                 if (nullFlavors) certificate.nullFlavors = nullFlavors
                 if (!e.checked) certificate.deathAreaType = undefined

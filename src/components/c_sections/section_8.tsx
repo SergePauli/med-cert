@@ -155,10 +155,10 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
               value={medservCode}/>          
           </div>         
           <div className="p-field p-col-12  p-d-flex p-ai-center">                          
-            <Calendar id="effectiveDate" className="p-mr-3" inputStyle={{width:'9.5rem'}} 
-              showTime={!dateETChecked} placeholder="Время"
+            <Calendar id="effectiveDate" className="p-mr-3" inputStyle={{width:'11.5rem'}} 
+              showTime={!dateETChecked} placeholder="Время" dateFormat="dd.mm.yy"
               key={`edt_${dateETChecked}_${procedure?.effectiveTime}`}              
-              value={procedure?.effectiveTime}
+              value={procedure?.effectiveTime} 
               onChange={(e)=>{ 
                 if (procedure===null) return 
                 if (e.target.value) {

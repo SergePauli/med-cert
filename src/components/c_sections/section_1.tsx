@@ -12,10 +12,11 @@ import NullFlavorWrapper from '../NullFlavorWrapper'
 import { ASKU, FEMALE, ID_CARD_TYPES, MALE, NA, NOGENDER, NULL_FLAVORS, PASSPORT_RF, UNK } from '../../utils/defaults'
 import { IReference } from '../../models/IReference'
 import { Calendar } from 'primereact/calendar'
-import { INullFlavorR } from '../../models/INullFlavor'
+import { checkFieldNullFlavor, INullFlavorR } from '../../models/INullFlavor'
 import { IPersonName } from '../../models/IPersonName'
 import IIdentity from '../../models/IIdentity'
 import Identity from '../../models/FormsData/Identity'
+import Person from '../../models/FormsData/Person'
 
 
  const Section1: FC = () => {   
@@ -25,14 +26,13 @@ import Identity from '../../models/FormsData/Identity'
   const person =  patient.person     
   const [yearBTChecked, setYearBTChecked] = useState<boolean>(!!patient.birth_year)   
   const [yearDTChecked, setYearDTChecked] = useState<boolean>(!!certificate.deathYear) 
-   
-  const fioChecked = true
+  
   const header = () => {
       return <span>Данные умершего</span>
     }
     
-  const identified = certificateStore.identified && person.fio !== undefined
-  const fio = person.fio ? {...person.fio} : {family:'', given_1:'', given_2:''}  
+  const identified = certificateStore.identified 
+  const [fio, setFio] = useState(person && person.fio ? person.fullName() : '') 
   const optionCode = certificateStore.fromRelatives ? 'ASKU' : 'NA'
   const isDeathTime = certificate.deathDatetime!==undefined 
         && certificate.nullFlavors.findIndex((item)=>item.parent_attr==="death_time")===-1
@@ -41,13 +41,14 @@ import Identity from '../../models/FormsData/Identity'
           <div className="p-fluid p-formgrid p-grid">
             <div className="p-field-checkbox p-col-12 p-lg-6">              
               <Checkbox inputId="notIdentified" checked={!certificateStore.identified} onChange={e =>{                
-                if (e.checked) person.fio = undefined
+                if (e.checked) patient.person = undefined
                 else { 
-                  person.fio = fio
+                  patient.person = new Person()
                   if (yearBTChecked) { setYearBTChecked(false) 
                     patient.setBirthDay(patient.birth_date as Date | undefined, false)
                   }      
-                }                
+                }  
+                checkFieldNullFlavor('person', patient.person, patient.nullFlavors, NA)              
                 certificateStore.identified = !e.checked  
                 }} />
               <label htmlFor="notIdentified">Умерший не идентифицирован</label>
@@ -57,13 +58,16 @@ import Identity from '../../models/FormsData/Identity'
               onChange={e =>{       
                 certificateStore.fromRelatives = e.checked
                 if (e.checked) { 
-                  person.fio = fio
+                  if (!patient.person) {
+                    patient.person = new Person()
+                    checkFieldNullFlavor('person', patient.person, patient.nullFlavors, NA)
+                  }  
                   if (yearBTChecked) { 
                     setYearBTChecked(false) 
                     patient.setBirthDay(patient.birth_date as Date | undefined, false)
                   }
                   patient.identity = undefined  
-                  patient.nullFlavors.push({parent_attr:'identity', code:ASKU})                 
+                  checkFieldNullFlavor('identity', patient.identity, patient.nullFlavors, ASKU)                                  
                 } else 
                   patient.identity = new Identity({identity_card_type_id: ID_CARD_TYPES[PASSPORT_RF].code} as IIdentity)                
                 }}/>
@@ -76,68 +80,28 @@ import Identity from '../../models/FormsData/Identity'
                 <NullFlavorWrapper 
                   disabled={!certificateStore.fromRelatives}               
                   checked={identified} 
-                  paraNum
-                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>
-                    { 
-                      if (e.checked)  person.fio = fio
-                      else person.fio = undefined 
-                      //if (nullFlavors) person.nullFlavors = nullFlavors
-                    }}                 
-                  label={<label htmlFor="family">Фамилия</label>}
-                  field={<InputText  id="family" value={fio.family} 
-                  autoFocus type="text" 
-                  onChange={(e)=>{                    
-                    fio.family = e.target.value
-                    person.fio = fio                    
+                  paraNum                                
+                  label={<label htmlFor="family">Фамилия матери, имя, отчество(при наличии)</label>}
+                  field={<InputText  id="fio" type="text" 
+                  value={fio}                    
+                  onChange={(e)=>{     
+                    if (!person) return
+                    setFio(e.target.value)               
+                    const values = e.target.value.trim().split(" ")
+                    if (values && values.length > 1) {
+                      const temp = {family: values[0], given_1: values[1]} as IPersonName
+                      if (values[2]) temp.given_2 = values[2]                       
+                      person.fio = temp
+                      checkFieldNullFlavor('fio.given_2', person.fio.given_2, person.nullFlavors, NA)                                           
+                    }                                        
                   }}/>}                  
                   options={NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))} 
                   value={certificateStore.fromRelatives ? ASKU : NA} 
-                  nullFlavors={person.nullFlavors}  
-                  field_name="person_name"                                 
+                  nullFlavors={patient.nullFlavors}  
+                  field_name="person"                                 
                 />             
               </div>
-              <div className="p-paragraph-field p-mr-2 p-mb-2" 
-              key={`pdiv2_${identified}`} style={{marginLeft:'1.5rem'}}>
-                <NullFlavorWrapper                   
-                  label={<label htmlFor="given_1">Имя</label>}
-                  checked={identified}                   
-                  field={
-                    <InputText id="given_1" value={fio.given_1} 
-                    type="text" 
-                    onChange={(e)=>{
-                      fio.given_1 = e.target.value
-                      person.fio = fio  
-                  }}/>}
-                  options={NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))}                   
-                  lincked                                    
-                />  
-              </div>
-              <div className="p-paragraph-field" style={{marginLeft:'1.5rem'}} key={`pdiv3_${identified}`}>
-                  <NullFlavorWrapper 
-                    disabled={!identified}
-                    label={<label htmlFor="given_2">Отчество</label>}
-                    checked={identified && fioChecked} 
-                    setCheck={(e:CheckboxChangeParams)=>{                      
-                      const fi = {family: fio.family, given_1: fio.given_1} as IPersonName
-                              if (e.checked)  fi.given_2='' 
-                              person.fio = fi
-                      }                      
-                    } 
-                    field={               
-                      <InputText id="given_2" type="text" 
-                        value={fio.given_2}                         
-                        onChange={(e)=>{ 
-                          fio.given_2 = e.target.value                         
-                          person.fio = fio                    
-                        }}
-                      />
-                    }
-                    options={[NULL_FLAVORS[identified ? NA : ASKU]]} 
-                    value={identified ? NA : ASKU} 
-                    lincked={!identified}                                      
-                  />
-              </div>              
-            </div>
+            </div>  
             <div className="p-d-flex p-jc-center">
               <div className='paragraph p-mr-1' > 2. </div>
               <div className='p-paragraph-field'>

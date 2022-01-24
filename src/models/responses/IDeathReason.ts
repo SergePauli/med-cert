@@ -7,6 +7,7 @@ export interface IDeathReason extends INullFlavorable {
   guid?: string
   certificate_id: number
   diagnosis?: IDiagnosis
+  ext_diagnosis?: IDiagnosis
   effective_time?: string
   procedures?: IProcedure[]
 }

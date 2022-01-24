@@ -40,7 +40,7 @@ export interface ICertificate extends INullFlavorable {
   traffic_accident?: number
   pregnancy_connection?: number
   author?: IAuthenticator
-  authenticator?: IAuthenticator
+  audithor?: IAuthenticator
   legal_authenticator?: IAuthenticator
   custodian_id?: number
   guid: string
