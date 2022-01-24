@@ -7,7 +7,7 @@ import '../styles/components/Divider.css'
 import '../styles/components/Button.css'
 import '../styles/pages/CertificatePage.css'
 
-import { useContext, FC, useEffect } from 'react'
+import { useContext, FC, useEffect, useRef } from 'react'
 import MainLayout from '../components/layouts/MainLayout'
 import { CERTIFICATE_ROUTE } from '../utils/consts'
 import { Avatar } from 'primereact/avatar'
@@ -26,7 +26,8 @@ import Section9 from '../components/c_sections/section_9'
 import { Context } from '..'
 import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
-import Certificate from '../models/FormsData/Certificate'
+import { Toast } from 'primereact/toast'
+import { DEFAULT_ERROR_TOAST } from '../utils/defaults'
 
 
 interface IMatch extends IRouteMatch {  
@@ -38,6 +39,7 @@ interface CertificatePageProps extends IRouteProps {
 
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
   const { certificateStore, userStore, layoutStore } = useContext(Context)
+  const toast = useRef<Toast>(null)  
   useEffect(()=>{
     if (userStore.userInfo) certificateStore.userInfo = userStore.userInfo
     certificateStore.getList()      
@@ -80,8 +82,13 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
                 .then(response=>{
                   certificateStore.clean()
                   certificateStore.select()
+                  if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись удалена', life: 3000 })
                 })
-                .catch(reason=>console.log(reason))
+                .catch(reason=>{
+                  console.log(reason)
+                  if (toast!==null && toast.current!==null) 
+                  toast.current.show(DEFAULT_ERROR_TOAST)
+                })
                 .finally(()=>layoutStore.isLoading = false)
               }
             }
@@ -96,10 +103,16 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
                 console.log('нет юзера')
                 layoutStore.isLoading = false
               } else {
-                result.then(response=>{
+                result.then(response=>{   
+                  layoutStore.isLoading = false               
+                  if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Изменения сохранены', life: 3000 })
                   console.log(response.data)
-                  certificateStore.cert = new Certificate(response.data)
-                }).catch(err=>console.log(err)).finally(()=>layoutStore.isLoading = false )
+                }).catch(err=>{       
+                  layoutStore.isLoading = false           
+                  if (toast!==null && toast.current!==null) 
+                  toast.current.show(DEFAULT_ERROR_TOAST)
+                  console.log(err)
+                })
               }
                             
             }
@@ -107,7 +120,13 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
         {
             label: 'Создать',
             icon: 'pi pi-plus',
-            command: () => certificateStore.createNew()
+            command: () => { 
+              try {
+                certificateStore.createNew() 
+                 if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Пустое  свидетельство создано!', detail: 'Внесите изменения и сохраните, чтоб получить номер', life: 3000 })
+              } catch {if (toast!==null && toast.current!==null) 
+                  toast.current.show(DEFAULT_ERROR_TOAST)}
+            }
         },
         {
             label: 'Далее',
@@ -143,10 +162,11 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
   const layoutParams = {
     title: 'Медицинское свидетельство о смерти',     
     url: `${CERTIFICATE_ROUTE}/${props.match.params.id}${props.location.search}`,
-    content:(<>
-      <div className="p-d-flex p-jc-center" >
-        {secton_router()}
-        <Card className="p-mr-2 p-mb-2 p-suggestion" key={`p_sug_${sugCount}`} header={suggestionHeader}>            
+    content:(<>      
+      <div className="p-d-flex p-jc-center" >        
+        {secton_router()}        
+        <Card className="p-mr-2 p-mb-2 p-suggestion"
+         key={`p_sug_${sugCount}`} header={suggestionHeader}>                        
             <DataTable className="p-datatable-sm" rowClassName={rowClass} 
             value={suggestions} responsiveLayout="scroll">
               <Column field="code" header="Код"></Column>
@@ -154,7 +174,8 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
               <Column body={doneBodyTemplate}></Column>
             </DataTable> 
         </Card>
-      </div>      
+      </div>   
+      <Toast ref={toast} />   
     </>),
     actionItems: items
   } 
