@@ -467,7 +467,8 @@ export default class Certificate implements ISerializable {
     if (this._certType) _cert.cert_type = this._certType
     if (this._childInfo) _cert.child_info_attributes = this._childInfo.getAttributes()
     else if (this._oldOne && this._oldOne.child_info) _cert.child_info_attributes = { _destroy: "1" } as IChildInfoR
-    if (this._deathAddr) _cert.death_addr_attributes = { ...this._deathAddr } as IAddressR
+    if (this._deathAddr && !!this._deathAddr.state && !!this._deathAddr.streetAddressLine)
+      _cert.death_addr_attributes = { ...this._deathAddr } as IAddressR
     else if (this._oldOne && this._oldOne.death_addr)
       _cert.death_addr_attributes = { id: this._oldOne.death_addr.id, _destroy: "1" } as IAddressR
     if (this._deathAreaType) _cert.death_area_type = this._deathAreaType
