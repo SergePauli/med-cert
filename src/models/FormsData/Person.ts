@@ -15,8 +15,10 @@ export default class Person implements ISerializable {
   private _nullFlavors: INullFlavorR[]
   private _address?: IAddressR | undefined
   private _contacts: IContact[]
+  private _oldOne?: IPerson
 
   constructor(props = {} as IPerson) {
+    this._oldOne = props
     this._personName = props.person_name
     this._SNILS = props.SNILS
     this._id = props.id
@@ -39,7 +41,10 @@ export default class Person implements ISerializable {
     let _person = {} as IPersonR
     if (this._id) _person.id = this._id
     if (this._SNILS) _person.SNILS = this._SNILS
-    if (this._address) _person.address_attributes = { ...this._address }
+    if (this._address && !!this._address.state && !!this._address.streetAddressLine)
+      _person.address_attributes = { ...this._address }
+    else if (this._oldOne && this._oldOne.address?.id)
+      _person.address_attributes = { id: this._oldOne.address.id, _destroy: "1" } as IAddressR
     if (this._contacts.length > 0) _person.contacts_attributes = [...this._contacts]
     if (this._nullFlavors.length > 0) _person.null_flavors_attributes = this.null_flavors_attributes()
     if (this._personName) _person.person_name_attributes = { ...this._personName }
@@ -90,5 +95,10 @@ export default class Person implements ISerializable {
   }
   set contacts(value: IContact[]) {
     this._contacts = value
+  }
+
+  fullName(): string {
+    const fio = this._personName
+    return !!fio ? `${fio.family} ${fio.given_1} ${!!fio.given_2 ? fio.given_2 : ""}` : ""
   }
 }
