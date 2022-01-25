@@ -190,7 +190,8 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
             }} />                    
           </div>
           <div className="p-field p-col-12">
-            <DataTable value={newReason.procedures} selection={selectedProcedures} 
+            <DataTable value={newReason.procedures} selection={selectedProcedures}
+              responsiveLayout="scroll" 
               className="p-datatable-sm" emptyMessage="Операции отсутствуют" style={{width:'100%'}} 
               onSelectionChange={e =>setSelectedProcedures(e.value)}  dataKey={"id"}>
               <Column selectionMode="multiple" headerStyle={{width: '3em'}}></Column>
@@ -201,7 +202,7 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
         </div> 
         <DataTable value={certificate.deathReasons} style={{marginTop:'8px', marginLeft:'10px'}} 
           className="p-datatable-sm" emptyMessage="Состояния отсутствуют" selection={selectedReasons}  
-          dataKey={"id"} onSelectionChange={e =>setSelectedReasons(e.value)}>
+          responsiveLayout="scroll" dataKey={"id"} onSelectionChange={e =>setSelectedReasons(e.value)}>
           <Column selectionMode="multiple" headerStyle={{width: '3em'}}></Column>
           <Column header="Состояние" body={reasonTextBodyTemplate}></Column>
           <Column header="Период времени" body={reasonTimeBodyTemplate}></Column>
