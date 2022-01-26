@@ -254,7 +254,6 @@ export const DoctorsPage: FC = () => {
             <Toast ref={toast} />
             <div className="card">
                 <Toolbar className="p-mb-4" right={rightToolbarTemplate}></Toolbar>
-
                 <DataTable ref={dt} value={doctors} selection={selectedDoctors} onSelectionChange={(e) => setSelectedDoctors(e.value)} responsiveLayout="scroll"
                     dataKey="id" >
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>                    

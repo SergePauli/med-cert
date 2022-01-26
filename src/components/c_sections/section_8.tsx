@@ -23,7 +23,7 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
 
 
  const Section8: FC = () => {
-  const { certificateStore } = useContext(Context) 
+  const { certificateStore, temporaryIDStore } = useContext(Context) 
   const checkReason = certificateStore.suggestions[EXT_REASON_SUG].done && certificateStore.suggestions[EXT_REASON_TIME_SUG].done
   
   
@@ -44,9 +44,9 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
   const header = () => {
       return <><span><span className='paragraph p-mr-1'>22(II).</span>Прочие состояния.</span> 
       <Button icon="pi pi-plus" className="p-ml-auto p-mr-2 p-button-sm p-button-raised p-button-success" label="Добавить состояние" 
-        disabled={!checkReason || (newReason.diagnosis===undefined && newReason.procedures.length===0) || procedure!==null }
+        disabled={!checkReason || (!newReason.diagnosis && newReason.procedures.length===0) || procedure!==null }
         onClick={()=>{
-          certificate.deathReasons.push(newReason)
+          if (!certificate.deathReasons.includes(newReason)) certificate.deathReasons.push(newReason)
           setNewReason(certificate.createDeathReason({} as IDeathReason))                
         }}
       />
@@ -80,7 +80,7 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
 
   const setMedServValue = (e:any)=>{
     if (procedure) procedure.medicalServ = e.value
-    else  setProcedure(new Procedure({medical_serv: e.value} as IProcedure))    
+    else  setProcedure(new Procedure({id: temporaryIDStore.lastProcedureID, medical_serv: e.value} as IProcedure))    
     setMedservText(e.value.name)
     setMedservCode(e.value.s_code)              
   } 
@@ -161,9 +161,8 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
               value={procedure?.effectiveTime} 
               onChange={(e)=>{ 
                 if (procedure===null) return 
-                if (e.target.value) {
-                  const ed = e.target.value as Date
-                  procedure.effectiveTime =dateETChecked ?  new Date(ed.getFullYear(), ed.getMonth(), ed.getDay()) : new Date(ed.getFullYear(), ed.getMonth(), ed.getDay(), ed.getHours(), ed.getMinutes())                  
+                if (e.target.value) {                  
+                  procedure.effectiveTime = e.target.value as Date
                 } else procedure.effectiveTime =  undefined               
                }}
               showIcon 
@@ -177,7 +176,7 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
             </div>                       
             <Button icon="pi pi-plus" className="p-ml-auto p-mr-2 p-button-sm p-button-raised p-button-success"  title="Добавить хир.операцию" disabled={procedure===null || (procedure.medicalServ===undefined && procedure.textValue === undefined)} onClick={()=>{
               if (procedure) { 
-                newReason.procedures.push(procedure)
+                if (newReason.procedures.findIndex(pr=>pr.guid === procedure.guid)===-1) newReason.procedures.push(procedure)
                 setProcedure(null) 
                 setMedservCode('')
                 setMedservText('')               
@@ -190,9 +189,23 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
             }} />                    
           </div>
           <div className="p-field p-col-12">
-            <DataTable value={newReason.procedures} selection={selectedProcedures} 
+            <DataTable value={newReason.procedures} selection={selectedProcedures}
+              responsiveLayout="scroll" dataKey={"id"}
               className="p-datatable-sm" emptyMessage="Операции отсутствуют" style={{width:'100%'}} 
-              onSelectionChange={e =>setSelectedProcedures(e.value)}  dataKey={"id"}>
+              onSelectionChange={e =>{
+                setSelectedProcedures(e.value)                
+                if (e.value && e.value.length>0) {
+                  const pr = e.value[0] as Procedure
+                  setProcedure(pr)
+                  setDateETChecked(pr.effectiveTime?.getHours() === 0 && pr.effectiveTime.getMinutes()=== 0)
+                  setMedservCode(pr.medicalServ.s_code)
+                  setMedservText(pr.medicalServ.name)
+                } else {
+                  setProcedure(null) 
+                  setMedservCode('')
+                  setMedservText('') 
+                }
+              }}  >
               <Column selectionMode="multiple" headerStyle={{width: '3em'}}></Column>
               <Column field="medicalServ.name" header="Наименование"></Column>
               <Column header="Время" body={procTimeBodyTemplate}></Column>                            
@@ -201,7 +214,13 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
         </div> 
         <DataTable value={certificate.deathReasons} style={{marginTop:'8px', marginLeft:'10px'}} 
           className="p-datatable-sm" emptyMessage="Состояния отсутствуют" selection={selectedReasons}  
-          dataKey={"id"} onSelectionChange={e =>setSelectedReasons(e.value)}>
+          responsiveLayout="scroll" dataKey={"id"} onSelectionChange={e=>{            
+            setSelectedReasons(e.value)            
+            if (e.value && e.value.length>0) setNewReason(e.value[0])
+            else {
+              setNewReason(certificate.createDeathReason({id: temporaryIDStore.lastDeathReasonID} as IDeathReason)) 
+            }
+          }}>
           <Column selectionMode="multiple" headerStyle={{width: '3em'}}></Column>
           <Column header="Состояние" body={reasonTextBodyTemplate}></Column>
           <Column header="Период времени" body={reasonTimeBodyTemplate}></Column>
