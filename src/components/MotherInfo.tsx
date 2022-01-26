@@ -5,7 +5,7 @@ import NullFlavorWrapper from './NullFlavorWrapper'
 import { ChildInfo } from '../models/FormsData/ChildInfo'
 import RelatedSubject from '../models/FormsData/RelatedSubject'
 import { IChildInfo } from '../models/IChildInfo'
-import {  INullFlavorR } from '../models/INullFlavor'
+import {  checkFieldNullFlavor, INullFlavorR } from '../models/INullFlavor'
 import { IPersonName } from '../models/IPersonName'
 import { IReference } from '../models/IReference'
 import { IRelatedSubject } from '../models/IRelatedSubject'
@@ -13,7 +13,7 @@ import { CheckboxChangeParams } from 'primereact/checkbox'
 import { Calendar } from 'primereact/calendar'
 import { Context } from '..'
 import AddressFC2 from './inputs/InputAddress'
-import { NULL_FLAVORS, UNK } from '../utils/defaults'
+import { NA, NULL_FLAVORS, UNK } from '../utils/defaults'
 import AddressDialog from './dialogs/AddressDialog'
 import { DEFAULT_ADDRESS, IAddressR } from '../models/requests/IAddressR'
 
@@ -79,6 +79,7 @@ export const MotherInfo = (props: MotherInfoProps) => {
                     if (values && values.length > 1) {
                       const temp = {family: values[0], given_1: values[1]} as IPersonName
                       if (values[2]) temp.given_2 = values[2]
+                      else checkFieldNullFlavor('given_2',temp.given_2,relatedSubject.nullFlavors, NA)
                       relatedSubject.fio = temp
                       props.onChange(childInfo)                     
                     }                                        
@@ -96,7 +97,7 @@ export const MotherInfo = (props: MotherInfoProps) => {
                       if (!e.checked) {                        
                         relatedSubject.birthTime = undefined                        
                       } 
-                      //if (nullFlavors) relatedSubject.nullFlavors = nullFlavors
+                      if (nullFlavors) relatedSubject.nullFlavors = nullFlavors
                     }} 
           onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{
             if (nullFlavors) relatedSubject.nullFlavors = nullFlavors}}
