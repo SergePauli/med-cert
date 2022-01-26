@@ -116,13 +116,13 @@ export class DeathReason implements ISerializable {
     this._procedures.forEach((proc) => {
       _result += proc.textValue || proc.medicalServ.name
       if (proc.effectiveTime) _result += " от " + proc.timeStr()
-      _result += ";"
+      _result += "; "
     })
     return _result
   }
   getAttributes(isExt = false): IDeathReasonR {
     let _dr = { guid: this._guid } as IDeathReasonR
-    if (this._id) _dr.id = this._id
+    if (this._id && this._id > -1) _dr.id = this._id
     if (this._effectiveTime) _dr.effective_time = this._effectiveTime
     if (this._diagnosis && !isExt) _dr.diagnosis_id = Number.parseInt(this._diagnosis.id)
     if (this._diagnosis && isExt) _dr.ext_diagnosis_id = Number.parseInt(this._diagnosis.id)
