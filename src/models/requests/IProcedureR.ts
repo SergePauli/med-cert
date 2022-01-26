@@ -5,6 +5,6 @@ export interface IProcedureR extends IDestroyble, INullFlavorableR {
   id?: number
   guid: string
   medical_serv_id?: number
-  text_value?: String
-  effective_time?: String
+  text_value?: string
+  effective_time?: string
 }
