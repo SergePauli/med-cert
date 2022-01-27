@@ -23,12 +23,18 @@ export class DeathReason implements ISerializable {
   private _procedures: Procedure[]
   private _nullFlavors: INullFlavorR[]
 
-  constructor(props: IDeathReason) {
+  constructor(props = {} as IDeathReason) {
     this._oldOne = { ...props }
     this._id = props.id
     this._guid = props.guid || uuidv4()
     this._diagnosis = props.diagnosis || props.ext_diagnosis
     if (props.effective_time) this._effectiveTime = new Date(props.effective_time)
+    this._days = props.days
+    this._hours = props.hours
+    this._minutes = props.minutes
+    this._months = props.months
+    this._weeks = props.weeks
+    this._years = props.years
     this._procedures = props.procedures?.map((proc) => new Procedure(proc)) || []
     this._nullFlavors =
       props.null_flavors?.map((item) => {
@@ -124,6 +130,12 @@ export class DeathReason implements ISerializable {
     let _dr = { guid: this._guid } as IDeathReasonR
     if (this._id && this._id > -1) _dr.id = this._id
     if (this._effectiveTime) _dr.effective_time = this._effectiveTime
+    if (this._days) _dr.days = this._days
+    if (this._hours) _dr.hours = this._hours
+    if (this._minutes) _dr.minutes = this._minutes
+    if (this._months) _dr.months = this._months
+    if (this._weeks) _dr.weeks = this._weeks
+    if (this._years) _dr.years = this._years
     if (this._diagnosis && !isExt) _dr.diagnosis_id = Number.parseInt(this._diagnosis.id)
     if (this._diagnosis && isExt) _dr.ext_diagnosis_id = Number.parseInt(this._diagnosis.id)
     if (this._nullFlavors.length > 0) _dr.null_flavors_attributes = this.null_flavors_attributes()

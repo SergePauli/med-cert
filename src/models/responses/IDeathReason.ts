@@ -9,5 +9,11 @@ export interface IDeathReason extends INullFlavorable {
   diagnosis?: IDiagnosis
   ext_diagnosis?: IDiagnosis
   effective_time?: string
+  years?: number
+  months?: number
+  weeks?: number
+  days?: number
+  hours?: number
+  minutes?: number
   procedures?: IProcedure[]
 }

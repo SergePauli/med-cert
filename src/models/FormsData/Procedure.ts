@@ -12,7 +12,7 @@ export class Procedure implements ISerializable {
   private _id?: number
   private _medicalServ: IMedicalServs
   private _guid: string
-  private _textValue?: String | undefined
+  private _textValue?: string | undefined
   private _effectiveTime?: Date
   private _nullFlavors: INullFlavorR[]
   constructor(props: IProcedure) {
@@ -48,10 +48,10 @@ export class Procedure implements ISerializable {
   set effectiveTime(value: Date | undefined) {
     this._effectiveTime = value
   }
-  get textValue(): String | undefined {
+  get textValue(): string | undefined {
     return this._textValue
   }
-  set textValue(value: String | undefined) {
+  set textValue(value: string | undefined) {
     this._textValue = value
   }
   get medicalServ(): IMedicalServs {

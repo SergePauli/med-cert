@@ -112,12 +112,12 @@ export default class Certificate implements ISerializable {
     else if (props.reason_ACME && props.reason_ACME === props.d_reason?.diagnosis?.ICD10)
       this._reasonACME = this._reasonD
 
-    if (props.a_reason) this._reasonA = this.createDeathReason(props.a_reason)
-    else this._reasonA = this.createDeathReason({} as IDeathReason)
-    if (props.b_reason) this._reasonB = this.createDeathReason(props.b_reason)
-    if (props.c_reason) this._reasonC = this.createDeathReason(props.c_reason)
-    if (props.d_reason) this._reasonD = this.createDeathReason(props.d_reason)
-    if (props.death_reasons) this._deathReasons = props.death_reasons.map((reason) => this.createDeathReason(reason))
+    if (props.a_reason) this._reasonA = new DeathReason(props.a_reason)
+    else this._reasonA = new DeathReason({} as IDeathReason)
+    if (props.b_reason) this._reasonB = new DeathReason(props.b_reason)
+    if (props.c_reason) this._reasonC = new DeathReason(props.c_reason)
+    if (props.d_reason) this._reasonD = new DeathReason(props.d_reason)
+    if (props.death_reasons) this._deathReasons = props.death_reasons.map((reason) => new DeathReason(reason))
     else this._deathReasons = []
     makeAutoObservable(this, undefined, { deep: false })
     this.disposers = []
@@ -412,25 +412,9 @@ export default class Certificate implements ISerializable {
       this.deathYear = undefined
     }
   }
-  createDeathReason(props = {} as IDeathReason): DeathReason {
-    const newReason = new DeathReason(props)
-    if (newReason.effectiveTime && !!this._deathDatetime) {
-      try {
-        const diff = timeDiff(newReason.effectiveTime, this._deathDatetime)
-        if (diff.days && diff.days > 0) newReason.days = diff.days
-        if (diff.hours) newReason.hours = diff.hours
-        if (diff.minutes && diff.minutes > 0) newReason.minutes = diff.minutes
-        if (diff.months && diff.months > 0) newReason.months = diff.months
-        if (diff.weeks && diff.weeks > 0) newReason.weeks = diff.weeks
-        if (diff.years && diff.years > 0) newReason.years = diff.years
-      } catch {
-        newReason.effectiveTime = this._deathDatetime
-      }
-    }
-    return newReason
-  }
+
   saveReasonEffTime(reason: DeathReason) {
-    if (this._deathDatetime === undefined) return false
+    if (!this._deathDatetime) return false
     let result = new Date(this._deathDatetime)
     if (reason.minutes) result.setMinutes(result.getMinutes() - reason.minutes)
     if (reason.hours) result.setHours(result.getHours() - reason.hours)

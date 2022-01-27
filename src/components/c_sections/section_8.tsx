@@ -19,6 +19,7 @@ import { Checkbox } from 'primereact/checkbox'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
+import { InputText } from 'primereact/inputtext'
 
 
 
@@ -28,9 +29,9 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
   
   
   const certificate = certificateStore.cert   
-  const [newReason, setNewReason] = useState(certificate.createDeathReason({} as IDeathReason))
+  const [newReason, setNewReason] = useState(new DeathReason({id: temporaryIDStore.lastDeathReasonID} as IDeathReason))
   const [medicalServs, setMedicalServs] = useState<IMedicalServs[]>([]) 
-  const [medservText, setMedservText] = useState('')
+  const [medservText, setMedservText] = useState('')  
   const [medservCode, setMedservCode] = useState('')
   const [procedure, setProcedure] = useState<Procedure | null>(null)  
   const [dateETChecked, setDateETChecked] = useState(false)
@@ -47,7 +48,7 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
         disabled={!checkReason || (!newReason.diagnosis && newReason.procedures.length===0) || procedure!==null }
         onClick={()=>{
           if (!certificate.deathReasons.includes(newReason)) certificate.deathReasons.push(newReason)
-          setNewReason(certificate.createDeathReason({} as IDeathReason))                
+          setNewReason(new DeathReason({id: temporaryIDStore.lastDeathReasonID} as IDeathReason))                
         }}
       />
       <Button icon="pi pi-minus" className="p-button-sm p-button-raised p-button-danger"  
@@ -126,7 +127,10 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
           key={`ra2_${newReason.effectiveTime}`}           
           onChange={(reason: DeathReason | undefined)=>{  
             if (reason) {              
-              if (reason !==newReason) setNewReason(reason)
+              if (reason!==newReason) {
+                if (!reason.id) reason.id = temporaryIDStore.lastDeathReasonID
+                setNewReason(reason)
+              }  
             }           
           }}
           onDiagnosisChecked={(checked)=>setDiagnosChecked(checked)}
@@ -153,7 +157,15 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
                  else setMedservCode(e.value)               
               }}
               value={medservCode}/>          
-          </div>         
+          </div>  
+          <div className="p-field p-col-12">
+            <InputText id="procedure_alterText" disabled={!procedure}
+            placeholder="Свое наименование, если оно отличается от официального"
+               onChange={e =>{ 
+                if (procedure) procedure.textValue = e.target.value               
+              }}
+              value={procedure?.textValue || ''}/>          
+          </div>       
           <div className="p-field p-col-12  p-d-flex p-ai-center">                          
             <Calendar id="effectiveDate" className="p-mr-3" inputStyle={{width:'11.5rem'}} 
               showTime={!dateETChecked} placeholder="Время" dateFormat="dd.mm.yy"
@@ -218,7 +230,7 @@ import { EXT_REASON_SUG, EXT_REASON_TIME_SUG } from '../../utils/defaults'
             setSelectedReasons(e.value)            
             if (e.value && e.value.length>0) setNewReason(e.value[0])
             else {
-              setNewReason(certificate.createDeathReason({id: temporaryIDStore.lastDeathReasonID} as IDeathReason)) 
+              setNewReason(new DeathReason({id: temporaryIDStore.lastDeathReasonID} as IDeathReason)) 
             }
           }}>
           <Column selectionMode="multiple" headerStyle={{width: '3em'}}></Column>

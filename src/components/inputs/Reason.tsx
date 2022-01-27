@@ -166,7 +166,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
       setCheck={(e: CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
         setChecked(e.checked)        
         if (e.checked) {
-          const reason = props.certificate.createDeathReason({certificate_id: props.certificate.id} as IDeathReason)
+          const reason = new DeathReason()
           props.onChange(reason)
           setDeathReason(reason)
         } else {           
