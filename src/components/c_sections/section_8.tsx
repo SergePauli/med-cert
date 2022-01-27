@@ -29,7 +29,7 @@ import { InputText } from 'primereact/inputtext'
   
   
   const certificate = certificateStore.cert   
-  const [newReason, setNewReason] = useState(certificate.createDeathReason({} as IDeathReason))
+  const [newReason, setNewReason] = useState(new DeathReason({id: temporaryIDStore.lastDeathReasonID} as IDeathReason))
   const [medicalServs, setMedicalServs] = useState<IMedicalServs[]>([]) 
   const [medservText, setMedservText] = useState('')  
   const [medservCode, setMedservCode] = useState('')
@@ -48,7 +48,7 @@ import { InputText } from 'primereact/inputtext'
         disabled={!checkReason || (!newReason.diagnosis && newReason.procedures.length===0) || procedure!==null }
         onClick={()=>{
           if (!certificate.deathReasons.includes(newReason)) certificate.deathReasons.push(newReason)
-          setNewReason(certificate.createDeathReason({} as IDeathReason))                
+          setNewReason(new DeathReason({id: temporaryIDStore.lastDeathReasonID} as IDeathReason))                
         }}
       />
       <Button icon="pi pi-minus" className="p-button-sm p-button-raised p-button-danger"  
@@ -127,7 +127,10 @@ import { InputText } from 'primereact/inputtext'
           key={`ra2_${newReason.effectiveTime}`}           
           onChange={(reason: DeathReason | undefined)=>{  
             if (reason) {              
-              if (reason !==newReason) setNewReason(reason)
+              if (reason!==newReason) {
+                if (!reason.id) reason.id = temporaryIDStore.lastDeathReasonID
+                setNewReason(reason)
+              }  
             }           
           }}
           onDiagnosisChecked={(checked)=>setDiagnosChecked(checked)}
@@ -227,7 +230,7 @@ import { InputText } from 'primereact/inputtext'
             setSelectedReasons(e.value)            
             if (e.value && e.value.length>0) setNewReason(e.value[0])
             else {
-              setNewReason(certificate.createDeathReason({id: temporaryIDStore.lastDeathReasonID} as IDeathReason)) 
+              setNewReason(new DeathReason({id: temporaryIDStore.lastDeathReasonID} as IDeathReason)) 
             }
           }}>
           <Column selectionMode="multiple" headerStyle={{width: '3em'}}></Column>

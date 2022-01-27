@@ -13,6 +13,7 @@ import Reason from '../inputs/Reason'
 import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
 
+
  const Section7: FC = () => {
   const { certificateStore } = useContext(Context)   
   
@@ -47,7 +48,8 @@ import { InputText } from 'primereact/inputtext'
           fieldName='a_reason' 
           onDown={()=>{
             if (!certificate.reasonA && !certificate.reasonB) return
-            reasonIDExchange(certificate.reasonA || certificate.createDeathReason(), certificate.reasonB || certificate.createDeathReason())            
+            reasonIDExchange(certificate.reasonA || new DeathReason(), 
+            certificate.reasonB || new DeathReason())            
             const reason = certificate.reasonA
             certificate.reasonA = certificate.reasonB
             certificate.reasonB = reason           
@@ -66,14 +68,16 @@ import { InputText } from 'primereact/inputtext'
           fieldName='b_reason' 
           onDown={()=>{
             if (!certificate.reasonB && !certificate.reasonC) return
-            reasonIDExchange(certificate.reasonB || certificate.createDeathReason(), certificate.reasonC || certificate.createDeathReason())
+            reasonIDExchange(certificate.reasonB || new DeathReason(), 
+            certificate.reasonC || new DeathReason())
             const reason = certificate.reasonB
             certificate.reasonB = certificate.reasonC
             certificate.reasonC = reason
           }}  
           onUp={()=>{
             if (!certificate.reasonB && !certificate.reasonC) return
-            reasonIDExchange(certificate.reasonC || certificate.createDeathReason(), certificate.reasonB || certificate.createDeathReason())
+            reasonIDExchange(certificate.reasonC || new DeathReason(),
+             certificate.reasonB || new DeathReason())
             const reason = certificate.reasonB
             certificate.reasonB = certificate.reasonA
             certificate.reasonA = reason
@@ -91,7 +95,8 @@ import { InputText } from 'primereact/inputtext'
           }} fieldName='c_reason' checked={reasonCckecked}
           onUp={()=>{
             if (!certificate.reasonC && !certificate.reasonB) return
-            reasonIDExchange(certificate.reasonC || certificate.createDeathReason(), certificate.reasonB || certificate.createDeathReason())
+            reasonIDExchange(certificate.reasonC || new DeathReason(),
+             certificate.reasonB || new DeathReason())
             const reason = certificate.reasonC
             certificate.reasonC = certificate.reasonB
             certificate.reasonB = reason
