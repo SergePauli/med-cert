@@ -1,8 +1,10 @@
 import { AxiosResponse } from "axios"
 import $api, { API_URL } from "../http"
 import { NULLFLAVORABLE_RENDER_OPTIONS } from "../models/render_options/address"
+import { DEFAULT_AUTHENTICATOR_RENDER_OPTIONS } from "../models/render_options/Authenticator"
 import { CHILD_INFO_RENDER_OPTIONS } from "../models/render_options/child_info"
 import { DEFAULT_RENDER_OPTIONS } from "../models/render_options/default"
+import { SHORT_DOCTOR_RENDER_OPTIONS } from "../models/render_options/Doctor"
 import { EXTERNAL_DEATH_REASON_RENDER_OPTIONS } from "../models/render_options/external_death_reason"
 import { LETTERED_DEATH_REASON_RENDER_OPTIONS } from "../models/render_options/lettered_reason"
 import { OTHER_REASON_RENDER_OPTIONS } from "../models/render_options/other_reason"
@@ -15,7 +17,7 @@ import { ICertificate } from "../models/responses/ICertificate"
 
 export const CERTIFICATE_FULL_RENDER_OPTIONS = {
   render_options: {
-    except: ["patient_id", "updated_at"],
+    except: ["custodian_id", "patient_id", "updated_at"],
     include: [
       "patient",
       "author",
@@ -27,11 +29,22 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
       "d_reason",
       "death_addr",
       "child_info",
+      "custodian",
       "death_reasons",
       "null_flavors",
     ],
   },
-  includes: ["patient", "a_reason", "b_reason", "c_reason", "d_reason", "death_addr", "child_info", "death_reasons"],
+  includes: [
+    "patient",
+    "custodian",
+    "a_reason",
+    "b_reason",
+    "c_reason",
+    "d_reason",
+    "death_addr",
+    "child_info",
+    "death_reasons",
+  ],
   death_addr: NULLFLAVORABLE_RENDER_OPTIONS,
   patient: PATIENT_RENDER_OPTIONS,
   identity: NULLFLAVORABLE_RENDER_OPTIONS,
@@ -40,15 +53,18 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
   b_reason: LETTERED_DEATH_REASON_RENDER_OPTIONS,
   c_reason: LETTERED_DEATH_REASON_RENDER_OPTIONS,
   d_reason: EXTERNAL_DEATH_REASON_RENDER_OPTIONS,
-  author: DEFAULT_RENDER_OPTIONS,
-  legal_authenticator: DEFAULT_RENDER_OPTIONS,
-  audithor: DEFAULT_RENDER_OPTIONS,
+  author: DEFAULT_AUTHENTICATOR_RENDER_OPTIONS,
+  legal_authenticator: DEFAULT_AUTHENTICATOR_RENDER_OPTIONS,
+  audithor: DEFAULT_AUTHENTICATOR_RENDER_OPTIONS,
   death_reasons: OTHER_REASON_RENDER_OPTIONS,
   procedures: PROCEDURE_RENDER_OPTIONS,
   child_info: CHILD_INFO_RENDER_OPTIONS,
   related_subject: RELATED_SUBJECT_RENDER_OPTIONS,
   addr: NULLFLAVORABLE_RENDER_OPTIONS,
   person: PERSON_RENDER_OPTIONS,
+  doctor: SHORT_DOCTOR_RENDER_OPTIONS,
+  position: { only: ["id", "name"] },
+  custodian: { only: ["id", "name"] },
   null_flavors: DEFAULT_RENDER_OPTIONS,
 }
 
