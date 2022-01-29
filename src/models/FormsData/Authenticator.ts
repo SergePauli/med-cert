@@ -9,7 +9,7 @@ export default class Authenticator implements ISerializable {
   private _doctorID?: number | undefined
   constructor(props: IAuthenticator) {
     this._id = props.id
-    this._doctorID = props.doctor_id
+    this._doctorID = props.doctor.id
     if (props.time) this._time = new Date(props.time)
     else this._time = new Date()
     makeAutoObservable(this)
