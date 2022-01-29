@@ -117,7 +117,7 @@ import { IAuthenticator } from '../../models/responses/IAuthenticator'
                   value={doctors?.find(item=>item.id === certificate.author?.doctorID)} showClear             
                   onChange={(e) =>{
                     if (e.value) { 
-                      certificate.author = new Authenticator({doctor_id: e.value.id} as IAuthenticator)                     
+                      certificate.author = new Authenticator({doctor: e.value} as IAuthenticator)                     
                     } else certificate.author = undefined                       
                   }} />
                 <label htmlFor="legalAuthenticator">Руководитель медицинской организации *</label>
@@ -126,7 +126,7 @@ import { IAuthenticator } from '../../models/responses/IAuthenticator'
                   value={doctors?.find(item=>item.id === certificate.legalAuthenticator?.doctorID)}                
                   onChange={(e) =>{
                     if (e.value) { 
-                      certificate.legalAuthenticator =  new Authenticator({doctor_id: e.value.id} as IAuthenticator)                     
+                      certificate.legalAuthenticator =  new Authenticator({doctor: e.value} as IAuthenticator)                     
                     } else certificate.legalAuthenticator = undefined                   
                   }} />  
               </div>               
@@ -140,7 +140,7 @@ import { IAuthenticator } from '../../models/responses/IAuthenticator'
                   value={doctors?.find(item=>item.id===certificate.authenticator?.doctorID)}                
                   onChange={e=>{
                     if (e.value) {
-                      certificate.authenticator =  new Authenticator({doctor_id: e.value.id} as IAuthenticator)                      
+                      certificate.authenticator =  new Authenticator({doctor: e.value} as IAuthenticator)                      
                     } else certificate.authenticator = undefined
                   }} 
                 />
