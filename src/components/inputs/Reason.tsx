@@ -10,12 +10,10 @@ import Certificate from '../../models/FormsData/Certificate'
 import { DeathReason } from '../../models/FormsData/DeathReason'
 import { INullFlavorR } from '../../models/INullFlavor'
 import { IReference } from '../../models/IReference'
-import { IDeathReason } from '../../models/responses/IDeathReason'
 import { IDiagnosis } from '../../models/responses/IDiagnosis'
 import DiagnosisService from '../../services/DiagnosisService'
 import { NA, NULL_FLAVORS, UNK } from '../../utils/defaults'
 import NullFlavorWrapper from '../NullFlavorWrapper'
-
 
 type ReasonProps = {
   disabled?:boolean

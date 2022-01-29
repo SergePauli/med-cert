@@ -74,7 +74,7 @@ export default class CertificateStore {
     this.disposers = []
     this._certs = []
     this._cert = new Certificate({
-      custodian_id: this._userInfo?.organization.id,
+      custodian: this._userInfo?.organization,
       patient: {
         organization_id: this._userInfo?.organization.id,
         identity: {
@@ -423,6 +423,9 @@ export default class CertificateStore {
   set submitted(value: boolean) {
     this._submitted = value
   }
+  get certs(): ICertificate[] {
+    return this._certs
+  }
   // genSeries(userInfo: IUserInfo) {
   //   const today = new Date().toLocaleDateString()
   //   // номер версии системы у текуще - 3
@@ -450,7 +453,7 @@ export default class CertificateStore {
   }
   createNew() {
     this._cert = new Certificate({
-      custodian_id: this._userInfo?.organization.id,
+      custodian: this._userInfo?.organization,
       patient: {
         organization_id: this._userInfo?.organization.id,
         identity: {
@@ -488,7 +491,7 @@ export default class CertificateStore {
     else this.createNew()
   }
 
-  getList() {
+  getList(doAfter?: () => void) {
     if (!this._userInfo) return false
     CertificateService.getCertificates({ q: { custudian_id_eq: this._userInfo.organization.id } })
       .then((response) => {
@@ -497,6 +500,25 @@ export default class CertificateStore {
         this.select()
       })
       .catch((err) => console.log(err))
+      .finally(() => {
+        if (doAfter) doAfter()
+      })
+  }
+
+  findById(certificate_id: number, doAfter?: () => void) {
+    if (!this._userInfo) return false
+    CertificateService.getCertificates({
+      q: { custudian_id_eq: this._userInfo.organization.id, id_eq: certificate_id },
+    })
+      .then((response) => {
+        if (response.data && response.data.length > 0) this._cert = new Certificate(response.data[0])
+        console.log("response.data", response.data)
+        this.certs.push(response.data[0])
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        if (doAfter) doAfter()
+      })
   }
   dispose() {
     // So, to avoid subtle memory issues, always call the
