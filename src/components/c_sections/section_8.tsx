@@ -102,12 +102,12 @@ import { InputText } from 'primereact/inputtext'
   const reasonTimeBodyTemplate = (rowData: DeathReason) => {
     let _resultStr = ''
     if (rowData.effectiveTime === undefined) return _resultStr
-    if (rowData.years && rowData.years > 0) _resultStr += `${rowData.years}лет`
-    if (rowData.months && rowData.months > 0) _resultStr += `${rowData.months}мес`
-    if (rowData.weeks && rowData.weeks > 0) _resultStr += `${rowData.weeks}нед`
-    if (rowData.days && rowData.days > 0) _resultStr += `${rowData.days}дн`
-    if (rowData.hours && rowData.hours > 0) _resultStr += `${rowData.hours}час`
-    if (rowData.minutes && rowData.minutes > 0) _resultStr += `${rowData.minutes}мин`
+    if (rowData.years && rowData.years > 0) _resultStr += `лет:${rowData.years} `
+    if (rowData.months && rowData.months > 0) _resultStr += `мес: ${rowData.months}`
+    if (rowData.weeks && rowData.weeks > 0) _resultStr += `нед: ${rowData.weeks}`
+    if (rowData.days && rowData.days > 0) _resultStr += `дн: ${rowData.days}`
+    if (rowData.hours && rowData.hours > 0) _resultStr += `час: ${rowData.hours}`
+    if (rowData.minutes && rowData.minutes > 0) _resultStr += `мин: ${rowData.minutes}`
     return _resultStr
   }
   
