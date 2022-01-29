@@ -4,6 +4,7 @@ import { INullFlavorable } from "../INullFlavorable"
 import { IPatient } from "../IPatient"
 import { IAddress } from "./IAddress"
 import { IDeathReason } from "./IDeathReason"
+import { IReferenceId } from "../IReference"
 
 export interface ICertificate extends INullFlavorable {
   id: number
@@ -42,7 +43,7 @@ export interface ICertificate extends INullFlavorable {
   author?: IAuthenticator
   audithor?: IAuthenticator
   legal_authenticator?: IAuthenticator
-  custodian_id?: number
+  custodian?: IReferenceId
   guid: string
   latest_one?: ICertificate
   create_at: string

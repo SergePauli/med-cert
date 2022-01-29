@@ -1,7 +1,6 @@
 import { autorun, makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
 import { NA, NULL_FLAVOR_IDX, REGION_OKATO } from "../../utils/defaults"
-import { timeDiff } from "../../utils/functions"
 import { ISerializable } from "../common/ISerializabale"
 import { IAudit } from "../IAudit"
 import { checkFieldNullFlavor, INullFlavorR } from "../INullFlavor"
@@ -57,6 +56,7 @@ export default class Certificate implements ISerializable {
   private _legalAuthenticator?: Authenticator | undefined
   private _nullFlavors: INullFlavorR[]
   private _audits: IAudit[]
+  private _custodian_id?: number
   private _oldOne?: ICertificate
   disposers: (() => void)[]
 
@@ -70,6 +70,7 @@ export default class Certificate implements ISerializable {
     this._audits = []
     this._id = props.id || -1
     this._guid = props.guid || uuidv4()
+    this._custodian_id = props.custodian?.id
     this._patient = props.patient ? new Patient(props.patient) : new Patient()
     if (props.issue_date) this._issueDate = new Date(props.issue_date)
     this._certType = props.cert_type
@@ -501,7 +502,8 @@ export default class Certificate implements ISerializable {
     if (this._socialStatus) _cert.social_status = this._socialStatus
     if (this._trafficAccident) _cert.traffic_accident = this._trafficAccident
     if (this._patient) _cert.patient_attributes = this._patient.getAttributes()
-    if (_cert.patient_attributes) _cert.custodian_id = _cert.patient_attributes.organization_id
+    if (this._custodian_id) _cert.custodian_id = this._custodian_id
+
     return _cert
   }
 
