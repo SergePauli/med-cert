@@ -38,12 +38,27 @@ interface CertificatePageProps extends IRouteProps {
 }
 
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
-  const { certificateStore, userStore, layoutStore } = useContext(Context)
-  const toast = useRef<Toast>(null)  
+  const { certificateStore, userStore, layoutStore } = useContext(Context)   
   useEffect(()=>{
     if (userStore.userInfo) certificateStore.userInfo = userStore.userInfo
-    certificateStore.getList()      
-  },[certificateStore, userStore.userInfo])
+    layoutStore.isLoading = true
+    certificateStore.getList(()=>layoutStore.isLoading = false)         
+  },[certificateStore, layoutStore, userStore.userInfo])
+  const certID = props.match.params.id 
+  useEffect(()=>{
+    if (certID === certificateStore.cert.id) return
+    let _idx = -1
+    const cArray = certificateStore.certs
+    if (cArray.length>0){
+      _idx = cArray.findIndex(el=>el.id === certID)
+    }
+    if (_idx>-1) certificateStore.select(_idx)
+    else {
+      layoutStore.isLoading = true
+      certificateStore.findById(certID, ()=>layoutStore.isLoading = false)
+    }  
+  },[certID, certificateStore, layoutStore, certificateStore.cert.id])
+  const toast = useRef<Toast>(null)  
   const secton_router = ()=>{
     switch (props.location.search) {
       case "?q=0": return <Section0 />
@@ -161,7 +176,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
   
   const layoutParams = {
     title: 'Медицинское свидетельство о смерти',     
-    url: `${CERTIFICATE_ROUTE}/${props.match.params.id}${props.location.search}`,
+    url: `${CERTIFICATE_ROUTE}/${certID}${props.location.search}`,
     content:(<>      
       <div className="p-d-flex p-jc-center" >        
         {secton_router()}        
