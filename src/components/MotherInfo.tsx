@@ -101,7 +101,8 @@ export const MotherInfo = (props: MotherInfoProps) => {
                     }} 
           onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{
             if (nullFlavors) relatedSubject.nullFlavors = nullFlavors}}
-          field={<Calendar id="dateBirth" showIcon dateFormat='dd.mm.yy'                                           
+          field={<Calendar id="dateBirth" showIcon dateFormat='dd.mm.yy'
+                  locale='ru' mask='99.99.9999'                                          
                   value={relatedSubject.birthTime} 
                   onChange={(e)=>{
                     relatedSubject.birthTime = e.target.value as Date | undefined
