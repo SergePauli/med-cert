@@ -104,7 +104,10 @@ export default class CertificateStore {
       if (!this._cert) return
       const patient = this._cert.patient
       const isBirthDay =
-        !patient.birth_date && patient.nullFlavors.findIndex((element) => element.parent_attr === "birth_date") === -1
+        !patient.birth_date &&
+        patient.nullFlavors.findIndex((element) => {
+          return element.parent_attr === "birth_date" && !element._destroy
+        }) === -1
       this._suggestions[PATIENT_BIRTHDAY_SUG].done = !isBirthDay
     })
     this.disposers[4] = autorun(() => {
@@ -118,8 +121,9 @@ export default class CertificateStore {
       if (!this._cert) return
       const person = this._cert.patient.person
       const isSNILS =
-        !person ||
-        ((!person.SNILS || person.SNILS.length < 14) &&
+        (!person && this._identified) ||
+        (person &&
+          (!person.SNILS || person.SNILS.length < 14) &&
           person.nullFlavors.findIndex((element) => element.parent_attr === "SNILS") === -1)
       this._suggestions[SNILS_SUG].done = !isSNILS
     })
@@ -175,17 +179,19 @@ export default class CertificateStore {
       if (!this._cert) return
       const patient = this._cert.patient
       const isIDNumber =
-        (!patient.identity && patient.nullFlavors.findIndex((element) => element.parent_attr === "identity") === -1) ||
-        (patient.identity && !patient.identity?.number)
+        (!patient.identity &&
+          patient.nullFlavors.findIndex((element) => element.parent_attr === "identity" && !element._destroy) === -1) ||
+        (patient.identity && !patient.identity.number)
       this._suggestions[IDNUMBER_SUG].done = !isIDNumber
     })
     this.disposers[12] = autorun(() => {
       const person = this._cert.patient.person
       const isLifeArea =
-        !person ||
-        ((!person.address ||
-          !person.address.streetAddressLine ||
-          person.address.streetAddressLine.split(",").length < 3) &&
+        (!person && this._identified) ||
+        (person &&
+          (!person.address ||
+            !person.address.streetAddressLine ||
+            person.address.streetAddressLine.split(",").length < 3) &&
           person.nullFlavors.findIndex((element) => element.parent_attr === "address") === -1)
       this._suggestions[LIFE_PLACE_SUG].done = !isLifeArea
     })
@@ -367,8 +373,9 @@ export default class CertificateStore {
       this._suggestions[LEGAL_AUTHENTICATOR_SUG].done = !!this._cert.legalAuthenticator
     })
     this.disposers[43] = autorun(() => {
-      if (!this._cert) return
-      this._identified = !!this._cert.patient.person
+      this._identified =
+        !!this._cert.patient.person ||
+        this._cert.patient.nullFlavors.findIndex((el) => el.parent_attr === "person" && !el._destroy) === -1
     })
     this.disposers[44] = autorun(() => {
       if (!this._cert) return
@@ -378,7 +385,7 @@ export default class CertificateStore {
       const person = this._cert.patient?.person
       const fio = person?.fio
       const isPersonNameSug =
-        !person ||
+        (!person && this._identified) ||
         (!!fio &&
           (fio.family.trim().length === 0 ||
             fio.given_1.trim().length === 0 ||
@@ -424,7 +431,9 @@ export default class CertificateStore {
     this._submitted = value
   }
   get certs(): ICertificate[] {
-    return this._certs
+    return this._certs.map((el) => {
+      return { ...el }
+    })
   }
   // genSeries(userInfo: IUserInfo) {
   //   const today = new Date().toLocaleDateString()
@@ -451,8 +460,9 @@ export default class CertificateStore {
   set userInfo(value: IUserInfo | undefined) {
     this._userInfo = value
   }
-  createNew() {
+  createNew(id = -1) {
     this._cert = new Certificate({
+      id: id,
       custodian: this._userInfo?.organization,
       patient: {
         organization_id: this._userInfo?.organization.id,
@@ -486,17 +496,17 @@ export default class CertificateStore {
     }
   }
 
-  select(number = 0) {
-    if (this._certs.length > 0) this._cert = new Certificate(this._certs[number])
-    else this.createNew()
+  select(number = 1) {
+    if (this._certs.length > 1) this._cert = new Certificate(this._certs[number])
+    else this._cert = new Certificate(this._certs[0])
   }
 
   getList(doAfter?: () => void) {
     if (!this._userInfo) return false
-    CertificateService.getCertificates({ q: { custudian_id_eq: this._userInfo.organization.id } })
+    CertificateService.getCertificates({ q: { custudian_id_eq: this._userInfo?.organization.id } })
       .then((response) => {
         this._certs = response.data
-        console.log("response.data", response.data)
+        console.log("getList response", { q: { custudian_id_eq: this._userInfo?.organization.id } }, response.data)
         this.select()
       })
       .catch((err) => console.log(err))
@@ -512,7 +522,11 @@ export default class CertificateStore {
     })
       .then((response) => {
         if (response.data && response.data.length > 0) this._cert = new Certificate(response.data[0])
-        console.log("response.data", response.data)
+        console.log(
+          "findById response",
+          { custudian_id_eq: this._userInfo?.organization.id, id_eq: certificate_id },
+          response.data
+        )
         this.certs.push(response.data[0])
       })
       .catch((err) => console.log(err))
