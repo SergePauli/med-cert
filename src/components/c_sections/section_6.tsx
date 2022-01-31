@@ -64,14 +64,17 @@ import { BASIS_DERMINING } from '../../NSI/1.2.643.5.1.13.13.99.2.23'
                   onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{
                       if (nullFlavors) certificate.nullFlavors = nullFlavors}}
                   field={<div className="p-d-flex p-flex-wrap p-jc-start">
-                          <Calendar id="extReasonTime" showIcon className="p-mr-3 p-mb-2" placeholder='дата'                                          
+                          <Calendar id="extReasonTime" showIcon className="p-mr-3 p-mb-2"
+                            placeholder='дата' dateFormat={"dd.mm.yy"} 
+                            locale="ru" mask="99.99.9999" panelStyle={{marginLeft:'12rem'}}                                         
                             value={certificate.extReasonTime} 
                             onChange={(e)=>{
                               certificate.extReasonTime = e.target.value as Date | undefined
                             }}                         
                           />
-                         <Calendar id="timereason" timeOnly hourFormat="24" placeholder='время'             
-                            value={certificate.extReasonTime} className="p-mr-3 p-mb-2"
+                         <Calendar id="timereason" className="p-mr-3 p-mb-2" timeOnly 
+                         hourFormat="24" placeholder='время' locale="ru"           
+                         value={certificate.extReasonTime}                            
                             onChange={(e)=>{
                               certificate.extReasonTime = e.target.value as Date | undefined
                             }}
