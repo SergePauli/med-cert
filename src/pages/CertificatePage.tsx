@@ -31,31 +31,31 @@ import { DEFAULT_ERROR_TOAST } from '../utils/defaults'
 
 
 interface IMatch extends IRouteMatch {  
-  params: {id: number}
+  params: {id: string}
 }
 interface CertificatePageProps extends IRouteProps { 
     match: IMatch  
 }
 
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
-  const { certificateStore, userStore, layoutStore } = useContext(Context)   
-  useEffect(()=>{
-    if (userStore.userInfo) certificateStore.userInfo = userStore.userInfo
-    layoutStore.isLoading = true
-    certificateStore.getList(()=>layoutStore.isLoading = false)         
-  },[certificateStore, layoutStore, userStore.userInfo])
-  const certID = props.match.params.id 
-  useEffect(()=>{
-    if (certID === certificateStore.cert.id) return
+  const { certificateStore, userStore, layoutStore, temporaryIDStore } = useContext(Context)     
+  const certID = Number.parseInt(props.match.params.id)
+  useEffect(()=>{    
+    if (certID <-1 && toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Пустое  свидетельство создано!', detail: 'Внесите изменения и сохраните, чтоб получить номер', life: 3000 })
+    if (certID === certificateStore.cert.id || certID===-1) {
+      layoutStore.isLoading = false
+      return
+    }  
     let _idx = -1
-    const cArray = certificateStore.certs
-    if (cArray.length>0){
-      _idx = cArray.findIndex(el=>el.id === certID)
+    const cArray = certificateStore.certs   
+    if (cArray.length>0){            
+      _idx = cArray.findIndex(el=>el.id === certID)      
     }
-    if (_idx>-1) certificateStore.select(_idx)
-    else {
-      layoutStore.isLoading = true
-      certificateStore.findById(certID, ()=>layoutStore.isLoading = false)
+    if (_idx>-1) { 
+      certificateStore.select(_idx)
+      layoutStore.isLoading = false
+    } else {      
+      certificateStore.findById(certID, ()=>{layoutStore.isLoading = false})
     }  
   },[certID, certificateStore, layoutStore, certificateStore.cert.id])
   const toast = useRef<Toast>(null)  
@@ -78,7 +78,8 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             label: 'Назад',
             icon: 'pi pi-chevron-left',
             command: () => {
-              const section = Number.parseInt(props.location.search[props.location.search.length-1])-1             
+              let section = Number.parseInt(props.location.search[props.location.search.length-1])-1             
+              if (section===4) section--
                 if (section > -1) {               
                 userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=${section}`)
               }
@@ -98,6 +99,10 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
                   certificateStore.clean()
                   certificateStore.select()
                   if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись удалена', life: 3000 })
+                  let section = Number.parseInt(props.location.search[props.location.search.length-1])                          
+                  if (section) {               
+                    userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=${section}`)
+              }
                 })
                 .catch(reason=>{
                   console.log(reason)
@@ -137,8 +142,8 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             icon: 'pi pi-plus',
             command: () => { 
               try {
-                certificateStore.createNew() 
-                 if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Пустое  свидетельство создано!', detail: 'Внесите изменения и сохраните, чтоб получить номер', life: 3000 })
+                certificateStore.createNew(temporaryIDStore.lastCertificateID)                 
+                 if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Пустое  свидетельство создано!', detail: 'Внесите изменения и сохраните, чтоб получить номер', life: 3000 })                                               
               } catch {if (toast!==null && toast.current!==null) 
                   toast.current.show(DEFAULT_ERROR_TOAST)}
             }
@@ -147,7 +152,8 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             label: 'Далее',
             icon: 'pi pi-chevron-right',
             command: () => {
-              const section = Number.parseInt(props.location.search[props.location.search.length-1])+1              
+              let section = Number.parseInt(props.location.search[props.location.search.length-1])+1              
+              if (section===4) section++
               if (section > -1) {
                 userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=${section}`)
               } 
