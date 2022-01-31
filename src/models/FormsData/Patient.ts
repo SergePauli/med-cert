@@ -4,6 +4,7 @@ import { NULL_FLAVOR_IDX } from "../../utils/defaults"
 import { ISerializable } from "../common/ISerializabale"
 import { INullFlavorR } from "../INullFlavor"
 import { IPatient } from "../IPatient"
+import IIdentityR from "../requests/IIdentityR"
 import { IPatientR } from "../requests/IPatientR"
 import Identity from "./Identity"
 import Person from "./Person"
@@ -19,9 +20,11 @@ export default class Patient implements ISerializable {
   private _guid: string
   private _identity?: Identity
   private _nullFlavors: INullFlavorR[]
+  private _oldOne?: IPatient
   constructor(props = {} as IPatient) {
     this._guid = props.guid || uuidv4()
-    this._person = new Person(props.person)
+    this._oldOne = { ...props }
+    if (props.person) this._person = new Person(props.person)
     this._provider_organization = props.organization_id
     if (props.gender) this._gender = props.gender
     this._addrType = props.addr_type || MAIN_REGISTRATION_ADDRESS
@@ -44,8 +47,11 @@ export default class Patient implements ISerializable {
     if (this._birth_year) _patient.birth_year = this._birth_year
     if (this._gender) _patient.gender = this._gender
     if (this._identity) _patient.identity_attributes = this._identity.getAttributes()
+    else if (this._oldOne?.identity?.id)
+      _patient.identity_attributes = { id: this._oldOne.identity.id, _destroy: "1" } as IIdentityR
     if (this._provider_organization) _patient.organization_id = this._provider_organization
     if (this._person) _patient.person_attributes = this._person.getAttributes()
+    else _patient.person_id = null
     if (this.nullFlavors.length > 0) _patient.null_flavors_attributes = this.null_flavors_attributes()
     return _patient
   }

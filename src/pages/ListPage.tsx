@@ -3,7 +3,7 @@ import { Context } from '..'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
 import { Toast } from 'primereact/toast'
-import { useEffect, FC, useContext, useRef } from 'react'
+import { useEffect, FC, useContext, useRef, useState } from 'react'
 import MainLayout from '../components/layouts/MainLayout'
 import { CERTIFICATE_ROUTE, LIST_ROUTE } from '../utils/consts'
 import { ICertificate } from '../models/responses/ICertificate'
@@ -13,6 +13,8 @@ import { GENDERS } from '../NSI/1.2.643.5.1.13.13.11.1040'
 import { DEAD_PLACE_TYPES } from '../NSI/1.2.643.5.1.13.13.99.2.20'
 import { BASIS_DERMINING } from '../NSI/1.2.643.5.1.13.13.99.2.23'
 import '../styles/components/DataTable.css'
+import { CERT_TYPES } from '../NSI/1.2.643.5.1.13.13.99.2.19'
+import { getOneLinePersonName } from '../models/IPersonName'
 
 
 type ListPageProps = {}
@@ -27,12 +29,15 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     certificateStore.getList(()=>layoutStore.isLoading = false)         
   },[certificateStore, layoutStore, userStore.userInfo])
 
+  const [selected, setSelected] = useState<ICertificate | undefined>()
+
   const orderNumberBodyTemplate = (rowData: ICertificate)=>{
     const idx = certificateStore.certs.indexOf(rowData)+1
     return <i>{idx}</i>
   }
-  const seriesNumberBodyTemplate = (rowData: ICertificate)=>{    
-    return `${rowData.series} ${rowData.number}`
+  const seriesNumberBodyTemplate = (rowData: ICertificate)=>{   
+    const cert_type = CERT_TYPES.find(el=>el.code===rowData.cert_type) 
+    return <>{rowData.series} {rowData.number} {cert_type?.s_name}</>
   }
   const reasonsBodyTemplate = (rowData: ICertificate)=>{
     const acme = rowData.reason_ACME
@@ -81,18 +86,18 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     let age = dd.getFullYear() - db.getFullYear()
     const m = dd.getMonth() - dd.getMonth()
     if (m < 0 || (m === 0 && dd.getDate() < db.getDate())) age--    
-    return <b>{age}</b>
+    return age
   }
 
   const genderBodyTemplate = (rowData: ICertificate)=>{
     if (!rowData.patient?.gender) return ''
-    else return <b>{GENDERS[rowData.patient.gender-1].name.slice(0,1)}</b>
+    else return GENDERS[rowData.patient.gender-1].name.slice(0,1)
   }
 
   const fioBodyTemplate = (rowData: ICertificate)=>{
-      if (!rowData.patient || !rowData.patient.person.person_name) return ""
-      const fio = rowData.patient.person.person_name      
-      const result = `${fio.family} ${fio.given_1} ${fio.given_2 ? fio.given_2 : ''}`.trim()
+      if (!rowData.patient) return ""
+      else if (!rowData.patient.person) return "не иденти-фицирован"          
+      const result = getOneLinePersonName(rowData.patient.person.person_name)
       return <>{result}</>
     }
   const deathPlaceBodyTemplate = (rowData: ICertificate) => {
@@ -122,10 +127,9 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                       style={{ flexGrow: 1, flexBasis: '100px' }}> </Column> :
     <></>                  
   const doctorBodyTemplate = (rowData: ICertificate) => {
-    if (!rowData.author?.doctor.person_name ) return ''
-    else {
-     const fio = rowData.author.doctor.person_name      
-      const result = `${fio.family} ${fio.given_1} ${fio.given_2 ? fio.given_2 : ''}`.trim()
+    if (!rowData.author) return ''
+    else {       
+      const result = getOneLinePersonName(rowData.author.doctor.person_name)
       return  <span style={{fontSize:'small'}}>{result}</span>
     }      
   }
@@ -133,7 +137,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     if (!rowData.author?.doctor.position ) return ''
     else return  <span style={{fontSize:'small'}}>{rowData.author.doctor.position.name}</span>         
   }
-
+  
   const issueDateBodyTemplate = (rowData: ICertificate) => {
     const iDate = rowData.issue_date
     if (!iDate ) return ''    
@@ -144,7 +148,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
         return (
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${rowData.id}?q=0`)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning"  />
+                
             </React.Fragment>
         )
     }    
@@ -154,24 +158,29 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
         content:
         <>
           <Toast ref={toast} />
-          <div className='card'>             
+          <div id='tableDiv' className='p-card' >             
               <DataTable ref={dt} value={certificateStore.certs}  responsiveLayout="scroll" scrollDirection="both"
-                emptyMessage="нет данных, удовлетворяющих запросу" scrollable scrollHeight="400px" 
-                    dataKey="id" >  
+                emptyMessage="нет данных, удовлетворяющих запросу" scrollable scrollHeight="76vh" 
+                selectionMode="single" selection={selected}  dataKey="id" size="small"
+                onSelectionChange={e =>{
+                  certificateStore.select(certificateStore.certs.findIndex(el=>el.id === e.value.id))
+                  setSelected(e.value)
+                }}
+                onRowDoubleClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=0`)}>  
                     <Column header="№ п.п"  body={orderNumberBodyTemplate}
                       style={{ flexGrow: 1, flexBasis: '38px' }} frozen></Column>                                   
-                    <Column header="Серия номер" body={seriesNumberBodyTemplate} 
+                    <Column header="Серия Номер Вид" body={seriesNumberBodyTemplate} 
                        style={{ flexGrow: 1, flexBasis: '90px' }} frozen></Column>
                     <Column header="Причины смерти и соп. патологии"  
                       style={{ flexGrow: 1, flexBasis: '250px' }} body={reasonsBodyTemplate}></Column>
                     <Column  header="ФИО" body={fioBodyTemplate} 
-                      style={{ flexGrow: 1, flexBasis: '100px' }}>  </Column>                    
+                      style={{ flexGrow: 1, flexBasis: '140px' }}>  </Column>                    
                     <Column  header="Даты" body={datesBodyTemplate} 
-                      style={{ flexGrow: 1, flexBasis: '80px' }}> </Column>
+                      style={{ flexGrow: 1, flexBasis: '110px' }}> </Column>
                     <Column  header="Лет" body={ageBodyTemplate} 
-                      style={{ flexGrow: 1, flexBasis: '38px' }}> </Column>
+                      style={{ flexGrow: 1, flexBasis: '46px' }}> </Column>
                     <Column  header="Пол" body={genderBodyTemplate}
-                      style={{ flexGrow: 1, flexBasis: '38px' }}> </Column>    
+                      style={{ flexGrow: 1, flexBasis: '46px' }}> </Column>    
                     <Column  header="Адрес проживания" 
                       field='patient.person.address.streetAddressLine'
                       style={{ flexGrow: 1, flexBasis: '200px' }}> </Column>  
@@ -179,18 +188,18 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                       field='death_addr.streetAddressLine'
                       style={{ flexGrow: 1, flexBasis: '200px' }}> </Column>                     
                     <Column  header="Смерть наступила" body={deathPlaceBodyTemplate}
-                      style={{ flexGrow: 1, flexBasis: '100px' }}> </Column>  
+                      style={{ flexGrow: 1, flexBasis: '130px' }}> </Column>  
                     <Column  header="Основание заключения" body={basisDeterminingBodyTemplate}
-                      style={{ flexGrow: 1, flexBasis: '100px' }}> </Column>
+                      style={{ flexGrow: 1, flexBasis: '130px' }}> </Column>
                     {custodian}
                     <Column  header="Специалист" body={doctorBodyTemplate}
-                      style={{ flexGrow: 1, flexBasis: '100px' }}> </Column>
+                      style={{ flexGrow: 1, flexBasis: '120px' }}> </Column>
                     <Column  header="Должность" body={positionBodyTemplate}
-                      style={{ flexGrow: 1, flexBasis: '100px' }}> </Column>  
+                      style={{ flexGrow: 1, flexBasis: '130px' }}> </Column>  
                     <Column  header="Выдано" body={issueDateBodyTemplate}
-                      style={{ flexGrow: 1, flexBasis: '80px' }}> </Column>                
+                      style={{ flexGrow: 1, flexBasis: '100px' }}> </Column>                
                     <Column body={actionBodyTemplate} exportable={false} 
-                      style={{ flexGrow: 1, flexBasis: '70px' }}></Column>
+                      style={{ flexGrow: 1, flexBasis: '100px' }}></Column>
                 </DataTable>
           </div>  
         </>

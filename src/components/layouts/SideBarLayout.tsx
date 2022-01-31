@@ -20,7 +20,7 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
         { label: "Списки",  icon:"pi-list", items: [{label:"Свидетельства", icon:"pi-id-card", url:LIST_ROUTE},{label:"Журнал", icon:"pi-align-left", url:"/#"}]},]}, 
       {separator: true},
       { label: "Сеанс", className: "layout-root-menuitem",      
-        items: [{label:"Главная", icon:"pi-home", url:HOME_ROUTE},{label:"Выход", icon:"pi-sign-out", command:()=>{userStore.logout()}}]     
+        items: [{label:"Главная", icon:"pi-home", url:HOME_ROUTE},{label:"Свидетельства", icon:"pi-list", url:LIST_ROUTE},{label:"Выход", icon:"pi-sign-out", command:()=>{userStore.logout()}}]     
       },     
    ]   
   const url = props.activeUrl

@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { FC, useContext, useState } from 'react'
 import { Context } from '../..'
-import { InputText } from 'primereact/inputtext'
 import { Card } from 'primereact/card'
 import { Checkbox, CheckboxChangeParams } from 'primereact/checkbox'
 import { RadioButton } from 'primereact/radiobutton'
@@ -9,7 +8,7 @@ import '../../styles/components/RadioButton.css'
 import '../../styles/components/Calendar.css'
 import '../../styles/pages/CertificatePage.css'
 import NullFlavorWrapper from '../NullFlavorWrapper'
-import { ASKU, FEMALE, ID_CARD_TYPES, MALE, NA, NOGENDER, NULL_FLAVORS, PASSPORT_RF, UNK } from '../../utils/defaults'
+import { ASKU, FEMALE, ID_CARD_TYPES, MALE, NOGENDER, NULL_FLAVORS, PASSPORT_RF, UNK } from '../../utils/defaults'
 import { IReference } from '../../models/IReference'
 import { Calendar } from 'primereact/calendar'
 import { checkFieldNullFlavor, INullFlavorR } from '../../models/INullFlavor'
@@ -17,6 +16,7 @@ import { IPersonName } from '../../models/IPersonName'
 import IIdentity from '../../models/IIdentity'
 import Identity from '../../models/FormsData/Identity'
 import Person from '../../models/FormsData/Person'
+import { PersonName } from '../inputs/PersonName'
 
 
  const Section1: FC = () => {   
@@ -31,9 +31,8 @@ import Person from '../../models/FormsData/Person'
       return <span>Данные умершего</span>
     }
     
-  const identified = certificateStore.identified 
-  const [fio, setFio] = useState(person && person.fio ? person.fullName() : '') 
-  const optionCode = certificateStore.fromRelatives ? 'ASKU' : 'NA'
+  const identified = certificateStore.identified   
+  const optionCode = certificateStore.fromRelatives ? 'ASKU' : 'NA UNK'
   const isDeathTime = certificate.deathDatetime!==undefined 
         && certificate.nullFlavors.findIndex((item)=>item.parent_attr==="death_time")===-1
   return (<>    
@@ -41,16 +40,22 @@ import Person from '../../models/FormsData/Person'
           <div className="p-fluid p-formgrid p-grid">
             <div className="p-field-checkbox p-col-12 p-lg-6">              
               <Checkbox inputId="notIdentified" checked={!certificateStore.identified} onChange={e =>{                
-                if (e.checked) patient.person = undefined
-                else { 
+                if (e.checked) {
+                  patient.person = undefined
+                  patient.identity = undefined
+                  certificate.policyOMS = undefined
+                } else { 
                   patient.person = new Person()
                   if (yearBTChecked) { setYearBTChecked(false) 
                     patient.setBirthDay(patient.birth_date as Date | undefined, false)
                   }      
                 }  
-                checkFieldNullFlavor('person', patient.person, patient.nullFlavors, NA)              
+                checkFieldNullFlavor('person', patient.person, patient.nullFlavors, UNK) 
+                checkFieldNullFlavor('identity', patient.identity, patient.nullFlavors, UNK)  
+                checkFieldNullFlavor('policy_OMS', certificate.policyOMS, certificate.nullFlavors, UNK)           
                 certificateStore.identified = !e.checked  
-                }} />
+                }} 
+              />
               <label htmlFor="notIdentified">Умерший не идентифицирован</label>
             </div>
             <div className="p-field-checkbox p-col-12 p-lg-6">              
@@ -60,7 +65,7 @@ import Person from '../../models/FormsData/Person'
                 if (e.checked) { 
                   if (!patient.person) {
                     patient.person = new Person()
-                    checkFieldNullFlavor('person', patient.person, patient.nullFlavors, NA)
+                    checkFieldNullFlavor('person', patient.person, patient.nullFlavors)
                   }  
                   if (yearBTChecked) { 
                     setYearBTChecked(false) 
@@ -81,22 +86,15 @@ import Person from '../../models/FormsData/Person'
                   disabled={!certificateStore.fromRelatives}               
                   checked={identified} 
                   paraNum                                
-                  label={<label htmlFor="family">Фамилия матери, имя, отчество(при наличии)</label>}
-                  field={<InputText  id="fio" type="text" 
-                  value={fio}                    
-                  onChange={(e)=>{     
-                    if (!person) return
-                    setFio(e.target.value)               
-                    const values = e.target.value.trim().split(" ")
-                    if (values && values.length > 1) {
-                      const temp = {family: values[0], given_1: values[1]} as IPersonName
-                      if (values[2]) temp.given_2 = values[2]                       
-                      person.fio = temp
-                      checkFieldNullFlavor('fio.given_2', person.fio.given_2, person.nullFlavors, NA)                                           
-                    }                                        
+                  label={<label htmlFor="family">Фамилия, имя, отчество(при наличии)</label>}
+                  field={<PersonName personName={person?.fio}                                     
+                    onChange={(value: IPersonName | undefined)=>{     
+                      if (!person) return                                            
+                      person.fio = value || {family:'',given_1:''}
+                      checkFieldNullFlavor('fio.given_2', person.fio.given_2, person.nullFlavors, UNK)                                  
                   }}/>}                  
                   options={NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))} 
-                  value={certificateStore.fromRelatives ? ASKU : NA} 
+                  value={certificateStore.fromRelatives ? ASKU : UNK} 
                   nullFlavors={patient.nullFlavors}  
                   field_name="person"                                 
                 />             
@@ -151,8 +149,9 @@ import Person from '../../models/FormsData/Person'
                     }} 
                     onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) patient.nullFlavors = nullFlavors}}
                     field={<div className="p-d-flex p-jc-start p-ai-center">              
-                      <Calendar id="dateBirth" className="p-mr-2" 
-                        view={yearBTChecked ? "month" : "date"} dateFormat={yearBTChecked ? "yy" : "dd.mm.yy"}                          
+                      <Calendar id="dateBirth" className="p-mr-2" locale="ru"
+                        dateFormat={yearBTChecked ? "yy" : "dd.mm.yy"}  
+                        mask={yearBTChecked ? "9999" : "99.99.9999"}                         
                         value={patient.birth_date} 
                         onChange={(e)=>patient.setBirthDay(e.target.value as Date | undefined, yearBTChecked)                          
                         }
@@ -185,8 +184,9 @@ import Person from '../../models/FormsData/Person'
                   }} 
                   onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}}
                   field={<div className="p-d-flex p-jc-start p-ai-center">              
-                      <Calendar id="dateDeath" className="p-mr-2" 
-                        view={yearDTChecked ? "month" : "date"} dateFormat={yearDTChecked ? "yy" : "dd.mm.yy"} 
+                      <Calendar id="dateDeath" className="p-mr-2" locale="ru"
+                        dateFormat={yearDTChecked ? "yy" : "dd.mm.yy"} 
+                        mask={yearDTChecked ? "9999" : "99.99.9999"}
                         value={certificate.deathDatetime}
                         onChange={(e)=>certificate.setDeathDay(e.target.value as Date | undefined, yearDTChecked) 
                         } 
@@ -215,7 +215,7 @@ import Person from '../../models/FormsData/Person'
                   }}
                   onChange={(e:IReference,  nullFlavors: INullFlavorR[] | undefined)=>{if (nullFlavors) certificate.nullFlavors = nullFlavors}} 
                   field={ <Calendar id="timeDeath"  
-                    timeOnly hourFormat="24"             
+                    timeOnly hourFormat="24" locale="ru"                                                   
                     value={certificate.deathDatetime} 
                     showIcon />}
                   options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 

@@ -10,7 +10,7 @@ import RightSideBarLayout  from './RightSideBarLayout'
 import { IUserInfo } from '../../models/responses/IUserInfo'
 import { ActionButtonLayout, IActionItem } from './ActionButtonLayout'
 import { ProgressSpinner } from 'primereact/progressspinner'
-
+import { addLocale } from 'primereact/api'
 type MainLayoutProps = {
   title: string,
   url:string, 
@@ -38,6 +38,33 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
     },[userId, userInfo, userStore.userInfo]
   )
   const content =  layoutStore.isLoading ? <ProgressSpinner/> : props.content 
+  addLocale('ru', {
+    closeText: 'закрыть',
+    prevText: 'назад',
+    nextText: 'вперед',
+    currentText: 'текущий',
+    monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+    monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
+        'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+    dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+    dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+    dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+    weekHeader: 'Нед',
+    firstDay: 1,
+    isRTL: false,
+    showMonthAfterYear: false,
+    yearSuffix: '',
+    month: 'Мес',
+    week: 'Неделя',
+    day: 'День',
+    timeOnlyTitle: 'Выбор времени',
+    timeText: 'Время',
+    hourText: 'Часы',
+    minuteText: 'Минуты',
+    secondText: 'Секунды',
+    allDayText: 'Полный день'
+  })
   return (
   <div className={wrapperClass} data-theme='light'>    
     <div className='layout-content-wrapper' onClick={()=>onClickOutside()}>  
