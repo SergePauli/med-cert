@@ -126,7 +126,9 @@ import IIdentity from '../../models/IIdentity'
                   label={<label htmlFor="issueDate">Когда выдан</label>}
                   checked={docChecked}                   
                   field={<Calendar  id="issueDate" className="p-mr-2" 
-                    dateFormat={"dd.mm.yy"} value={identity?.issueOrgDate}
+                    dateFormat={"dd.mm.yy"} 
+                    locale="ru" mask="99.99.9999"                    
+                    value={identity?.issueOrgDate}
                     onChange={(e)=>{if (identity) identity.issueOrgDate = e.target.value as Date | undefined}}
                     showIcon />
                   }
