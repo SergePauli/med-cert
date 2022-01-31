@@ -31,8 +31,10 @@ import AddressFC2 from '../components/inputs/InputAddress'
 import AddressDialog from '../components/dialogs/AddressDialog'
 import Doctor from '../models/FormsData/Doctor'
 import { DEFAULT_ADDRESS, IAddressR } from '../models/requests/IAddressR'
+import { getOneLinePersonName, IPersonName } from '../models/IPersonName'
+import { PersonName } from '../components/inputs/PersonName'
 
-export const DoctorsPage: FC = () => {    
+const DoctorsPage: FC = () => {    
     const {addressStore, userStore} = useContext(Context)
     let emptyDoctor = {
         organization: userStore.userInfo?.organization,
@@ -42,7 +44,7 @@ export const DoctorsPage: FC = () => {
           SNILS: '456-145-154 25'
           } as IPerson        
     } as IDoctor
-    let doctor = new Doctor(emptyDoctor)
+    const [doctor, setDoctor] = useState(new Doctor(emptyDoctor))
     const [doctors, setDoctors] = useState<IDoctor[]>([])
     const [doctorDialog, setDoctorDialog] = useState(false)
     const [deleteDoctorDialog, setDeleteDoctorDialog] = useState(false)
@@ -77,8 +79,8 @@ export const DoctorsPage: FC = () => {
         }).catch((reason)=>console.log(reason))    
     }
 
-    const openNew = () => {
-        doctor = new Doctor(emptyDoctor)
+    const openNew = () => {        
+        if (doctor.id) setDoctor(new Doctor(emptyDoctor))
         addressStore.address = new Address(DEFAULT_ADDRESS)
         setSubmitted(false)
         setDoctorDialog(true)
@@ -102,6 +104,7 @@ export const DoctorsPage: FC = () => {
 
     const saveDoctor = () => {
         setSubmitted(true)
+        console.log('doctor2',doctor)
         if (doctor.person?.fio?.family.trim() && doctor.person?.SNILS && doctor.position) {
             let _doctors = [...doctors]
             onContactChange(phone)
@@ -149,19 +152,19 @@ export const DoctorsPage: FC = () => {
 
     const editDoctor = (_doctor: IDoctor) => {        
         setPhone({telcom_value:'', main:true} as IContact)
-        setEmail({telcom_value:'', main:false} as IContact)
-        doctor = new Doctor(_doctor)
+        setEmail({telcom_value:'', main:false} as IContact)        
+        if (_doctor.id !== doctor.id) setDoctor(new Doctor(_doctor))
         doctor.person.contacts?.forEach((item)=>{if (item.main) setPhone({...item})
         else setEmail({...item, telcom_value: item.telcom_value.replace('mailto:','')})})
         if (doctor.person.address) addressStore.address = new Address(doctor.person.address) 
         else  addressStore.address = new Address(DEFAULT_ADDRESS)
         setPosition(doctor.position?.name || '')
-        setDoctorDialog(true)
+        setDoctorDialog(true)        
     }
 
     const confirmDeleteDoctor = (_doctor: IDoctor) => {
-        doctor = new Doctor(_doctor)
-        setDeleteDoctorDialog(true);
+        if (_doctor.id !== doctor.id) setDoctor(new Doctor(_doctor))
+        setDeleteDoctorDialog(true)
     }
 
     const deleteDoctor = () => {
@@ -169,7 +172,7 @@ export const DoctorsPage: FC = () => {
           let _doctors = doctors.filter(val => val.id !== doctor.id)
           setDoctors(_doctors)
           setDeleteDoctorDialog(false)
-          doctor = new Doctor(emptyDoctor)
+          setDoctor(new Doctor(emptyDoctor))
           if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись удалена', life: 3000 })
         }).catch(reason=>{
           console.log('reason',reason)
@@ -241,9 +244,9 @@ export const DoctorsPage: FC = () => {
             <Button label="ДА" icon="pi pi-check" className="p-button-text p-button-warning" onClick={deleteSelectedDoctors} />
         </React.Fragment>
     )
-    const fioBodyTemplate = ()=>{
-      if (doctor.person===undefined || doctor.person.fio===undefined) return ""
-      const result = `${doctor.person.fio.family} ${doctor.person.fio.given_1} ${doctor.person.fio.given_2 ? doctor.person.fio.given_2 : ''}`.trim()
+    const fioBodyTemplate = (row: IDoctor)=>{
+      const fio = row.person?.person_name      
+      const result = getOneLinePersonName(fio)
       return <>{result}</>
     }  
     const layoutParams = {
@@ -265,29 +268,16 @@ export const DoctorsPage: FC = () => {
             </div>
 
             <Dialog visible={doctorDialog} style={{ width: '800px' }} header="Данные врача" modal 
-             footer={doctorDialogFooter} onHide={hideDialog}>   
+             footer={doctorDialogFooter} onHide={hideDialog} >   
                <div className='p-fluid p-formgrid p-grid'> 
-                <div className="p-field p-col-12 p-md-3">
-                    <label htmlFor="family">Фамилия</label>
-                    <InputText id="family" value={doctor.person?.fio?.family} onChange={(e) =>{
-                         if (doctor.person?.fio) doctor.person.fio.family = e.target.value     
-                         }} required autoFocus 
-                         className={classNames({ 'p-invalid': submitted && !!doctor.person?.fio && !doctor.person?.fio.family})} />
-                    {submitted && !!doctor.person?.fio && !doctor.person?.fio.family && <small className="p-error">Фамилия обязательна.</small>}
-                </div>
-                <div className="p-field  p-col-12 p-md-2">
-                    <label htmlFor="given_1">Имя</label>
-                    <InputText id="given_1" value={doctor.person?.fio?.given_1} onChange={(e) =>{
-                         if (doctor.person?.fio) doctor.person.fio.given_1 = e.target.value   
-                         }} required className={classNames({ 'p-invalid': submitted && !doctor.person?.fio?.given_1})} />
-                    {submitted && !doctor.person?.fio?.given_1 && <small className="p-error">Имя обязательно.</small>}
-                </div>
-                <div className="p-field  p-col-12 p-md-4">
-                    <label htmlFor="given_2">Отчество</label>
-                    <InputText id="given_2" value={doctor.person?.fio?.given_2 || ''} onChange={(e) =>{
-                         if (doctor.person?.fio) doctor.person.fio.given_2 = e.target.value   
-                        }}   />                    
-                </div>
+                <div className="p-field p-col-12 p-md-6">
+                    <label htmlFor="fio">Фамилия, Имя, Отчество(при наличии)</label>
+                    <PersonName personName={doctor.person?.fio} submitted={submitted}
+                      onChange={(value: IPersonName)=>{                       
+                        if (doctor.person) doctor.person.fio  = value
+                      }}  
+                    />                   
+                </div>                
                 <div className="p-field  p-col-12 p-md-3">
                     <label htmlFor="snils">СНИЛС</label>
                     <InputMask id="snils"  
@@ -303,11 +293,13 @@ export const DoctorsPage: FC = () => {
                 <div className="p-field  p-col-12 p-md-4">
                     <label htmlFor="position">Должность</label>
                     <AutoComplete id="position" suggestions={positions} field="name"
-                      value={doctor.position || {name: position} } delay={500} dropdown 
+                      value={doctor.position || position } delay={1000} dropdown 
                       completeMethod={getPositions}
                       onChange={(e)=>{ 
-                        if (e.value.name) { doctor.position = e.value
-                           setPosition(e.value.name) 
+                        console.log('e.value',e.value)
+                        if (e.value.name) { 
+                          doctor.position = e.value
+                          setPosition(e.value.name) 
                         } else setPosition(e.value)   
                        }}  
                         className={classNames({ 'p-invalid': submitted && !doctor.position})}
@@ -349,7 +341,7 @@ export const DoctorsPage: FC = () => {
             <Dialog visible={deleteDoctorDialog} style={{ width: '450px' }} header="Подтвердите" modal footer={deleteDoctorDialogFooter} onHide={hideDeleteDoctorDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem'}} />
-                    {doctor && <span>Вы действительно хотите удалить <b>{fioBodyTemplate()}</b>?</span>}
+                    {doctor && <span>Вы действительно хотите удалить <b>{fioBodyTemplate}</b>?</span>}
                 </div>
             </Dialog>
 
