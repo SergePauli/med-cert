@@ -2,9 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { FC, useContext, useEffect, useState } from 'react'
 import { Context } from '../..'
 import { Card } from 'primereact/card'
-import '../../styles/components/RadioButton.css'
 import '../../styles/components/Calendar.css'
-import '../../styles/pages/CertificatePage.css'
 import { DeathReason } from '../../models/FormsData/DeathReason'
 import { IDeathReason } from '../../models/responses/IDeathReason'
 import Reason from '../inputs/Reason'
@@ -167,9 +165,9 @@ import { InputText } from 'primereact/inputtext'
               value={procedure?.textValue || ''}/>          
           </div>       
           <div className="p-field p-col-12  p-d-flex p-ai-center">                          
-            <Calendar id="effectiveDate" className="p-mr-3" inputStyle={{width:'11.5rem'}} 
-              showTime={!dateETChecked} placeholder="Время" dateFormat="dd.mm.yy"
-              key={`edt_${dateETChecked}_${procedure?.effectiveTime}`}              
+            <Calendar id="effectiveDate" key={`effectiveDate${dateETChecked}`} className="p-mr-3" inputStyle={{width:'12.5rem'}} 
+              showTime={!dateETChecked} dateFormat="dd.mm.yy" locale="ru"
+              mask={dateETChecked ? '99.99.9999' : '99.99.9999 99:99'} panelStyle={{margin:'10rem'}}                           
               value={procedure?.effectiveTime} 
               onChange={(e)=>{ 
                 if (procedure===null) return 
