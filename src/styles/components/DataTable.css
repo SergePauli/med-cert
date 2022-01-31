@@ -8,6 +8,10 @@
   table-layout: fixed;
 }
 
+.p-datatable .p-datatable-thead>tr>th {
+  background: #dee2e6;
+}
+
 .p-datatable .p-sortable-column {
   cursor: pointer;
   user-select: none;
