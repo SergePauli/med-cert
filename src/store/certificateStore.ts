@@ -473,7 +473,7 @@ export default class CertificateStore {
       } as IPatient,
     } as ICertificate)
   }
-  save() {
+  save(onSuccess?: (data: ICertificate) => void, onError?: (message: string) => void) {
     if (!this._userInfo) return false
     if (!this._cert.patient.provider_organization)
       this._cert.patient.provider_organization = this.userInfo?.organization.id
@@ -481,7 +481,37 @@ export default class CertificateStore {
     console.log("request", request)
     return !request.id
       ? CertificateService.addCertificate(request)
+          .then((response) => {
+            const nCert = response.data
+            if (nCert) {
+              const idx = this._certs.length
+              this._certs.push(nCert)
+              this.select(idx)
+              if (onSuccess) onSuccess(nCert)
+            } else {
+              if (onError)
+                onError("Cвидетельство сохранено, но сервер не вернул результат. Необходим повторный вход в систему")
+            }
+          })
+          .catch((reason) => {
+            if (onError) onError(reason)
+          })
       : CertificateService.updateCertificate({ Certificate: request })
+          .then((response) => {
+            const nCert = response.data
+            if (nCert) {
+              const idx = this._certs.findIndex((cert) => cert.id === nCert.id)
+              this._certs[idx] = nCert
+              this.select(idx)
+              if (onSuccess) onSuccess(nCert)
+            } else {
+              if (onError)
+                onError("Свидетельство сохранено, но сервер не вернул результат. Необходим повторный вход в систему")
+            }
+          })
+          .catch((reason) => {
+            if (onError) onError(reason)
+          })
   }
   delete() {
     if (this._cert.id === -1) return false
@@ -491,14 +521,21 @@ export default class CertificateStore {
   clean(num = this._selected) {
     try {
       this._certs.splice(num)
+      const dataLength = this._certs.length
+      if (dataLength > 0) {
+        this.select(this._selected > dataLength - 1 ? dataLength - 1 : this._selected)
+      } else {
+        this.createNew(-1)
+        this._selected = 0
+      }
     } catch {
       throw Error("Not valid certificate number")
     }
   }
 
-  select(number = 1) {
-    if (this._certs.length > 1) this._cert = new Certificate(this._certs[number])
-    else this._cert = new Certificate(this._certs[0])
+  select(num: number) {
+    this._cert = new Certificate(this._certs[num])
+    this._selected = num
   }
 
   getList(doAfter?: () => void) {
@@ -506,8 +543,11 @@ export default class CertificateStore {
     CertificateService.getCertificates({ q: { custudian_id_eq: this._userInfo?.organization.id } })
       .then((response) => {
         this._certs = response.data
-        console.log("getList response", { q: { custudian_id_eq: this._userInfo?.organization.id } }, response.data)
-        this.select()
+        //console.log("getList response", { q: { custudian_id_eq: this._userInfo?.organization.id } }, response.data)
+        const dataLength = response.data.length
+        if (dataLength > 0) {
+          this.select(this._selected > dataLength ? dataLength - 1 : this._selected)
+        }
       })
       .catch((err) => console.log(err))
       .finally(() => {
@@ -527,7 +567,10 @@ export default class CertificateStore {
           { custudian_id_eq: this._userInfo?.organization.id, id_eq: certificate_id },
           response.data
         )
-        this.certs.push(response.data[0])
+        if (response.data) {
+          this.certs.push(response.data[0])
+          this.select(0)
+        }
       })
       .catch((err) => console.log(err))
       .finally(() => {
