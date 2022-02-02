@@ -7,6 +7,7 @@ import { IPatientR } from "./IPatientR"
 
 export interface ICertificateR {
   id?: number
+  number?: string
   series: string
   issue_date?: Date
   cert_type?: number

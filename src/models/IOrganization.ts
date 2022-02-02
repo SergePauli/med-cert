@@ -14,6 +14,7 @@ export interface IOrganization {
   name_full: string | null
   oid: string
   okpo: string | null
+  sm_code: string | null
   organization_type: number
   osp_oid: string | null
   parent_id: number | null

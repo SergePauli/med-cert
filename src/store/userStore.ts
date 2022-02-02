@@ -68,7 +68,7 @@ export default class UserStore {
         }
       })
       .catch((reason) => {
-        this._history.push("/error/" + reason.message)
+        this._history.push("/error/Auth1:" + reason.message)
       })
   }
   async registration(user: IRegistration) {
@@ -127,7 +127,7 @@ export default class UserStore {
         localStorage.removeItem("token")
         this._user = {} as IUser
         this._history.push(LOGIN_ROUTE)
-      } else this._history.push("/error/" + e.message)
+      } else this._history.push("/error/Auth2:" + e.message)
     } finally {
       this.setLoading(false)
     }
@@ -139,7 +139,7 @@ export default class UserStore {
       const response = await UsersService.getUser(id)
       return response.data
     } catch (e: any) {
-      this._history.push("/error/" + e.message)
+      this._history.push("/error/Auth3:" + e.message)
     } finally {
       this.setLoading(false)
     }

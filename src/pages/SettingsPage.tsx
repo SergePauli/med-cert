@@ -125,6 +125,7 @@ const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>{
                             license: organization.license || null,
                             license_data: organization.license_data || null,
                             okpo: organization.okpo || null,
+                            sm_code: organization.sm_code || '00',
                             contacts_attributes: organization.contacts,
                             address_attributes: organization.address
                            } as any                                                     
@@ -133,7 +134,7 @@ const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>{
           setAudits([])
           setSubmitted(false)
           setOrganization(response.data)
-          console.log('response.data',response.data)
+          //console.log('response.data',response.data)
           if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Изменения применены', life:3000 })
         })
         .catch((reason=>{console.log(reason)
@@ -249,6 +250,20 @@ const SettingsPage: FC<SettingsPageProps> = (props: SettingsPageProps) =>{
                   setOrganization(_organization) 
               }}               
             />            
+          </div>
+          <div className="p-field p-col-12 p-md-6">
+            <label htmlFor="sm_code">Последние две цифры кода в ТФОМС</label>
+            <div className="p-inputgroup">
+              <span className="p-inputgroup-addon">2800</span>
+              <InputMask mask="99" id="sm_code" value={organization.sm_code || ''} 
+                onChange={e=>{
+                  let _organization = {...organization}
+                  changesAudit("ТФОМС код", "sm_code", _organization.sm_code || '', e.target.value || '')
+                  _organization.sm_code = e.value
+                  setOrganization(_organization) 
+                }}               
+              />                            
+            </div>                        
           </div>
           <div className="p-field p-col-12 p-md-6">
             <label htmlFor="phone">телефон</label>
