@@ -129,7 +129,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
               }, (message:string)=>{                         
                 setToastMessage(DEFAULT_ERROR_TOAST)
                 console.log(message)
-              })
+              }, userStore.userInfo?.organization.sm_code)
               if (!result) {
                 console.log('нет юзера')
                 layoutStore.isLoading = false

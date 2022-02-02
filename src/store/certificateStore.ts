@@ -473,11 +473,12 @@ export default class CertificateStore {
       } as IPatient,
     } as ICertificate)
   }
-  save(onSuccess?: (data: ICertificate) => void, onError?: (message: string) => void) {
+  save(onSuccess?: (data: ICertificate) => void, onError?: (message: string) => void, sm_code?: string) {
     if (!this._userInfo) return false
     if (!this._cert.patient.provider_organization)
       this._cert.patient.provider_organization = this.userInfo?.organization.id
     const request = this._cert.getAttributes()
+    if (!request.id && sm_code) request.number = sm_code
     console.log("request", request)
     return !request.id
       ? CertificateService.addCertificate(request)
