@@ -8,6 +8,7 @@ import { SHORT_DOCTOR_RENDER_OPTIONS } from "../models/render_options/Doctor"
 import { EXTERNAL_DEATH_REASON_RENDER_OPTIONS } from "../models/render_options/external_death_reason"
 import { LETTERED_DEATH_REASON_RENDER_OPTIONS } from "../models/render_options/lettered_reason"
 import { OTHER_REASON_RENDER_OPTIONS } from "../models/render_options/other_reason"
+import { PARTICIPANT_RENDER_OPTIONS } from "../models/render_options/Participant"
 import { PATIENT_RENDER_OPTIONS } from "../models/render_options/patient"
 import { PERSON_RENDER_OPTIONS } from "../models/render_options/person"
 import { PROCEDURE_RENDER_OPTIONS } from "../models/render_options/procedure"
@@ -31,11 +32,13 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
       "child_info",
       "custodian",
       "death_reasons",
+      "participant",
       "null_flavors",
     ],
   },
   includes: [
     "patient",
+    "participant",
     "custodian",
     "a_reason",
     "b_reason",
@@ -63,6 +66,7 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
   addr: NULLFLAVORABLE_RENDER_OPTIONS,
   person: PERSON_RENDER_OPTIONS,
   doctor: SHORT_DOCTOR_RENDER_OPTIONS,
+  participant: PARTICIPANT_RENDER_OPTIONS,
   position: { only: ["id", "name"] },
   custodian: { only: ["id", "name"] },
   null_flavors: DEFAULT_RENDER_OPTIONS,
