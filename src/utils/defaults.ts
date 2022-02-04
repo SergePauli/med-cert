@@ -268,6 +268,24 @@ export const DEFAULT_CERT_SUGGESTIONS = [
       "Указание данных об ответственном за проверку медицинских свидетельств лице - обязательно для заполнения",
     done: false,
   },
+  {
+    section: "10",
+    code: "*A",
+    suggestion: "Указание ФИО получателя - обязательно для печати",
+    done: false,
+  },
+  {
+    section: "10",
+    code: "*B",
+    suggestion: "Указание даты выдачи - обязательно для печати",
+    done: false,
+  },
+  {
+    section: "10",
+    code: "*С",
+    suggestion: "Указание СНИЛС или иного документа удостоверения личности - обязательно для печати",
+    done: false,
+  },
 ]
 export const CERT_TYPE_SUG = 0
 export const PERSON_NAME_SUG = 1
@@ -314,6 +332,9 @@ export const PREGNANCY_CONNECTION_SUG = 41
 export const AUTHOR_SUG = 42
 export const AUTHENTICATOR_SUG = 44
 export const LEGAL_AUTHENTICATOR_SUG = 43
+export const PARTIPICIPANT_FIO_SUG = 45
+export const PARTIPICIPANT_DATE_SUG = 46
+export const PARTIPICIPANT_IDENTITY_SUG = 47
 
 export const changeSuggestion = (code: string, suggestions: any[], done: boolean) => {
   const suggestion = suggestions.find((item) => item.code === code)
@@ -384,8 +405,14 @@ export const NOGENDER = 4
 
 export const URBAN_AREA_TYPE = 1
 export const VILAGE_AREA_TYPE = 2
-
-export const ID_CARD_TYPES = [
+export interface ID_CARD_TYPE {
+  code: number
+  name: string
+  s_mask?: string
+  n_mask?: string
+  c_mask?: string
+}
+export const ID_CARD_TYPES: Array<ID_CARD_TYPE> = [
   { code: 1, name: "Паспорт гр. РФ", s_mask: "99 99", n_mask: "999999", c_mask: "999-999" },
   { code: 2, name: "Заграничный паспорт гр. РФ", s_mask: "99", n_mask: "9999999", c_mask: "ФМС 99999" },
   { code: 3, name: "Служебный паспорт" },
@@ -400,6 +427,7 @@ export const ID_CARD_TYPES = [
   { code: 36, name: "Водительское удостоверение" },
   { code: 38, name: "Охотничий билет" },
 ]
+
 export const PASSPORT_RF = 0
 export const REGION = { code: "28", name: "Амурская область" }
 export const REGION_OKATO = "10"
