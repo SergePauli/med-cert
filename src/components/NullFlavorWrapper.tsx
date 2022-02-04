@@ -17,7 +17,7 @@ type NullFlavorWrapperProps = {
   field_name?: string,
   options: IReference[],
   nullFlavors?: INullFlavorR[], 
-  value?: number, 
+  value?: number,  
   onChange?: ((e: IReference, nullFlavors: INullFlavorR[] | undefined) => void),
   lincked?: boolean
 }
