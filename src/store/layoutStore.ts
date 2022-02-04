@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx"
+import { ToastMessageType } from "primereact/toast"
 
 export default class LayoutStore {
   private _isTabletOrMobile: boolean
@@ -7,6 +8,7 @@ export default class LayoutStore {
   private _isProfileMenuActive: boolean
   private _isNotificationsMenuActive: boolean
   private _isLoading: boolean
+  private _message: ToastMessageType | null
 
   constructor() {
     this._isTabletOrMobile = false
@@ -15,6 +17,7 @@ export default class LayoutStore {
     this._isProfileMenuActive = false
     this._isNotificationsMenuActive = false
     this._isLoading = false
+    this._message = null
     makeAutoObservable(this)
   }
   setTabletOrMobile(visible: boolean) {
@@ -55,5 +58,12 @@ export default class LayoutStore {
   }
   set isLoading(value: boolean) {
     this._isLoading = value
+  }
+
+  get message(): ToastMessageType | null {
+    return this._message
+  }
+  set message(value: ToastMessageType | null) {
+    this._message = value
   }
 }

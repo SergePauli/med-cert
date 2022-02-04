@@ -9,7 +9,7 @@ import { InputText } from 'primereact/inputtext'
 
 
  const Section7: FC = () => {
-  const { certificateStore } = useContext(Context)   
+  const { certificateStore, layoutStore } = useContext(Context)   
   
   
   const header = () => {
@@ -37,7 +37,9 @@ import { InputText } from 'primereact/inputtext'
           deathReason={certificate.reasonA} certificate={certificate}
            key={`ra2_${certificate.reasonA?.effectiveTime}`} 
           onChange={(reason: DeathReason | undefined)=>{ 
-            if (reason!==certificate.reasonA ) certificate.reasonA = reason }}
+            if (reason!==certificate.reasonA ) certificate.reasonA = reason
+            layoutStore.message = { severity: 'success', summary: 'Успешно', detail: 'Причина А изменена, рекомендуется сохранить изменения', life: 3000 }
+           }}
           disabled checked
           fieldName='a_reason' 
           onDown={()=>{
