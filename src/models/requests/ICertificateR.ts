@@ -3,6 +3,7 @@ import { IAddressR } from "./IAddressR"
 import { IAuthenticatorR } from "./IAuthenticatorR"
 import { IChildInfoR } from "./IChildInfoR"
 import { IDeathReasonR } from "./IDeathReasonR"
+import { IParticipantR } from "./IParticipintR"
 import { IPatientR } from "./IPatientR"
 
 export interface ICertificateR {
@@ -40,6 +41,7 @@ export interface ICertificateR {
   audithor_attributes?: IAuthenticatorR
   legal_authenticator_attributes?: IAuthenticatorR
   custodian_id?: number
+  participant_attributes?: IParticipantR
   guid: string
   null_flavors_attributes?: INullFlavorR[]
 }
