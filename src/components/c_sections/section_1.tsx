@@ -20,7 +20,7 @@ import { PersonName } from '../inputs/PersonName'
 
 
  const Section1: FC = () => {   
-  const { certificateStore } = useContext(Context) 
+  const { certificateStore, suggestionsStore, layoutStore } = useContext(Context) 
   const certificate = certificateStore.cert   
   const patient = certificate.patient
   const person =  patient.person     
@@ -31,15 +31,15 @@ import { PersonName } from '../inputs/PersonName'
       return <span>Данные умершего</span>
     }
     
-  const identified = certificateStore.identified   
-  const optionCode = certificateStore.fromRelatives ? 'ASKU' : 'NA UNK'
+  const identified = suggestionsStore.identified   
+  const optionCode = suggestionsStore.fromRelatives ? 'ASKU' : 'NA UNK'
   const isDeathTime = certificate.deathDatetime!==undefined 
         && certificate.nullFlavors.findIndex((item)=>item.parent_attr==="death_time")===-1
   return (<>    
       <Card className="c-section p-mr-2 p-mb-2" header={header}>        
           <div className="p-fluid p-formgrid p-grid">
             <div className="p-field-checkbox p-col-12 p-lg-6">              
-              <Checkbox inputId="notIdentified" checked={!certificateStore.identified} onChange={e =>{                
+              <Checkbox inputId="notIdentified" checked={!suggestionsStore.identified} onChange={e =>{                
                 if (e.checked) {
                   patient.person = undefined
                   patient.identity = undefined
@@ -53,15 +53,15 @@ import { PersonName } from '../inputs/PersonName'
                 checkFieldNullFlavor('person', patient.person, patient.nullFlavors, UNK) 
                 checkFieldNullFlavor('identity', patient.identity, patient.nullFlavors, UNK)  
                 checkFieldNullFlavor('policy_OMS', certificate.policyOMS, certificate.nullFlavors, UNK)           
-                certificateStore.identified = !e.checked  
+                suggestionsStore.identified = !e.checked  
                 }} 
               />
               <label htmlFor="notIdentified">Умерший не идентифицирован</label>
             </div>
             <div className="p-field-checkbox p-col-12 p-lg-6">              
-              <Checkbox inputId="fromRelatives" checked={certificateStore.fromRelatives} 
+              <Checkbox inputId="fromRelatives" checked={suggestionsStore.fromRelatives} 
               onChange={e =>{       
-                certificateStore.fromRelatives = e.checked
+                suggestionsStore.fromRelatives = e.checked
                 if (e.checked) { 
                   if (!patient.person) {
                     patient.person = new Person()
@@ -83,7 +83,7 @@ import { PersonName } from '../inputs/PersonName'
               <div className='p-paragraph-field p-mr-2 p-mb-2' 
                 key={`pdiv1_${identified}`} >
                 <NullFlavorWrapper 
-                  disabled={!certificateStore.fromRelatives}               
+                  disabled={!suggestionsStore.fromRelatives}               
                   checked={identified} 
                   paraNum                                
                   label={<label htmlFor="family">Фамилия, имя, отчество(при наличии)</label>}
@@ -91,10 +91,11 @@ import { PersonName } from '../inputs/PersonName'
                     onChange={(value: IPersonName | undefined)=>{     
                       if (!person) return                                            
                       person.fio = value || {family:'',given_1:''}
-                      checkFieldNullFlavor('fio.given_2', person.fio.given_2, person.nullFlavors, UNK)                                  
+                      checkFieldNullFlavor('fio.given_2', person.fio.given_2, person.nullFlavors, UNK)     
+                      layoutStore.message = { severity: 'success', summary: 'Успешно', detail: 'ФИО умершего изменены, чтобы сохранить изменения, введите причину А в п.22', life: 3000 }                             
                   }}/>}                  
                   options={NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))} 
-                  value={certificateStore.fromRelatives ? ASKU : UNK} 
+                  value={suggestionsStore.fromRelatives ? ASKU : UNK} 
                   nullFlavors={patient.nullFlavors}  
                   field_name="person"                                 
                 />             
@@ -138,9 +139,9 @@ import { PersonName } from '../inputs/PersonName'
               <div className='paragraph p-mr-1'> 3. </div>
               <div className='p-paragraph-field' key={`pdiv5_${identified}`}>                    
                 <NullFlavorWrapper paraNum
-                    disabled={certificateStore.identified}                    
+                    disabled={suggestionsStore.identified}                    
                     label={<label htmlFor="dateBirth">Дата рождения</label>}
-                    checked={certificateStore.identified || yearBTChecked } setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{                      
+                    checked={suggestionsStore.identified || yearBTChecked } setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{                      
                       if (!e.checked) {                        
                         patient.birth_date = undefined
                         patient.birth_year = undefined 
@@ -158,7 +159,7 @@ import { PersonName } from '../inputs/PersonName'
                         showIcon />
                       <div className="p-field-checkbox">              
                         <Checkbox checked={yearBTChecked} 
-                          inputId="bd_year" disabled={certificateStore.identified}
+                          inputId="bd_year" disabled={suggestionsStore.identified}
                           onChange={e=>{
                             setYearBTChecked(e.checked)
                             patient.setBirthDay(patient.birth_date as Date | undefined, e.checked) }}/>
@@ -166,7 +167,7 @@ import { PersonName } from '../inputs/PersonName'
                       </div>
                     </div>}
                     options={NULL_FLAVORS.filter((item:IReference)=>"ASKU UNK".includes(item.code))} 
-                    value={certificateStore.fromRelatives ? ASKU : UNK}
+                    value={suggestionsStore.fromRelatives ? ASKU : UNK}
                     field_name="birth_date"
                     nullFlavors={patient.nullFlavors}
                 />                               

@@ -16,15 +16,15 @@ import { DEFAULT_ADDRESS, IAddressR } from "../../models/requests/IAddressR"
 
 
 const Section3: FC = () => {
-  const { addressStore, certificateStore } = useContext(Context)
+  const { addressStore, certificateStore,suggestionsStore } = useContext(Context)
   const certificate = certificateStore.cert  
   const patient = certificate.patient
   const [addressLife, setAddressLife] = useState(patient.person?.address) 
   const [addressDeath, setAddressDeath] = useState(certificate.deathAddr) 
-  const identified = certificateStore.identified
+  const identified = suggestionsStore.identified
   const checkedLifeArea = !!patient.person && patient.person.nullFlavors.findIndex((item)=>item.parent_attr==='address' && !item._destroy)===-1
   const checkedDeathArea = !!addressDeath || certificate.nullFlavors.findIndex((item)=>item.parent_attr==='death_addr')===-1  
-  const fromRelatives = certificateStore.fromRelatives
+  const fromRelatives = suggestionsStore.fromRelatives
   const submitted = certificateStore.submitted
   
   const header = () => {

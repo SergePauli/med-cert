@@ -13,16 +13,17 @@ import { IReference } from '../../models/IReference'
 import { Calendar } from 'primereact/calendar'
 import { checkFieldNullFlavor, INullFlavorR } from '../../models/INullFlavor'
 import { Dropdown } from 'primereact/dropdown'
-import { InputMask, InputMaskProps } from 'primereact/inputmask'
+import { InputMask } from 'primereact/inputmask'
 import { InputTextarea } from 'primereact/inputtextarea'
 import Identity from '../../models/FormsData/Identity'
 import IIdentity from '../../models/IIdentity'
+import { inputsIdentity } from '../inputs/inputsIdentity'
 
 
 
  const Section2: FC = () => {
-  const { certificateStore } = useContext(Context)   
-  const identified = certificateStore.identified  
+  const { certificateStore, suggestionsStore } = useContext(Context)   
+  const identified = suggestionsStore.identified  
   const header = () => {
       return <span>Документы умершего</span>
     }    
@@ -33,18 +34,7 @@ import IIdentity from '../../models/IIdentity'
   const [dulValue, setDulValue]  = useState(ID_CARD_TYPES.find((item)=>item.code === identity?.identityCardType))
   const person =  patient.person   
   const nullFlavorOption =  docChecked ? "UNK" : "UNK ASKU NA" 
-  const seriesProps = {type:"text", id:"series", value:identity?.series,                  
-      onChange:(e:any)=>{if (identity) identity.series = e.target.value }}  
-  const seriesField = dulValue?.s_mask ? <InputMask {...{mask:dulValue?.s_mask,...seriesProps} as InputMaskProps }/>
-    : <InputText {...seriesProps}/>   
-  const numberProps = {type:"text", id:"docNumber", value:identity?.number,                  
-      onChange:(e:any)=>{if (identity) identity.number = e.target.value }}  
-  const numberField = dulValue?.n_mask ? <InputMask {...{mask:dulValue?.n_mask,...numberProps} as InputMaskProps }/>
-    : <InputText {...numberProps}/> 
-  const depCodeProps = {type:"text", id:"depCode", value:identity?.issueOrgCode,                  
-      onChange:(e:any)=>{if (identity) identity.issueOrgCode = e.target.value}}  
-  const depCodeField = dulValue?.c_mask ? <InputMask {...{mask:dulValue?.c_mask,...depCodeProps} as InputMaskProps }/>
-    : <InputText {...depCodeProps}/>    
+  const [seriesField, numberField, depCodeField] = inputsIdentity({dulValue, identity})    
   return (<>    
       <Card className="c-section p-mr-2 p-mb-2" header={header}>        
           <div className="p-fluid p-formgrid p-grid">            
@@ -58,7 +48,7 @@ import IIdentity from '../../models/IIdentity'
                       patient.identity = new Identity({
                         identity_card_type_id: ID_CARD_TYPES[PASSPORT_RF].code,                                  
                           } as IIdentity)
-                        if (!identified) certificateStore.identified = true
+                        if (!identified) suggestionsStore.identified = true
                       } else patient.identity = undefined 
                       if (nullFlavors) patient.nullFlavors = nullFlavors
                       setDocChecked(e.checked)

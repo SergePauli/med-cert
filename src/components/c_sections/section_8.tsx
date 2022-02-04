@@ -22,8 +22,8 @@ import { InputText } from 'primereact/inputtext'
 
 
  const Section8: FC = () => {
-  const { certificateStore, temporaryIDStore } = useContext(Context) 
-  const checkReason = certificateStore.suggestions[EXT_REASON_SUG].done && certificateStore.suggestions[EXT_REASON_TIME_SUG].done
+  const { certificateStore, temporaryIDStore, suggestionsStore } = useContext(Context) 
+  const checkReason = suggestionsStore.suggestions[EXT_REASON_SUG].done && suggestionsStore.suggestions[EXT_REASON_TIME_SUG].done
   
   
   const certificate = certificateStore.cert   
@@ -37,9 +37,9 @@ import { InputText } from 'primereact/inputtext'
   const [selectedProcedures, setSelectedProcedures] = useState<Procedure[]>([])
   const [selectedReasons, setSelectedReasons] = useState<DeathReason[]>([])
   useEffect(()=>{
-    certificateStore.suggestions[EXT_REASON_SUG].done = !(newReason.diagnosis === undefined && (newReason.nullFlavors.length===0 || newReason.nullFlavors.findIndex((item)=>item.parent_attr==='diagnosis')===-1))
-    certificateStore.suggestions[EXT_REASON_TIME_SUG].done = !(newReason.effectiveTime === undefined && newReason.nullFlavors.findIndex((item)=>item.parent_attr==='effective_time')===-1)
-  },[newReason.diagnosis, newReason.effectiveTime, certificateStore.suggestions, newReason.nullFlavors]) 
+    suggestionsStore.suggestions[EXT_REASON_SUG].done = !(newReason.diagnosis === undefined && (newReason.nullFlavors.length===0 || newReason.nullFlavors.findIndex((item)=>item.parent_attr==='diagnosis')===-1))
+    suggestionsStore.suggestions[EXT_REASON_TIME_SUG].done = !(newReason.effectiveTime === undefined && newReason.nullFlavors.findIndex((item)=>item.parent_attr==='effective_time')===-1)
+  },[newReason.diagnosis, newReason.effectiveTime, suggestionsStore.suggestions, newReason.nullFlavors]) 
   const header = () => {
       return <><span><span className='paragraph p-mr-1'>22(II).</span>Прочие состояния.</span> 
       <Button icon="pi pi-plus" className="p-ml-auto p-mr-2 p-button-sm p-button-raised p-button-success" label="Добавить состояние" 
