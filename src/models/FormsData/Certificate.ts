@@ -267,6 +267,7 @@ export default class Certificate implements ISerializable {
     if (this._trafficAccident) _cert.traffic_accident = this._trafficAccident
     if (this._patient) _cert.patient_attributes = this._patient.getAttributes()
     _cert.custodian_id = this._custodian_id || _cert.patient_attributes?.organization_id
+    if (this._participant) _cert.participant_attributes = this._participant.getAttributes()
     return _cert
   }
   //#region Getters - Setters
