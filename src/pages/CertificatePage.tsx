@@ -23,10 +23,11 @@ import Section6 from '../components/c_sections/section_6'
 import Section7 from '../components/c_sections/section_7'
 import Section8 from '../components/c_sections/section_8'
 import Section9 from '../components/c_sections/section_9'
+import Section10 from '../components/c_sections/section_10'
 import { Context } from '..'
 import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
-import { Toast, ToastMessageType } from 'primereact/toast'
+import { Toast } from 'primereact/toast'
 import { DEFAULT_ERROR_TOAST } from '../utils/defaults'
 import { ICertificate } from '../models/responses/ICertificate'
 
@@ -39,9 +40,9 @@ interface CertificatePageProps extends IRouteProps {
 }
 
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
-  const { certificateStore, userStore, layoutStore } = useContext(Context)     
+  const { certificateStore, userStore, layoutStore, suggestionsStore } = useContext(Context)     
   const [certID, setCertID] = useState(Number.parseInt(props.match.params.id))
-  const [toastMessage, setToastMessage] = useState<ToastMessageType | null>(null)
+  
   useEffect(()=>{    
     if (certID ===-1 && toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Пустое  свидетельство создано!', detail: 'Внесите изменения и сохраните, чтоб получить номер', life: 3000 })
     if (certID === certificateStore.cert.id || certID===-1) {
@@ -61,11 +62,11 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
     }  
   },[certID, certificateStore, layoutStore, certificateStore.cert.id])
   useEffect(()=>{
-    if (!layoutStore.isLoading && !!toastMessage && !!toast.current) { 
-      toast.current.show(toastMessage)
-      setToastMessage(null)
+    if (!layoutStore.isLoading && !!layoutStore.message && !!toast.current) { 
+      toast.current.show(layoutStore.message)
+      layoutStore.message = null
     }
-  },[layoutStore.isLoading, toastMessage])
+  },[layoutStore, layoutStore.isLoading, layoutStore.message])
   const toast = useRef<Toast>(null)  
   const secton_router = ()=>{
     switch (props.location.search) {
@@ -78,6 +79,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       case "?q=7": return <Section7 />
       case "?q=8": return <Section8 />
       case "?q=9": return <Section9 />
+      case "?q=10": return <Section10 />
       default: return <Section0 /> 
     } 
   }    
@@ -123,11 +125,11 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             command: () => { 
               layoutStore.isLoading = true
               const result = certificateStore.save((data:ICertificate)=>{                                
-                  setToastMessage({ severity: 'success', summary: 'Успешно', detail: 'Изменения сохранены', life: 3000 })
+                  layoutStore.message ={ severity: 'success', summary: 'Успешно', detail: 'Изменения сохранены', life: 3000 }
                   setCertID(data.id)
                   console.log(data)   
               }, (message:string)=>{                         
-                setToastMessage(DEFAULT_ERROR_TOAST)
+                layoutStore.message = DEFAULT_ERROR_TOAST
                 console.log(message)
               }, userStore.userInfo?.organization.sm_code)
               if (!result) {
@@ -170,14 +172,14 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       'p-suggestion-actual': !data.done
     }
   } 
-  const sugCount = certificateStore.redSuggestionsCount() 
+  const sugCount = suggestionsStore.redSuggestionsCount() 
   const suggestionHeader = () => {    
     const avatar = sugCount === 0 ? <Avatar icon="pi pi-check" shape="circle" style={{ height:'1.5rem', width: '1.5rem',backgroundColor: 'rgb(104 159 56)', color: 'white'}}/> : <Badge value={sugCount}  style={{ backgroundColor: 'rgb(204, 0, 0)', color: 'white', marginLeft: '4px'}}/>
     return <><span>Контроль заполнения</span>{avatar}</>
   }
-  const suggestions = certificateStore.suggestions
+  const suggestions = suggestionsStore.suggestions
     .filter((item:ISuggestions) =>
-    item.section === props.location.search.slice(-1))
+    item.section === props.location.search.slice(3))
   
   const layoutParams = {
     title: 'Медицинское свидетельство о смерти',     
