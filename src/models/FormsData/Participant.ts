@@ -7,7 +7,7 @@ import Person from "./Person"
 
 export default class Participant implements ISerializable {
   private _id?: number | undefined
-  private _person?: Person | undefined
+  private _person: Person
   private _receiptDate: Date
   private _description?: string | undefined
   private _identity?: Identity | undefined
@@ -17,7 +17,9 @@ export default class Participant implements ISerializable {
   constructor(props = {} as IParticipant) {
     this._oldOne = { ...props }
     if (props.person) this._person = new Person(props.person)
-    this._receiptDate = new Date(props.receipt_date) || new Date()
+    else this._person = new Person()
+    if (props.receipt_date) this._receiptDate = new Date(props.receipt_date)
+    else this._receiptDate = new Date()
     if (props.identity) this._identity = new Identity(props.identity)
     this._id = props.id
     this._description = props.description
@@ -26,12 +28,13 @@ export default class Participant implements ISerializable {
   }
   getAttributes() {
     const _pr = {} as IParticipantR
-    _pr.id = this._id
+    if (this._id) _pr.id = this._id
     _pr.description = this._description
     _pr.original = this._original
     _pr.receipt_date = this._receiptDate?.toDateString()
     if (this._person) _pr.person_attributes = this._person.getAttributes()
     if (this._identity) _pr.identity_attributes = this._identity.getAttributes()
+    return _pr
   }
   get oldOne(): IParticipant | undefined {
     return this._oldOne
@@ -60,10 +63,10 @@ export default class Participant implements ISerializable {
   set receiptDate(value: Date) {
     this._receiptDate = value
   }
-  get person(): Person | undefined {
+  get person(): Person {
     return this._person
   }
-  set person(value: Person | undefined) {
+  set person(value: Person) {
     this._person = value
   }
   get id(): number | undefined {
