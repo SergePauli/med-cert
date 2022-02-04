@@ -202,6 +202,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
                   if (deathReason) deathReason.diagnosis = undefined
                   setDiagnosisText('')                  
                 }  
+                if (deathReason!=null) props.onChange(deathReason)
               }}
               value={props.deathReason?.diagnosis || diagnosisText}/>          
           </div>
@@ -220,6 +221,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
                   if (deathReason) deathReason.diagnosis = undefined               
                   setDiagnosisCode('')
                 }  
+                if (deathReason!=null) props.onChange(deathReason)
               }}
               value={props.deathReason?.diagnosis || diagnosisCode}/>          
           </div>
