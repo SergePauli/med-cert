@@ -162,7 +162,7 @@ export default class Certificate implements ISerializable {
   yearsAge() {
     const dd = this._deathDatetime as Date
     const db = this._patient.birth_date as Date
-    if (dd !== undefined && db !== undefined) return dd.getFullYear() - db.getFullYear()
+    if (!!dd && !!db) return dd.getFullYear() - db.getFullYear()
     else return false
   }
   setDeathDay(value: Date | undefined, isYear: boolean) {
