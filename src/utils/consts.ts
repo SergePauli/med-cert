@@ -14,13 +14,31 @@ export const REPORT_ROUTE = "/report"
 export const DOCTORS_ROUTE = "/doctors"
 export const USER_ROUTE = "/user"
 export const MO_SETTINGS_ROUTE = "/organization"
-
+export const DIRECTION = ["asc", "desc"]
 export const ROLES: IObjectKeys = {
   USER: "ПОЛЬЗОВАТЕЛЬ",
   ADMIN: "АДМИНИСТРАТОР",
   STATS: "СТАТИСТИК",
 }
-
+export const RunsackFilterMatchMode = {
+  startsWith: "_start",
+  contains: "_cont",
+  notContains: "_not_cont",
+  endsWith: "_end",
+  equals: "_eq",
+  notEquals: "_not_eq",
+  in: "_in",
+  lt: "_lt",
+  lte: "lteq",
+  gt: "_gt",
+  gte: "_gteq",
+  between: "",
+  dateIs: "_eq",
+  dateIsNot: "_not_eq",
+  dateBefore: "_lt",
+  dateAfter: "_gt",
+  custom: "",
+}
 // маркер удаления для использования в запросах на обновление
 // destroy-marker for using in nested_attributes
 export const DESTROY_OPTION = { _destroy: "1" }
