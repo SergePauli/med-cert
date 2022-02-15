@@ -895,7 +895,7 @@ a {
 }
 
 .layout-content {
-  padding: 1rem;
+  padding: 0 1rem;
   /* flex: 1 1 auto;
   -ms-flex: 1 1 auto; */
 }

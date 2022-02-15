@@ -691,4 +691,54 @@
   80%, 90% {
     stroke: #ffa700
   }
+
+}
+
+.p-column-filter-overlay {
+  background: #ffffff;
+  color: #495057;
+  border: 0 none;
+  border-radius: 6px;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  min-width: 12.5rem;
+}
+
+.p-column-filter-overlay-menu .p-column-filter-operator {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1 px solid #dee2e6;
+  color: #343a40;
+  background: #f8f9fa;
+  margin: 0;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+}
+
+.p-column-filter-overlay-menu .p-column-filter-constraint:last-child {
+  border-bottom: 0 none;
+}
+
+.p-column-filter-overlay-menu .p-column-filter-constraint {
+  padding: 1.25rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.p-column-filter-overlay-menu .p-column-filter-add-rule {
+  padding: 0.75rem 1.25rem;
+}
+
+.p-column-filter-overlay-menu .p-column-filter-buttonbar {
+  padding: 1.25rem;
+}
+
+.p-column-filter-buttonbar {
+  display: -moz-box;
+  display: flex;
+  -moz-box-align: center;
+  align-items: center;
+  -moz-box-pack: justify;
+  justify-content: space-between;
+}
+
+.p-column-filter-overlay-menu .p-column-filter-constraint .p-column-filter-matchmode-dropdown {
+  margin-bottom: 0.5rem;
 }
