@@ -128,7 +128,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             label: 'Сохранить',
             icon: 'pi pi-save p-success',
             command: () => { 
-              if (!suggestionsStore.suggestions[CERT_TYPE_SUG].done! || suggestionsStore.suggestions[PERSON_NAME_SUG].done ||
+              if (!suggestionsStore.suggestions[CERT_TYPE_SUG].done || !suggestionsStore.suggestions[PERSON_NAME_SUG].done ||
                !suggestionsStore.suggestions[REASON_A_SUG].done ) {
                  setMessage({severity:'warn', summary:'ОТКЛОНЕНО', detail:'Внесите минимальный набор данных: вид свидетельства, ФИО умершего(для идентифицированых), причину а)', life: 6000})
                  return
