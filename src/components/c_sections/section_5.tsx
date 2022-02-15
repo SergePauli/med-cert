@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { FC, useContext, useEffect} from 'react'
+import { FC, useContext, useEffect, useState} from 'react'
 import { Context } from '../..'
 import { Card } from 'primereact/card'
 import { CheckboxChangeParams } from 'primereact/checkbox'
@@ -20,9 +20,11 @@ import { checkFieldNullFlavor, INullFlavorR } from '../../models/INullFlavor'
 import { TERMS_PREGNANCY } from '../../NSI/1.2.643.5.1.13.13.99.2.18'
 import { ChildInfo } from '../../models/FormsData/ChildInfo'
 import { MotherInfo } from '../MotherInfo'
+import InputAddress from '../inputs/InputAddress'
+import { DEFAULT_ADDRESS, IAddressR } from '../../models/requests/IAddressR'
 
  const Section5: FC = () => {
-  const { certificateStore } = useContext(Context)
+  const { certificateStore, addressStore } = useContext(Context)
    
   const optionCode = 'NA'
   const options = NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))  
@@ -32,8 +34,9 @@ import { MotherInfo } from '../MotherInfo'
     }
   const certificate = certificateStore.cert
   const age = certificate.hoursAge()  
-  const isChildInfo = !!age && certificate.hoursAge() > 168 &&  certificate.yearsAge() < 1          
+  const isChildInfo = !!age && (age > 168) && certificate.yearsAge() < 1      
   const isMonthChild = isChildInfo && certificate.daysAge() < 30 
+  const [address, setAddress] = useState(certificate.childInfo?.address)
   
   useEffect(()=>{
     if (isChildInfo && certificate.childInfo===undefined) 
@@ -73,7 +76,7 @@ import { MotherInfo } from '../MotherInfo'
               </div>  
             </div> 
             <div className="p-field p-d-flex p-flex-wrap p-jc-start" style={{width: '98%'}}>
-              <div className='paragraph p-mr-1'>13.*</div>
+              <div className='paragraph p-mr-1'>13.</div>
               <div className="p-paragraph-field p-mr-2 p-mb-2" style={{width: '90%'}}>
                 <NullFlavorWrapper  checked={isMonthChild}  key={`MonthChild_${isMonthChild}`} 
                   disabled
@@ -97,13 +100,13 @@ import { MotherInfo } from '../MotherInfo'
               </div>  
             </div>
             <div className="p-field p-d-flex p-flex-wrap p-jc-start" style={{width: '98%'}} >
-              <div className='paragraph p-mr-1'>14.*</div>
+              <div className='paragraph p-mr-1'>14.</div>
               <div className="p-paragraph-field p-mr-2 p-mb-2" style={{width: '90%'}}>
                 <NullFlavorWrapper  checked={isChildInfo}  key={`YearChild_${isChildInfo}`} 
                   disabled
                   setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
                             if (nullFlavors) certificate.nullFlavors = nullFlavors                  
-                              certificate.maritalStatus = undefined
+                              certificate.childInfo = undefined
                             }}            
                   label={<label htmlFor="YearChild">Для детей, умерших в возрасте от 168 час. до 1 года</label>}
                   field={<MotherInfo childInfo={childInfo} onChange={(chInf: ChildInfo)=>{
@@ -113,6 +116,38 @@ import { MotherInfo } from '../MotherInfo'
                   value={defaultCode} 
                   nullFlavors={certificate.nullFlavors}  
                   field_name="related_subject" paraNum 
+                />    
+              </div>  
+            </div>
+            <div className="p-field p-d-flex p-flex-wrap p-jc-start" style={{width: '98%'}} >
+              <div className='paragraph p-mr-1'>8K.</div>
+              <div className="p-paragraph-field p-mr-2 p-mb-2" style={{width: '90%'}}>
+                <NullFlavorWrapper  checked={isChildInfo}  key={`YearChild_BP_${isChildInfo}`} 
+                  disabled
+                  setCheck={(e:CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
+                              if (!certificate.childInfo) return
+                              if (nullFlavors) certificate.childInfo.nullFlavors = nullFlavors
+                              if (!e.checked) certificate.childInfo.address = undefined  
+                            }}            
+                  label={<label htmlFor="child_birth_addr">Место рождения ребенка</label>}
+                  field={<InputAddress submitted={false} 
+                      id='child_birth_addr'            
+                      value={address || DEFAULT_ADDRESS} 
+                      onClear={(value: IAddressR)=>{ 
+                        if (!certificate.childInfo) return                                             
+                        certificate.childInfo.address = value
+                        setAddress(certificate.childInfo.address)
+                      }}
+                      onChange={()=>{
+                        if (!certificate.childInfo) return
+                        certificate.childInfo.address = addressStore.addressProps()
+                        setAddress(certificate.childInfo.address)
+                      }}  
+                    />}
+                  options={options} 
+                  value={defaultCode} 
+                  nullFlavors={certificate.childInfo?.nullFlavors}  
+                  field_name="address" paraNum 
                 />    
               </div>  
             </div>
