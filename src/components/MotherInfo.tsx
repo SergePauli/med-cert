@@ -44,8 +44,9 @@ export const MotherInfo = (props: MotherInfoProps) => {
           className="p-col-fixed" style={{width:'85%'}} >масса тела ребенка при рождении (грамм)</label>
         <div className="p-col">
           <InputNumber  id="weight" value={childInfo.weight} max={9999} min={10} 
-            onChange={(e)=>{
-              childInfo.weight=e.value              
+            onChange={(e)=>{              
+             if (!!e.value) childInfo.weight=e.value 
+             else childInfo.weight= undefined             
             }}
           type="text"/>
         </div>
@@ -55,7 +56,8 @@ export const MotherInfo = (props: MotherInfoProps) => {
         <div className="p-col">
           <InputNumber  id="which_account" max={99} min={1}
             onChange={(e)=>{
-              childInfo.whichAccount=e.value              
+             if (!!e.value) childInfo.whichAccount=e.value    
+             else  childInfo.whichAccount=undefined         
             }} 
             value={childInfo.whichAccount} type="text"/>
         </div>
