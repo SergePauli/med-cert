@@ -20,7 +20,7 @@ COPY package*.json ./
 # копируем исходный код
 COPY . .
 # Устанавливаем зависимости, собираем проект и удаляем зависимости
-RUN npm install -g --ca=null && npm install -g serve && npm install --production && npm run build:production && rm -rf node_module
+RUN npm set strict-ssl false && npm install -g serve && npm install --production && npm run build:production && rm -rf node_module
 
 # Проброс порта 3000
 EXPOSE 3000
