@@ -89,10 +89,11 @@ import { PersonName } from '../inputs/PersonName'
                   label={<label htmlFor="family">Фамилия, имя, отчество(при наличии)</label>}
                   field={<PersonName personName={person?.fio}                                     
                     onChange={(value: IPersonName | undefined)=>{     
-                      if (!person) return                                            
+                      if (!person) return                          
+                      if (value?.family !== "" && (!person.fio || person.fio.family ==="")) layoutStore.message = { severity: 'success', summary: 'Успешно', detail: 'ФИО умершего изменены, чтобы сохранить изменения, введите причину А в п.22', life: 3000 }                                        
                       person.fio = value || {family:'',given_1:''}
                       checkFieldNullFlavor('fio.given_2', person.fio.given_2, person.nullFlavors, UNK)     
-                      layoutStore.message = { severity: 'success', summary: 'Успешно', detail: 'ФИО умершего изменены, чтобы сохранить изменения, введите причину А в п.22', life: 3000 }                             
+                                                  
                   }}/>}                  
                   options={NULL_FLAVORS.filter((item:IReference)=>optionCode.includes(item.code))} 
                   value={suggestionsStore.fromRelatives ? ASKU : UNK} 

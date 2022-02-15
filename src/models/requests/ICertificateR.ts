@@ -15,6 +15,7 @@ export interface ICertificateR {
   death_addr_attributes?: IAddressR
   policy_OMS?: string
   patient_attributes?: IPatientR
+  patient_id?: string
   life_area_type?: number
   death_area_type?: number
   death_datetime?: Date
@@ -44,4 +45,7 @@ export interface ICertificateR {
   participant_attributes?: IParticipantR
   guid: string
   null_flavors_attributes?: INullFlavorR[]
+  series_prev?: string
+  number_prev?: string
+  eff_time_prev?: string
 }

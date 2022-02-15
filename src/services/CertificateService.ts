@@ -34,6 +34,7 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
       "death_reasons",
       "participant",
       "null_flavors",
+      "latest_one",
     ],
   },
   includes: [
@@ -47,6 +48,7 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
     "death_addr",
     "child_info",
     "death_reasons",
+    "latest_one",
   ],
   death_addr: NULLFLAVORABLE_RENDER_OPTIONS,
   patient: PATIENT_RENDER_OPTIONS,
@@ -74,13 +76,18 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
 
 export default class CertificateService {
   //POST request for get Certificate's list
-  static async getCertificates(query: any): Promise<AxiosResponse<ICertificate[]>> {
+  static async getCertificates(query: any, first = 0, last = 9): Promise<AxiosResponse<ICertificate[]>> {
     return $api.post(`${API_URL}model/Certificate/`, {
       ...query,
-      offset: 0,
-      limit: 10,
+      offset: first,
+      limit: last - first + 1,
       ...CERTIFICATE_FULL_RENDER_OPTIONS,
     })
+  }
+
+  // POST request for get Certificate's count
+  static async getCount(query: any): Promise<AxiosResponse<number>> {
+    return $api.post(`${API_URL}model/Certificate/`, { ...query, count: "1" })
   }
 
   //POST request for add  /REST_API/v1/model/Certificate/add

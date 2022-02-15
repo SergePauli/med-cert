@@ -59,7 +59,8 @@ export default class Certificate implements ISerializable {
   private _audits: IAudit[]
   private _custodian_id?: number
   private _participant?: Participant | undefined
-  private _oldOne?: ICertificate
+  private _oldOne?: ICertificate | undefined
+  private _latestOne?: ICertificate | undefined
   disposers: (() => void)[]
 
   constructor(props: ICertificate) {
@@ -69,6 +70,7 @@ export default class Certificate implements ISerializable {
       })
     else this._nullFlavors = []
     this._oldOne = { ...props }
+    this._latestOne = props.latest_one
     this._audits = []
     this._id = props.id || -1
     this._guid = props.guid || uuidv4()
@@ -97,6 +99,7 @@ export default class Certificate implements ISerializable {
     this._educationLevel = props.education_level
     this._maritalStatus = props.marital_status
     this._socialStatus = props.social_status
+    if (props.eff_time_prev) this._effTimePrev = new Date(props.eff_time_prev)
     if (props.child_info) this._childInfo = new ChildInfo(props.child_info)
     if (props.author) this._author = new Authenticator(props.author)
     if (props.audithor) this._audithor = new Authenticator(props.audithor)
@@ -195,6 +198,9 @@ export default class Certificate implements ISerializable {
     let _cert = { guid: this._guid } as ICertificateR
     if (this._id > -1) _cert.id = this._id
     if (this._issueDate) _cert.issue_date = this._issueDate
+    _cert.number_prev = this._numberPrev
+    _cert.series_prev = this._seriesPrev
+    _cert.eff_time_prev = this._effTimePrev?.toDateString()
     if (this._audithor) {
       _cert.audithor_attributes = this._audithor.getAttributes()
       if (!_cert.audithor_attributes.id && !!this._oldOne?.audithor?.id)
@@ -516,6 +522,17 @@ export default class Certificate implements ISerializable {
   set participant(value: Participant | undefined) {
     this._participant = value
   }
+  get latestOne(): ICertificate | undefined {
+    return this._latestOne
+  }
+  set latestOne(value: ICertificate | undefined) {
+    this._latestOne = value
+  }
+
+  get oldOne(): ICertificate | undefined {
+    return this._oldOne
+  }
+
   //#endregion
 
   dispose() {

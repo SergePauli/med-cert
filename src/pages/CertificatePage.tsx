@@ -27,8 +27,8 @@ import Section10 from '../components/c_sections/section_10'
 import { Context } from '..'
 import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
-import { Toast } from 'primereact/toast'
-import { DEFAULT_ERROR_TOAST } from '../utils/defaults'
+import { Toast, ToastMessageType } from 'primereact/toast'
+import { CERT_TYPE_SUG, DEFAULT_ERROR_TOAST, PERSON_NAME_SUG, REASON_A_SUG } from '../utils/defaults'
 import { ICertificate } from '../models/responses/ICertificate'
 
 
@@ -42,9 +42,15 @@ interface CertificatePageProps extends IRouteProps {
 const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) => {  
   const { certificateStore, userStore, layoutStore, suggestionsStore } = useContext(Context)     
   const [certID, setCertID] = useState(Number.parseInt(props.match.params.id))
-  
+  const [message, setMessage] = useState<ToastMessageType | null>(null)
+  useEffect(()=>{
+    if (!!message) {
+      layoutStore.message = message
+      setMessage(null)
+    }
+  },[layoutStore, message])
   useEffect(()=>{    
-    if (certID ===-1 && toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Пустое  свидетельство создано!', detail: 'Внесите изменения и сохраните, чтоб получить номер', life: 3000 })
+    //if (certID ===-1 && toast!==null && toast.current!==null) toast.current.show()
     if (certID === certificateStore.cert.id || certID===-1) {
       layoutStore.isLoading = false
       return
@@ -108,13 +114,12 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
                   layoutStore.isLoading = false
                   certificateStore.clean() 
                   setCertID(certificateStore.cert.id)                 
-                  if (toast!==null && toast.current!==null) toast.current.show({ severity: 'success', summary: 'Успешно', detail: 'Запись удалена', life: 3000 })                                 
+                  setMessage({ severity: 'success', summary: 'Успешно', detail: 'Запись удалена', life: 3000 })                                 
                 })
                 .catch(reason=>{
                   layoutStore.isLoading = false
                   console.log(reason)
-                  if (toast!==null && toast.current!==null) 
-                  toast.current.show(DEFAULT_ERROR_TOAST)
+                  setMessage((DEFAULT_ERROR_TOAST))
                 })                
               }
             }
@@ -123,13 +128,18 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             label: 'Сохранить',
             icon: 'pi pi-save p-success',
             command: () => { 
+              if (!suggestionsStore.suggestions[CERT_TYPE_SUG].done! || suggestionsStore.suggestions[PERSON_NAME_SUG].done ||
+               !suggestionsStore.suggestions[REASON_A_SUG].done ) {
+                 setMessage({severity:'warn', summary:'ОТКЛОНЕНО', detail:'Внесите минимальный набор данных: вид свидетельства, ФИО умершего(для идентифицированых), причину а)', life: 6000})
+                 return
+               }
               layoutStore.isLoading = true
               const result = certificateStore.save((data:ICertificate)=>{                                
-                  layoutStore.message ={ severity: 'success', summary: 'Успешно', detail: 'Изменения сохранены', life: 3000 }
+                  setMessage({ severity: 'success', summary: 'Успешно', detail: 'Изменения сохранены', life: 3000 })
                   setCertID(data.id)
                   console.log(data)   
               }, (message:string)=>{                         
-                layoutStore.message = DEFAULT_ERROR_TOAST
+                setMessage(DEFAULT_ERROR_TOAST)
                 console.log(message)
               }, userStore.userInfo?.organization.sm_code)
               if (!result) {
@@ -144,10 +154,29 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             command: () => { 
               try {
                 certificateStore.createNew()
-                setCertID(-1)                         
-              } catch {if (toast!==null && toast.current!==null) 
-                  toast.current.show(DEFAULT_ERROR_TOAST)}
-            }
+                setCertID(-1)      
+                setMessage({ severity: 'success', summary: 'Пустое  свидетельство создано!', detail: 'Внесите минимальные изменения и сохраните, чтоб получить номер', life: 3000 })                   
+              } catch { 
+                setMessage(DEFAULT_ERROR_TOAST)
+              }
+            }  
+        },
+        {
+            label: 'Заменить',
+            icon: 'pi pi-sync',            
+            command: () => { 
+              if (certificateStore.cert.id < 0 || !certificateStore.cert.issueDate) {
+                setMessage({severity:'warn', summary:'ОТКЛОНЕНО', detail:'Замена возможна только для выданных свидетельств'})
+              return  
+              }
+              try {
+                certificateStore.replace()
+                setCertID(-1) 
+                setMessage({ severity: 'success', summary: 'Cвидетельство заменено!', detail: 'Проверьте вид и сохраните, чтоб получить номер', life: 3000 })                        
+              } catch { 
+                setMessage(DEFAULT_ERROR_TOAST)
+              }
+            }  
         },
         {
             label: 'Далее',

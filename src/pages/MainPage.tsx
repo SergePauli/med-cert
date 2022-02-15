@@ -17,7 +17,7 @@ const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
   useEffect(()=>{
     if (userStore.userInfo) certificateStore.userInfo = userStore.userInfo
     layoutStore.isLoading = true
-    certificateStore.getList(()=>{layoutStore.isLoading = false})         
+    certificateStore.getList(()=>{layoutStore.isLoading = false},0,4)         
   },[certificateStore, layoutStore, userStore.userInfo])
   
   const news =[{version:"3.00",record:"с учетом требований CDA_R2 уровня 3"},
