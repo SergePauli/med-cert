@@ -39,6 +39,30 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
   )
   const content =  layoutStore.isLoading ? <ProgressSpinner/> : props.content 
   addLocale('ru', {
+    startsWith: 'Начинается с',
+    contains: 'Содержит',
+    notContains: 'Не содержит',
+    endsWith: 'Оканчивается на',
+    equals: 'Равно',
+    notEquals: 'Не равно',
+    noFilter: 'Любое',
+    lt: 'Меньше чем',
+    lte: 'Меньше или равно',
+    gt: 'Больше',
+    gte: 'Больше либо равно',
+    dateIs: 'Равна',
+    dateIsNot: 'Не равна',
+    dateBefore: 'Ранее чем',
+    dateAfter: 'Позже чем',
+    custom: 'Свое',
+    clear: 'Очистить',
+    apply: 'Применить',
+    matchAll: 'условия (И)',
+    matchAny: 'условия (ИЛИ)' ,
+    addRule: '+ условие',
+    removeRule: ' - условие',
+    accept: 'ДА',
+    reject: 'НЕТ',
     closeText: 'закрыть',
     prevText: 'назад',
     nextText: 'вперед',
@@ -63,7 +87,7 @@ const MainLayout: FC<MainLayoutProps>=(props: MainLayoutProps) => {
     hourText: 'Часы',
     minuteText: 'Минуты',
     secondText: 'Секунды',
-    allDayText: 'Полный день'
+    allDayText: 'Полный день',      
   })
   return (
   <div className={wrapperClass} data-theme='light'>    
