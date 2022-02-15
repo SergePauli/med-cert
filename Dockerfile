@@ -20,14 +20,15 @@ COPY package*.json ./
 # копируем исходный код
 COPY . .
 # Устанавливаем зависимости, собираем проект и удаляем зависимости
-RUN npm set strict-ssl false && npm install -g serve && npm install --production && npm run build && rm -rf node_module
+# RUN npm set strict-ssl false && npm install -g serve && npm install --production && npm run build && rm -rf node_module
+RUN npm set strict-ssl false  && npm install  && rm -rf node_module
 
 # Проброс порта 3000
 EXPOSE 3000
 
 # пользователь для запуска
-USER node
+# USER node
 
 # Запуск по умолчанию 
-CMD ["serve", "-s", "build"]
+CMD ["npm", "start"]
 
