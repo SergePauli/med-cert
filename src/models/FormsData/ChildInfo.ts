@@ -4,6 +4,7 @@ import { NULL_FLAVOR_IDX } from "../../utils/defaults"
 import { ISerializable } from "../common/ISerializabale"
 import { IChildInfo } from "../IChildInfo"
 import { INullFlavorR } from "../INullFlavor"
+import { IAddressR } from "../requests/IAddressR"
 import { IChildInfoR } from "../requests/IChildInfoR"
 import RelatedSubject from "./RelatedSubject"
 
@@ -14,6 +15,7 @@ export class ChildInfo implements ISerializable {
   private _weight?: number | undefined
   private _whichAccount?: number | undefined
   private _relatedSubject?: RelatedSubject | undefined
+  private _address?: IAddressR | undefined
   private _nullFlavors: INullFlavorR[]
 
   constructor(props: IChildInfo | undefined = undefined) {
@@ -23,6 +25,13 @@ export class ChildInfo implements ISerializable {
       this._termPregnancy = props.term_pregnancy
       this._weight = props.weight
       this._whichAccount = props.which_account
+      this._address = {
+        ...props.address,
+        null_flavors_attributes:
+          props.address?.null_flavors?.map((item) => {
+            return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
+          }) || [],
+      } as IAddressR
       if (props.null_flavors && props.null_flavors.length > 0)
         this._nullFlavors = props.null_flavors.map((item) => {
           return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
@@ -66,7 +75,12 @@ export class ChildInfo implements ISerializable {
   set nullFlavors(value: INullFlavorR[]) {
     this._nullFlavors = value
   }
-
+  get address(): IAddressR | undefined {
+    return this._address
+  }
+  set address(value: IAddressR | undefined) {
+    this._address = value
+  }
   // получение копии массива заполнителей из Observable.array
   null_flavors_attributes() {
     return this._nullFlavors.map((el) => {
@@ -82,6 +96,8 @@ export class ChildInfo implements ISerializable {
     if (this._weight) _chInfo.weight = this._weight
     if (this._whichAccount) _chInfo.which_account = this._whichAccount
     if (this._id) _chInfo.id = this._id
+    if (this._address && !!this._address.state && !!this._address.streetAddressLine)
+      _chInfo.address_attributes = { ...this._address }
     return _chInfo
   }
 }
