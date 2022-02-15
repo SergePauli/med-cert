@@ -54,7 +54,7 @@ export const SideBarMenu:FC<IMenuProps> = (props: IMenuProps) =>{
                 {label}
                 {submenuIcon}                                
               </button>,              
-            ] :  [<a href={item.url} 
+            ] :  [<a href={item.url} target={item.target}
                     key={`a_${item.disabled ? label : index}`}  
                     className={linkClassName} 
                     onClick={(e:React.MouseEvent)=>onItemClick(e, item)} 
