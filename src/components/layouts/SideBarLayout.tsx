@@ -6,6 +6,7 @@ import { Link } from "react-router-dom"
 import { CERTIFICATE_ROUTE, HOME_ROUTE, LIST_ROUTE } from "../../utils/consts"
 import { SideBarMenu } from "../menus/SideBarMenu"
 import { MenuItem } from "primereact/menuitem"
+import { API_URL } from "../../http"
 type SideBarLayoutProps = {activeUrl: string}
 const SideBarLayout = observer((props: SideBarLayoutProps) => {
    const {userStore, certificateStore} = useContext(Context)
@@ -17,6 +18,7 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
           {label:"Сведения о документе", 
           url:`${cert_route_id}?q=0`}, 
           {label:"Начало(п.1-3,7)", url:`${cert_route_id}?q=1`},{label:"Документы(п.4-6)", url:`${cert_route_id}?q=2`},{label:"Адреса.(п.8-11)", url:`${cert_route_id}?q=3`},{label:"п.12-17", url:`${cert_route_id}?q=5`},{label:"п.18-21", url:`${cert_route_id}?q=6`},{label:"Причины (п.22 I)", url:`${cert_route_id}?q=7`},{label:"Прочие (п.22 II)", url:`${cert_route_id}?q=8`},{label:"п.23-26", url:`${cert_route_id}?q=9`},{label:"Получатель", url:`${cert_route_id}?q=10`}]},
+        { label: "Печать", disabled: !certificateStore.cert.issueDate,  icon:"pi-print", items: [{label:"Лицевая", icon:"pi-file", target:"_blank", url:`${API_URL}print/face/${cert_id}`},{ label:"Оборотная", icon:"pi-file", target:"_blank", url:`${API_URL}print/back/${cert_id}`}]},  
         { label: "Списки",  icon:"pi-list", items: [{label:"Свидетельства", icon:"pi-id-card", url:LIST_ROUTE},{label:"Журнал", icon:"pi-align-left", url:"/#"}]},]}, 
       {separator: true},
       { label: "Сеанс", className: "layout-root-menuitem",      
