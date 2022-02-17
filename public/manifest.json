@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "МедСС",
+  "name": "Медицинское свидетельство о смерти",
   "icons": [
     {
       "src": "favicon.ico",
