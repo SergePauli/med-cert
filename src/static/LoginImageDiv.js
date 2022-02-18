@@ -9,7 +9,7 @@ const LoginImageDiv = () => {
         <h3>(с учетом требований CDA_R2 уровня 3)</h3>
       </div>
       <div className='login-footer'>
-        <p>2021 © АО "АМИАЦ"</p>
+        <p>2022 © АО "АМИАЦ"</p>
       </div>
     </div>
   )
