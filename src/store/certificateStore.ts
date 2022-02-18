@@ -49,7 +49,7 @@ export default class CertificateStore {
     // реакции на изменение данных
     this.disposers[0] = autorun(() => {
       let _q = { ...this._filters }
-      if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custudian_id_eq = this._userInfo?.organization.id
+      if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
       if (this._filters)
         CertificateService.getCount({ q: _q })
           .then((value) => (this._count = value.data))
@@ -325,7 +325,7 @@ export default class CertificateStore {
 
   getList(doAfter?: () => void, first = this._first, last = this._first + 9) {
     let _q = { ...this._filters, sorts: this._sorts }
-    if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custudian_id_eq = this._userInfo?.organization.id
+    if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
     else if (!this._userInfo) return false
     CertificateService.getCertificates({ q: _q }, first, last)
       .then((response) => {
@@ -347,7 +347,7 @@ export default class CertificateStore {
   findById(certificate_id: number, doAfter?: () => void) {
     if (!this._userInfo) return false
     CertificateService.getCertificates({
-      q: { custudian_id_eq: this._userInfo.organization.id, id_eq: certificate_id },
+      q: { custodian_id_eq: this._userInfo.organization.id, id_eq: certificate_id },
     })
       .then((response) => {
         if (response.data && response.data.length > 0) this._cert = new Certificate(response.data[0])

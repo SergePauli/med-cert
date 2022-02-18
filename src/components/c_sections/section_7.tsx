@@ -116,6 +116,10 @@ import { doACME } from '../../utils/acme'
           className='p-button-warning p-mr-2'
           onClick={()=>{            
             if (certificate.reasonA?.diagnosis?.ICD10) {
+              if (certificate.reasonC?.diagnosis?.ICD10 && certificate.reasonC.diagnosis.ICD10.includes('U07')) {
+                  certificate.changeReasonACME(certificate.reasonC.diagnosis.ICD10)
+                  layoutStore.message = { severity: 'success', summary: 'Успешно', detail: `${certificate.reasonC.diagnosis.ICD10}-первопричина определенная АСМЕ`, life: 3000 }
+              } else                 
               doACME(certificate, result=>{
                 certificate.changeReasonACME(result)
                 layoutStore.message = { severity: 'success', summary: 'Успешно', detail: `${result}-первопричина определенная АСМЕ`, life: 3000 }           

@@ -110,18 +110,13 @@ export default class Certificate implements ISerializable {
     this._basisDetermining = props.basis_determining
     this._trafficAccident = props.traffic_accident
     this._pregnancyConnection = props.pregnancy_connection
-    if (props.reason_ACME && props.reason_ACME === props.a_reason?.diagnosis?.ICD10) this._reasonACME = this._reasonA
-    else if (props.reason_ACME && props.reason_ACME === props.b_reason?.diagnosis?.ICD10)
-      this._reasonACME = this._reasonB
-    else if (props.reason_ACME && props.reason_ACME === props.c_reason?.diagnosis?.ICD10)
-      this._reasonACME = this._reasonC
-    else if (props.reason_ACME && props.reason_ACME === props.d_reason?.diagnosis?.ICD10)
-      this._reasonACME = this._reasonD
 
     if (props.a_reason) this._reasonA = new DeathReason(props.a_reason)
     else this._reasonA = new DeathReason({} as IDeathReason)
     if (props.b_reason) this._reasonB = new DeathReason(props.b_reason)
     if (props.c_reason) this._reasonC = new DeathReason(props.c_reason)
+    if (props.reason_ACME) this.changeReasonACME(props.reason_ACME)
+
     if (props.d_reason) this._reasonD = new DeathReason(props.d_reason)
     if (props.death_reasons) this._deathReasons = props.death_reasons.map((reason) => new DeathReason(reason))
     else this._deathReasons = []
