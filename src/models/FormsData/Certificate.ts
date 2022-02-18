@@ -140,6 +140,15 @@ export default class Certificate implements ISerializable {
     })
   }
 
+  changeReasonACME(value: string | undefined) {
+    if (!value || "" === value) this._reasonACME = undefined
+    else {
+      if (value === this._reasonA?.diagnosis?.ICD10) this._reasonACME = this._reasonA
+      else if (value === this._reasonB?.diagnosis?.ICD10) this._reasonACME = this._reasonB
+      else if (value === this._reasonC?.diagnosis?.ICD10) this._reasonACME = this._reasonC
+      else this._reasonACME = undefined
+    }
+  }
   milisecAge() {
     // Discard the time-zone information.
     const a = this._patient.birth_date as Date

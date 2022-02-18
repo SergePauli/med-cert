@@ -75,8 +75,8 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
           </span>
         )
     }
-  const effTime = checked && !!deathReason && !!deathTime ? (<NullFlavorWrapper disabled={props.disabled} 
-      checked={checked && (!!deathReason.effectiveTime || props.disabled)} 
+  const effTime = checked && !!deathReason && !!deathTime ? (<NullFlavorWrapper  
+      checked={checked && !!deathReason.effectiveTime} 
       key={`et_${deathReason.effectiveTime}`} 
       label={<label>Период времени между началом патол. состояния и смертью</label>} 
       options={options}  paraNum value={UNK}

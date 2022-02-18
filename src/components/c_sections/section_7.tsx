@@ -6,6 +6,7 @@ import { DeathReason } from '../../models/FormsData/DeathReason'
 import Reason from '../inputs/Reason'
 import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
+import { doACME } from '../../utils/acme'
 
 
  const Section7: FC = () => {
@@ -110,13 +111,30 @@ import { InputText } from 'primereact/inputtext'
         />   
       </div>  
       <div className={mainCSSClass(false)+'p-fluid'}  style={{width: '98%',padding:'4px'}} >  
-        <Button type="button" label="ACME" style={{width: '5rem', height: '2.4rem'}} className='p-button-warning p-mr-2'/>
+        <Button type="button" label="ACME" 
+          style={{width: '5rem', height: '2.4rem'}} 
+          className='p-button-warning p-mr-2'
+          onClick={()=>{            
+            if (certificate.reasonA?.diagnosis?.ICD10) {
+              doACME(certificate, result=>{
+                certificate.changeReasonACME(result)
+                layoutStore.message = { severity: 'success', summary: 'Успешно', detail: `${result}-первопричина определенная АСМЕ`, life: 3000 }           
+              },message=>{
+                layoutStore.message = { severity: 'error', summary: 'Сбой', detail: message, life: 7000 }
+              })
+            } else {
+              layoutStore.message = { severity: 'warn', summary: 'Oтклонено', detail: "Причина а) отсутствует", life: 7000 }
+            }
+          }}
+        />
          <div className="p-field  p-grid">       
           <label htmlFor="ACME" 
                  className="p-col-fixed" 
                  style={{width:'226px'}}>Первоначальная причина по АСМЕ</label>   
           <div className='p-col-12 p-md-2'>                  
-            <InputText id="ACME" type="text" disabled/>
+            <InputText id="ACME" type="text" 
+              disabled value={certificate.reasonACME?.diagnosis?.ICD10 || ''}  
+            />
           </div>
          </div>            
       </div>        

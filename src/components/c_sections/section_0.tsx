@@ -15,7 +15,6 @@ import { DATE_FORMAT } from '../../utils/consts'
    const header = () => {
       return <span>Сведения о документе</span>
     }
-    console.log('cert.certType',cert.certType)
   return (<>    
       <Card className="c-section p-mr-2 p-mb-2" header={header} key={certificateStore.cert.id}>
         <div className="p-fluid p-formgrid p-grid">

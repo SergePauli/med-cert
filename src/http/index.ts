@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig } from "axios"
 import { AuthResponse } from "../models/responses/AuthResponse"
 export const API_URL = "http://10.33.7.10:5000/REST_API/v1/"
 export const FIAS_URL = "http://10.33.7.10:5050/fias"
+export const ACME_URL = "http://10.33.7.8:5005/"
 const $api = axios.create({
   withCredentials: true,
   baseURL: API_URL,
@@ -9,6 +10,15 @@ const $api = axios.create({
 
 export const $fias = axios.create({
   baseURL: FIAS_URL,
+})
+
+export const $acme = axios.create({
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Requested-With": "XMLHttpRequest",
+  },
+  baseURL: ACME_URL,
 })
 
 $api.interceptors.request.use((config: AxiosRequestConfig) => {

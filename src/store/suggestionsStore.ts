@@ -280,7 +280,11 @@ export default class SuggestionsStore {
     })
     this.disposers[30] = autorun(() => {
       if (!this._cStore.cert) return
-      this._suggestions[REASON_A_TIME_SUG].done = !!this._cStore.cert.reasonA?.effectiveTime
+      this._suggestions[REASON_A_TIME_SUG].done =
+        !!this._cStore.cert.reasonA?.effectiveTime ||
+        this._cStore.cert.reasonA?.nullFlavors.findIndex(
+          (item) => item.parent_attr === "effective_time" && !item._destroy
+        ) !== -1
     })
     this.disposers[31] = autorun(() => {
       if (!this._cStore.cert) return
