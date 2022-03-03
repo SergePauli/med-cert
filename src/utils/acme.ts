@@ -145,8 +145,8 @@ const ACME_AIN = (withOtherReasons: boolean, certificate: Certificate) => {
   //Значению deathKind=7 (в ходе террористических действий) соответствует в АСМЕ код A
   //Значению deathKind=8 (род смерти не установлен) соответствует в АСМЕ код C
   let X42 = " "
-  if (certificate.deathKind && certificate.deathKind > 0)
-    X42 = ["N", "A", "A", "H", "S", "A", "A", "C"][certificate.deathKind]
+  if (!!certificate.deathKind && certificate.deathKind > 0)
+    X42 = ["N", "A", "A", "H", "S", "A", "A", "C"][certificate.deathKind - 1]
   //Позиция 43 соответствует одному пробелу (" ")
   //Позиция 44 - кем отвергнута запись (принимается пробел, т.е. не отвергнута)
 
