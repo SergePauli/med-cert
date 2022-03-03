@@ -41,7 +41,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
   const  getDiagnoses = (event: { query: string })=>{
   const option = {} as any
   if (event.query.trim().length>0) option.s_name_cont = event.query.trim()
-  if (diagnosisCode && diagnosisCode.trim().length>0) option.ICD10_start =  diagnosisCode    
+  if (!!diagnosisCode && diagnosisCode.trim().length>0) option.ICD10_start =  diagnosisCode    
   if (props.isExt) DiagnosisService.fetchExtDiagnoses(option).then(response=>{
         if (response.data.length>0) setDiagnoses(response.data)
         else setDiagnoses([])        
@@ -194,7 +194,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               field="s_name" onChange={(e) =>{ 
                 if (!!deathReason && !!e.value.s_name) { 
                   deathReason.diagnosis = e.value
-                  if (deathReason.diagnosis) setDiagnosisCode(deathReason.diagnosis?.ICD10)
+                  if (!!deathReason.diagnosis) setDiagnosisCode(deathReason.diagnosis?.ICD10)
                 } else if(e.value) {
                   if (!!deathReason) deathReason.diagnosis = undefined
                   setDiagnosisText(e.value)                  
@@ -213,15 +213,15 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               completeMethod={getCodes} onChange={(e) =>{ 
                 if (!!deathReason && !!e.value.s_name) {
                     deathReason.diagnosis = e.value
-                    if (deathReason.diagnosis) setDiagnosisCode(deathReason.diagnosis?.ICD10)
+                    if (!!deathReason.diagnosis) setDiagnosisCode(deathReason.diagnosis?.ICD10)
                 } else if(e.value) {
-                    if (deathReason) deathReason.diagnosis = undefined
+                    if (!!deathReason) deathReason.diagnosis = undefined
                   setDiagnosisCode(e.value)                
                 } else {
-                  if (deathReason) deathReason.diagnosis = undefined               
+                  if (!!deathReason) deathReason.diagnosis = undefined               
                   setDiagnosisCode('')
                 }  
-                if (deathReason!=null) props.onChange(deathReason)
+                if (!!deathReason) props.onChange(deathReason)
               }}
               value={props.deathReason?.diagnosis || diagnosisCode}/>          
           </div>
