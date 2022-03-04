@@ -28,7 +28,7 @@ import { Context } from '..'
 import { observer } from 'mobx-react-lite'
 import { ISuggestions } from '../models/ISuggestions'
 import { Toast, ToastMessageType } from 'primereact/toast'
-import { CERT_TYPE_SUG, DEFAULT_ERROR_TOAST, PERSON_NAME_SUG, REASON_A_SUG } from '../utils/defaults'
+import { CERT_TYPE_SUG, DEFAULT_ERROR_TOAST, PERSON_NAME_SUG } from '../utils/defaults'
 import { ICertificate } from '../models/responses/ICertificate'
 
 
@@ -128,9 +128,8 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
             label: 'Сохранить',
             icon: 'pi pi-save p-success',
             command: () => { 
-              if (!suggestionsStore.suggestions[CERT_TYPE_SUG].done || !suggestionsStore.suggestions[PERSON_NAME_SUG].done ||
-               !suggestionsStore.suggestions[REASON_A_SUG].done ) {
-                 setMessage({severity:'warn', summary:'ОТКЛОНЕНО', detail:'Внесите минимальный набор данных: вид свидетельства, ФИО умершего(для идентифицированых), причину а)', life: 6000})
+              if (!suggestionsStore.suggestions[CERT_TYPE_SUG].done || !suggestionsStore.suggestions[PERSON_NAME_SUG].done ) {
+                 setMessage({severity:'warn', summary:'ОТКЛОНЕНО', detail:'Внесите минимальный набор данных: вид свидетельства, ФИО умершего(для идентифицированых)', life: 6000})
                  return
                }
               layoutStore.isLoading = true
