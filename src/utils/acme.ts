@@ -19,8 +19,9 @@ const codogram = (
   reasons: Array<string | undefined>
 ): string => {
   let _result = ""
-  const part_2 = reasons.forEach((code) => {
-    if (!!code) _result += " " + code
+  let _part_2 = ""
+  reasons.forEach((code) => {
+    if (!!code) _part_2 += " " + code
   })
   if (!reason_b && !ext_reason && !reasons[0]) {
     _result = reason_a
@@ -29,11 +30,11 @@ const codogram = (
   } else if (!!reason_b && !!reason_c && !ext_reason && !reasons[0]) {
     _result = reason_a + "/" + reason_b + "/" + reason_c
   } else if (!reason_b && !ext_reason && !!reasons[0]) {
-    _result = reason_a + "*" + part_2
+    _result = reason_a + "*" + _part_2
   } else if (!!reason_b && !reason_c && !ext_reason && !!reasons[0]) {
-    _result = reason_a + "/" + reason_b + "*" + part_2
+    _result = reason_a + "/" + reason_b + "*" + _part_2
   } else if (!!reason_b && !!reason_c && !ext_reason && !!reasons[0]) {
-    _result = reason_a + "/" + reason_b + "/" + reason_c + "*" + part_2
+    _result = reason_a + "/" + reason_b + "/" + reason_c + "*" + _part_2
   } else if (!reason_b && !!ext_reason && !reasons[0]) {
     _result = reason_a + " " + ext_reason
   } else if (!!reason_b && !reason_c && !!ext_reason && !reasons[0]) {
@@ -41,11 +42,11 @@ const codogram = (
   } else if (!!reason_b && !!reason_c && !!ext_reason && !reasons[0]) {
     _result = reason_a + "/" + reason_b + "/" + reason_c + " " + ext_reason
   } else if (!reason_b && !!ext_reason && !!reasons[0]) {
-    _result = reason_a + "*" + part_2 + " " + ext_reason
+    _result = reason_a + "*" + _part_2 + " " + ext_reason
   } else if (!!reason_b && !reason_c && !!ext_reason && !!reasons[0]) {
-    _result = reason_a + "/" + reason_b + "*" + part_2 + " " + ext_reason
+    _result = reason_a + "/" + reason_b + "*" + _part_2 + " " + ext_reason
   } else if (!!reason_b && !!reason_c && !!ext_reason && !!reasons[0]) {
-    _result = reason_a + "/" + reason_b + "/" + reason_c + "*" + part_2 + " " + ext_reason
+    _result = reason_a + "/" + reason_b + "/" + reason_c + "*" + _part_2 + " " + ext_reason
   }
   return _result.padEnd(120, " ")
 }
@@ -53,7 +54,7 @@ const codogram = (
 /**
  * экспорт массива причин в строку
  *
- * @param num определяет ее номер в файле
+ * @param withOtherReasons определяет есть ли прочие причины
  * @return входную кодограмму для внешнего модуля АСМЕ
  * (файл с расширением ain)
  */
