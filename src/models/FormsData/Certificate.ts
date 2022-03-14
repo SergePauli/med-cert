@@ -259,17 +259,17 @@ export default class Certificate implements ISerializable {
     if (this._pregnancyConnection) _cert.pregnancy_connection = this.pregnancyConnection
     if (this._maritalStatus) _cert.marital_status = this._maritalStatus
     if (this.nullFlavors.length > 0) _cert.null_flavors_attributes = this.null_flavors_attributes()
-    if (this._reasonA) _cert.a_reason_attributes = this._reasonA.getAttributes()
+    if (this._reasonA && this._reasonA.diagnosis) _cert.a_reason_attributes = this._reasonA.getAttributes()
     else if (this._oldOne && this._oldOne.a_reason)
       _cert.a_reason_attributes = { id: this._oldOne.a_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._reasonACME) _cert.reason_ACME = this._reasonACME.diagnosis?.ICD10
-    if (this._reasonB) _cert.b_reason_attributes = this._reasonB.getAttributes()
+    if (this._reasonB && this._reasonB.diagnosis) _cert.b_reason_attributes = this._reasonB.getAttributes()
     else if (this._oldOne && this._oldOne.b_reason)
       _cert.b_reason_attributes = { id: this._oldOne.b_reason.id, _destroy: "1" } as IDeathReasonR
-    if (this._reasonC) _cert.c_reason_attributes = this._reasonC.getAttributes()
+    if (this._reasonC && this._reasonC.diagnosis) _cert.c_reason_attributes = this._reasonC.getAttributes()
     else if (this._oldOne && this._oldOne.c_reason)
       _cert.c_reason_attributes = { id: this._oldOne.c_reason.id, _destroy: "1" } as IDeathReasonR
-    if (this._reasonD) _cert.d_reason_attributes = this._reasonD.getAttributes(true)
+    if (this._reasonD && this._reasonD.diagnosis) _cert.d_reason_attributes = this._reasonD.getAttributes(true)
     else if (this._oldOne && this._oldOne.d_reason)
       _cert.d_reason_attributes = { id: this._oldOne.d_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._series) _cert.series = this._series

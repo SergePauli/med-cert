@@ -11,7 +11,7 @@ import { IDoctorR } from "../models/requests/IDoctorR"
 export default class DoctorService {
   //POST request for get doctor's list
   static async getDoctors(query: any): Promise<AxiosResponse<IDoctor[]>> {
-    return $api.post(`${API_URL}model/Doctor/`, { ...query, offset: 0, limit: 10, ...DOCTOR_RENDER_OPTIONS })
+    return $api.post(`${API_URL}model/Doctor/`, { ...query, offset: 0, limit: 100, ...DOCTOR_RENDER_OPTIONS })
   }
   //POST request for get list of pasible values for Doctor.position field
   static async getPositions(query: any): Promise<AxiosResponse<IReferenceId[]>> {
