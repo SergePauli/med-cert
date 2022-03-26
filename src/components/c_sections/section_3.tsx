@@ -8,7 +8,7 @@ import { IReference } from "../../models/IReference"
 import { ASKU, NULL_FLAVORS, UNK } from "../../utils/defaults"
 import { removeEmpty } from "../../utils/functions"
 import AddressDialog from "../dialogs/AddressDialog"
-import AddressFC2 from "../inputs/InputAddress"
+import InputAddress from "../inputs/InputAddress"
 import { AreaType } from "../inputs/AreaType"
 import NullFlavorWrapper from "../NullFlavorWrapper"
 import { INullFlavorR } from "../../models/INullFlavor"
@@ -62,7 +62,7 @@ const Section3: FC = () => {
                 if (nullFlavors) patient.person.nullFlavors = nullFlavors
                 if (!e.checked) patient.person.address = undefined                
               }}               
-              field={<AddressFC2  submitted={submitted} 
+              field={<InputAddress  submitted={submitted} 
                       id='person_addr'            
                       value={addressLife || DEFAULT_ADDRESS} 
                       onClear={(value: IAddressR)=>{  
@@ -113,7 +113,7 @@ const Section3: FC = () => {
                 if (nullFlavors) certificate.nullFlavors = nullFlavors
                 if (!e.checked) certificate.deathAddr = undefined                
               }}               
-              field={<AddressFC2  submitted={submitted} 
+              field={<InputAddress  submitted={submitted} 
                       id='death_addr'            
                       value={addressDeath || DEFAULT_ADDRESS} 
                       onClear={(value: IAddressR)=>{                                               

@@ -48,7 +48,7 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
   const toast = useRef<Toast>(null)
   const setAddress = (e:IFiasItem)=>{ 
     if (e === null) return      
-    if (e.parent!==undefined) setAddress(e.parent)
+    if (e.parent) setAddress(e.parent)
     if (e.postalCode && e.postalCode.length>0) value.postalCode = e.postalCode
     value.aoGUID = e.AOGUID
     value.houseGUID = e.HouseGUID 
@@ -77,7 +77,7 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
     }         
   }  
   useEffect( () => {     
-    if (regions ===undefined) {
+    if (regions===undefined) {
       addressStore.fetchRegionOptions()          
     } else if (value.state===undefined || value.state===null)  {      
       setRegion(regions?.find((region)=>region.code===HOME_REGION_CODE)) 
@@ -116,8 +116,13 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
   const footer = (
     <div>
       <Button label="Применить" icon="pi pi-check" disabled={cantSaveChanges()}
-        onClick={()=>{
-          if (addressStore.isNotStrictly() && addressStore.manualMode) addressStore.address.streetAddressLine = searchStr
+        onClick={()=>{          
+          if (addressStore.isNotStrictly() && addressStore.manualMode) {  
+            value.housenum = house          
+            if (value.houseGUID === null && !!house ) 
+              addressStore.address.streetAddressLine = `${searchStr}${value.housenum.length>0 ? ', '+value.housenum : ''}`
+            else addressStore.address.streetAddressLine = searchStr
+          }  
           if (addressStore.onAddrComplete) addressStore.onAddrComplete()          
           onHide()
         }} className="p-button-text p-button-success"/>        
@@ -231,10 +236,9 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
               setAddress(e.value)
               setHouse(e.value.name)
             } else {
-              setHouse(e.value)
-              if (addresses?.entries.length===0 && e.value.trim().length>0) {
-                value.housenum = e.value
-              }
+              setHouse(e.value)              
+              value.housenum = e.value                               
+              value.houseGUID = null
             }
           }}                       
           suggestions={addresses}

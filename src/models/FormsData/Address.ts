@@ -14,12 +14,12 @@ export default class Address {
   private _city?: IReference
   private _town?: IReference
   private _street?: IReference
-  private _aoGUID?: string
-  private _houseGUID?: string
-  private _housenum?: string
-  private _buildnum?: string
-  private _strucnum?: string
-  private _flat?: string
+  private _aoGUID?: string | null
+  private _houseGUID?: string | null
+  private _housenum?: string | null
+  private _buildnum?: string | null
+  private _strucnum?: string | null
+  private _flat?: string | null
   private _postalCode?: string
   private _nullFlavors: INullFlavorR[]
   private _parent?: string
@@ -68,7 +68,7 @@ export default class Address {
   get flat() {
     return this._flat
   }
-  set flat(value: string | undefined) {
+  set flat(value: string | undefined | null) {
     this._flat = value
   }
 
@@ -81,19 +81,19 @@ export default class Address {
   get housenum() {
     return this._housenum
   }
-  set housenum(value: string | undefined) {
+  set housenum(value: string | undefined | null) {
     this._housenum = value
   }
   get buildnum() {
     return this._buildnum
   }
-  set buildnum(value: string | undefined) {
+  set buildnum(value: string | undefined | null) {
     this._buildnum = value
   }
   get strucnum() {
     return this._strucnum
   }
-  set strucnum(value: string | undefined) {
+  set strucnum(value: string | undefined | null) {
     this._strucnum = value
   }
 
@@ -109,13 +109,13 @@ export default class Address {
   get town() {
     return this._town
   }
-  set aoGUID(value: string | undefined) {
+  set aoGUID(value: string | undefined | null) {
     this._aoGUID = value
   }
   get aoGUID() {
     return this._aoGUID
   }
-  set houseGUID(value: string | undefined) {
+  set houseGUID(value: string | undefined | null) {
     this._houseGUID = value
   }
   get houseGUID() {

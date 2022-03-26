@@ -27,7 +27,7 @@ import { DEFAULT_ERROR_TOAST } from '../utils/defaults'
 import Address from '../models/FormsData/Address'
 import { IPerson } from '../models/IPerson'
 import { genUpdateDoctorRequest } from '../models/FormsData/DoctorRequest'
-import AddressFC2 from '../components/inputs/InputAddress'
+import InputAddress from '../components/inputs/InputAddress'
 import AddressDialog from '../components/dialogs/AddressDialog'
 import Doctor from '../models/FormsData/Doctor'
 import { DEFAULT_ADDRESS, IAddressR } from '../models/requests/IAddressR'
@@ -108,8 +108,7 @@ const DoctorsPage: FC = () => {
         if (doctor.person?.fio?.family.trim() && doctor.person?.SNILS && doctor.position) {
             let _doctors = [...doctors]
             onContactChange(phone)
-            onContactChange(email)            
-            doctor.person.address = addressStore.addressProps()                        
+            onContactChange(email)  
             if (doctor.id) { 
               const index = findIndexById(doctor.id)
               const request = genUpdateDoctorRequest(_doctors[index], doctor)
@@ -155,9 +154,8 @@ const DoctorsPage: FC = () => {
         setEmail({telcom_value:'', main:false} as IContact)        
         if (_doctor.id !== doctor.id) setDoctor(new Doctor(_doctor))
         doctor.person.contacts?.forEach((item)=>{if (item.main) setPhone({...item})
-        else setEmail({...item, telcom_value: item.telcom_value.replace('mailto:','')})})
-        if (doctor.person.address) addressStore.address = new Address(doctor.person.address) 
-        else  addressStore.address = new Address(DEFAULT_ADDRESS)
+        else setEmail({...item, telcom_value: item.telcom_value.replace('mailto:','')})})        
+        //addressStore.address = new Address(doctor.person.address || DEFAULT_ADDRESS)         
         setPosition(doctor.position?.name || '')
         setDoctorDialog(true)        
     }
@@ -326,15 +324,14 @@ const DoctorsPage: FC = () => {
                     />
                     {submitted && !(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email.telcom_value) || email.telcom_value==='') && <small className="p-error">Неверный email</small>}
                 </div>
-                <AddressFC2 className="p-col-12" submitted={submitted} 
+                <InputAddress className="p-col-12" submitted={submitted} 
                   label='Адрес проживания'
                   value={doctor.person.address || DEFAULT_ADDRESS} strictly 
                   onClear={(value: IAddressR)=>{
                     doctor.person.address = {...value}                    
                   }}
-                  onChange={()=>{        
-                    doctor.person.address = addressStore.addressProps()                    
-                }} />    
+                  onChange={()=>doctor.person.address = {...addressStore.addressProps()}} 
+                />    
                </div>               
             </Dialog>
             <AddressDialog />

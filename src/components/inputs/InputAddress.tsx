@@ -29,8 +29,9 @@ const InputAddress: FC<InputAddressProps> = (props: InputAddressProps) =>{
   
   const bt_id = `bt_addr_${props.id}`   
   
-  useEffect(()=>{addressStore.address = new Address(props.value || DEFAULT_ADDRESS)
-  },[addressStore, props.value])
+  //useEffect(()=>{addressStore.address = new Address(props.value || DEFAULT_ADDRESS)
+  //  console.log('props.value', props.value.streetAddressLine)
+  //},[addressStore, props.value])
 
    useEffect(()=>{
     if (addressStore.manualMode!== !props.strictly) {
@@ -42,6 +43,7 @@ const InputAddress: FC<InputAddressProps> = (props: InputAddressProps) =>{
     {props.label && <label htmlFor={bt_id}>{props.label}</label>}
     <div className='p-inputgroup'>
       <Button id='bt_addr_dialog' label="Ввод" onClick={()=>{
+        addressStore.address = new Address(props.value || DEFAULT_ADDRESS)
         addressStore.dialogVisible = true
         addressStore.onAddrComplete = props.onChange}} style={{width:'5rem'}}/>
       <InputText 

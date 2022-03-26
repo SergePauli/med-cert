@@ -6,15 +6,15 @@ export interface IAddressR extends INullFlavorableR, IDestroyble {
   id?: string
   state: string
   streetAddressLine: string
-  aoGUID?: string
-  houseGUID?: string
+  aoGUID?: string | null
+  houseGUID?: string | null
   postalCode?: string
   code?: string
   parent_guid?: string
   actual?: boolean
-  house_number?: string
-  struct_number?: string
-  building_number?: string
-  flat_number?: string
+  house_number?: string | null
+  struct_number?: string | null
+  building_number?: string | null
+  flat_number?: string | null
 }
 export const DEFAULT_ADDRESS = { state: HOME_REGION_CODE, streetAddressLine: "" } as IAddressR
