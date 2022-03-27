@@ -1,6 +1,6 @@
 {
   "name": "medss-client",
-  "description": "frontend part of medical certificate of death project",
+  "description": "frontend part of medical death's certificate project",
   "author": "Serge Pauli <sergepauli@ya.ru>",
   "license": "MIT",
   "version": "0.1.0",
