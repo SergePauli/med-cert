@@ -2,8 +2,8 @@ FROM node:12
 
 # Добавляем сертификат прокси в доверенные
 # только в случае использования прокси-сервера
-#ADD squid.crt /usr/local/share/ca-certificates
-#RUN update-ca-certificates
+ADD squid.crt /usr/local/share/ca-certificates
+RUN update-ca-certificates
 
 # создание директории приложения и прав доступа
 WORKDIR /usr/src/app
@@ -20,7 +20,7 @@ COPY --chown=node:node . .
 # копируем исходный код
 COPY . .
 # Устанавливаем зависимости, собираем проект и удаляем зависимости
-# RUN npm set strict-ssl false && npm install -g serve && npm install --production && npm run build && rm -rf node_module
+RUN npm set strict-ssl false && npm install -g express-generator@4
 # RUN npm set strict-ssl false  && npm install  && rm -rf node_module
 
 # Проброс порта 3000
