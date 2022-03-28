@@ -20,8 +20,8 @@ COPY --chown=node:node . .
 # копируем исходный код
 COPY . .
 # Устанавливаем зависимости, собираем проект и удаляем зависимости
-RUN npm set strict-ssl false && npm install -g express-generator@4 && npm install express
-# RUN npm set strict-ssl false  && npm install  && rm -rf node_module
+#RUN npm set strict-ssl false && npm install -g express-generator@4 && npm install express
+RUN npm set strict-ssl false  && npm install -g serve
 
 # Проброс порта 3000
 EXPOSE 3000
@@ -30,5 +30,6 @@ EXPOSE 3000
 USER node
 
 # Запуск по умолчанию 
-CMD ["node", "node_run.js"]
+#CMD ["node", "node_run.js"]
+CMD ["serve","-s","build"]
 
