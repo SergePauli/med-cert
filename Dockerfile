@@ -20,7 +20,7 @@ COPY --chown=node:node . .
 # копируем исходный код
 COPY . .
 # Устанавливаем зависимости, собираем проект и удаляем зависимости
-RUN npm set strict-ssl false && npm install -g express-generator@4
+RUN npm set strict-ssl false && npm install -g express-generator@4 && npm install express
 # RUN npm set strict-ssl false  && npm install  && rm -rf node_module
 
 # Проброс порта 3000
