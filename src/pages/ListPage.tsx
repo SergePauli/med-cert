@@ -209,7 +209,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
           <Toast ref={toast} />
           <div id='tableDiv' className='p-card' >             
               <DataTable ref={dt} value={certificateStore.certs}  responsiveLayout="scroll" scrollDirection="both"
-                emptyMessage="нет данных, удовлетворяющих запросу" scrollable scrollHeight="76vh" 
+                emptyMessage="нет данных, удовлетворяющих запросу" scrollable scrollHeight="72vh" 
                 selectionMode="single" selection={selected}  dataKey="id" size="small"
                 footer={footer}
                 onSelectionChange={e =>{
