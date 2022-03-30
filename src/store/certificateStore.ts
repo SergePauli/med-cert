@@ -244,10 +244,12 @@ export default class CertificateStore {
         ...old.death_addr,
         null_flavors_attributes:
           old.death_addr?.null_flavors?.map((item) => {
-            return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
+            return { parent_attr: item.parent_attr, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
           }) || [],
         id: undefined,
+        parent_guid: undefined,
       } as IAddressR
+
     old.latest_one = this._cert.oldOne
   }
 
