@@ -10,7 +10,7 @@ export interface ICertificateR {
   id?: number
   number?: string
   series: string
-  issue_date?: Date
+  issue_date?: string
   cert_type?: number
   death_addr_attributes?: IAddressR
   policy_OMS?: string

@@ -201,7 +201,7 @@ export default class Certificate implements ISerializable {
   getAttributes(): ICertificateR {
     let _cert = { guid: this._guid } as ICertificateR
     if (this._id > -1) _cert.id = this._id
-    if (this._issueDate) _cert.issue_date = this._issueDate
+    if (this._issueDate) _cert.issue_date = this._issueDate.toDateString()
     _cert.number_prev = this._numberPrev
     _cert.series_prev = this._seriesPrev
     _cert.eff_time_prev = this._effTimePrev?.toDateString()
