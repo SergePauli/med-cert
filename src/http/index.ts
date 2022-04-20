@@ -3,7 +3,7 @@ import { AuthResponse } from "../models/responses/AuthResponse"
 
 // настройки на back-end
 //Main API service (Основной API) URL
-export const API_URL = "http://api-medss.int.amurzdrav.ru/REST_API/v1/"
+export const API_URL = "http://localhost:5000/REST_API/v1/"
 //FIAS service (Сервис адресов ФИАС) URL
 export const FIAS_URL = "http://fias.int.amurzdrav.ru/fias"
 //АСМЕ service (Сервис взаимодействия с АСМЕ) URL

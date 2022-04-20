@@ -104,7 +104,7 @@ const DoctorsPage: FC = () => {
 
     const saveDoctor = () => {
         setSubmitted(true)
-        console.log('doctor2',doctor)
+        //console.log('doctor2',doctor)
         if (doctor.person?.fio?.family.trim() && doctor.person?.SNILS && doctor.position) {
             let _doctors = [...doctors]
             onContactChange(phone)

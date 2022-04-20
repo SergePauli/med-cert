@@ -109,4 +109,8 @@ export default class CertificateService {
   static async removeCertificate(certificate_id: number): Promise<AxiosResponse<ICertificate>> {
     return $api.delete(`${API_URL}model/Certificate/${certificate_id}`)
   }
+  // request for get CDA version of Certificate /REST_API/v1/clinical_document/:id
+  static async getCDA(certificate_id: number): Promise<AxiosResponse<string>> {
+    return $api.get(`${API_URL}clinical_document/${certificate_id}`)
+  }
 }
