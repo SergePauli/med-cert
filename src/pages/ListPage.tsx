@@ -20,9 +20,6 @@ import { getOneLinePersonName } from '../models/IPersonName'
 import  PrimeReact, {FilterMatchMode}  from 'primereact/api'
 import { IReference } from '../models/IReference'
 import { InputText } from 'primereact/inputtext'
-import { Skeleton } from 'primereact/skeleton'
-
-
 
 type ListPageProps = {}
 
