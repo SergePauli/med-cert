@@ -23,6 +23,7 @@ export default class CertificateStore {
   private _first: number
   private _rows: number
   private _count: number
+  private _needFetch: boolean
 
   disposers: (() => void)[]
   constructor() {
@@ -33,6 +34,7 @@ export default class CertificateStore {
     this._first = 0
     this._rows = 0
     this._count = 0
+    this._needFetch = true
     this._cert = new Certificate({
       custodian: this._userInfo?.organization,
       patient: {
@@ -49,13 +51,23 @@ export default class CertificateStore {
     // реакции на изменение данных
     this.disposers[0] = autorun(() => {
       let _q = { ...this._filters }
+      //console.log("фильтры", this._filters)
       if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
-      if (this._filters)
+      if (this._filters) {
+        this._needFetch = true
         CertificateService.getCount({ q: _q })
-          .then((value) => (this._count = value.data))
+          .then((value) => {
+            this._count = value.data
+            //console.log("надено", this._count)
+          })
           .catch((reason) => console.log(reason))
+      }
+    })
+    this.disposers[1] = autorun(() => {
+      if (this._sorts) this._needFetch = true
     })
   }
+
   //#region setters-getters
   get cert() {
     return this._cert
@@ -325,18 +337,30 @@ export default class CertificateStore {
     this._selected = num
   }
 
-  getList(doAfter?: () => void, first = this._first, last = this._first + 9) {
+  getList(doAfter?: () => void, first = this._first, last = this._first + this._rows) {
     let _q = { ...this._filters, sorts: this._sorts }
     if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
     else if (!this._userInfo) return false
-    CertificateService.getCertificates({ q: _q }, first, last)
+    const isAdd = !this._needFetch && first === this.first
+    //console.log("getList response", first, last)
+    CertificateService.getCertificates({ q: _q }, isAdd ? this._first + this._rows : first, last)
       .then((response) => {
-        this._certs = response.data
-        //console.log("getList response", { q: { custudian_id_eq: this._userInfo?.organization.id } }, response.data)
+        let num = isAdd ? this._certs.length : 0
+        const _certs = isAdd
+          ? this._certs.concat(
+              response.data.map((cert) => {
+                return { ...cert, rowNumber: ++num }
+              })
+            )
+          : response.data.map((cert) => {
+              return { ...cert, rowNumber: ++num }
+            })
+        this._certs = _certs
         const dataLength = response.data.length
         if (dataLength > 0) {
           this._first = first
           this._rows = this._certs.length
+          this._needFetch = false
           this.select(this._selected > dataLength ? dataLength - 1 : this._selected)
         }
       })

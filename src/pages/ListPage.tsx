@@ -20,7 +20,7 @@ import { getOneLinePersonName } from '../models/IPersonName'
 import  PrimeReact, {FilterMatchMode}  from 'primereact/api'
 import { IReference } from '../models/IReference'
 import { InputText } from 'primereact/inputtext'
-
+import { Skeleton } from 'primereact/skeleton'
 
 
 
@@ -44,19 +44,17 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
         'basis_determining': { value: null, matchMode: FilterMatchMode.IN },              
         'number': { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]}, 
         'patient_fio': { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]},
-        'patient_birth_date' : { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER},{ value: null, matchMode: FilterMatchMode.DATE_BEFORE}]},
+        'patient_death_date' : { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER},{ value: null, matchMode: FilterMatchMode.DATE_BEFORE}]},
         'issue_date': { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER},{ value: null, matchMode: FilterMatchMode.DATE_BEFORE}]},   
         'death_place': { value: null, matchMode: FilterMatchMode.IN },        
         })        
     }
    
-   
     useEffect(() => {        
         initFilters()
     }, [])
-  const orderNumberBodyTemplate = (rowData: ICertificate)=>{
-    const idx = certificateStore.certs.indexOf(rowData)+1
-    return <i>{idx}</i>
+  const orderNumberBodyTemplate = (rowData: ICertificate)=>{    
+    return <i>{rowData.rowNumber}</i>
   }
   const seriesNumberBodyTemplate = (rowData: ICertificate)=>{   
     const cert_type = CERT_TYPES.find(el=>el.code===rowData.cert_type) 
@@ -138,7 +136,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
      if (!place) return ''
      else return <span style={{fontSize:'small'}}>{place.name}</span>
     }      
-  }   
+  }     
   const basisDeterminingBodyTemplate = (rowData: ICertificate) => {
     if (!rowData.basis_determining) return ''
     else {
@@ -177,12 +175,11 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
   const actionBodyTemplate = (rowData: ICertificate) => {       
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${rowData.id}?q=0`)} />
-                
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${rowData.id}?q=0`)} />                
             </React.Fragment>
         )
     }
-  const loadCertificatesLazy = (event: {first:number, last:number}) => {       
+  const loadCertificatesLazy = (event: {first:number, last:number}) => {           
       certificateStore.getList(()=>{setLazyLoading(false)}, event.first, event.last)      
   }   
   const sortLazy = (e: DataTableSortParams) => {    
@@ -196,10 +193,12 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     }
   const deathPlaceFilterTemplate = (options: any) => {
         return <MultiSelect value={options.value} options={DEAD_PLACE_TYPES}  onChange={(e) => options.filterCallback(e.value)} optionLabel="name" placeholder="не выбрано" className="p-column-filter" />;
-    }  
+    } 
+    
   const fioFilterTemplate = (options: any) => {
         return <InputText value={options.value}  onChange={(e) => options.filterCallback(e.target.value)}  placeholder="строка поиска" className="p-column-filter" />
     }  
+  
   const footer = `Всего ${ certificateStore.count } свидетельств(а).`  
   const layoutParams = {
         title: 'СПИСОК СВИДЕТЕЛЬСТВ',     
@@ -224,11 +223,11 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                     _filters[`issue_date${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
                   if (_constraint && _constraint.constraints[1] && _constraint.constraints[1].value) 
                     _filters[`issue_date${RunsackFilterMatchMode[_constraint.constraints[1].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[1].value
-                  _constraint = e.filters['patient_birth_date'] 
+                  _constraint = e.filters['patient_death_date'] 
                   if (_constraint && _constraint.constraints[0] && _constraint.constraints[0].value) 
-                    _filters[`patient_birth_date${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
+                    _filters[`death_datetime${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
                   if (_constraint && _constraint.constraints[1] && _constraint.constraints[1].value) 
-                    _filters[`patient_birth_date${RunsackFilterMatchMode[_constraint.constraints[1].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[1].value     
+                    _filters[`death_datetime${RunsackFilterMatchMode[_constraint.constraints[1].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[1].value     
                   _constraint = e.filters['number'] 
                   if (_constraint && _constraint.constraints[0] && _constraint.constraints[0].value) 
                     _filters[`number${RunsackFilterMatchMode[_constraint.constraints[0].matchMode as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value
@@ -252,7 +251,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                   certificateStore.filters = _filters
                   certificateStore.getList(()=>{})  
                 }}                
-                virtualScrollerOptions={{ lazy: true, onLazyLoad: loadCertificatesLazy, itemSize: 6, delay: 200, showLoader: false, loading: lazyLoading }} filters={filters} filterLocale={'ru'}
+                virtualScrollerOptions={{ lazy: true, onLazyLoad: loadCertificatesLazy, itemSize: 6, delay: 200, showLoader: true, loading: lazyLoading }} filters={filters} filterLocale={'ru'}
                 onRowDoubleClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=0`)}
                 onSort={sortLazy} sortField={sortField} sortOrder={sortOrder}
                 >  
@@ -269,8 +268,8 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                       filter filterField='patient_fio' filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  filterElement={fioFilterTemplate}
                       sortable style={{ flexGrow: 1, flexBasis: '140px' }}>  </Column>                    
                     <Column  header="Даты" body={datesBodyTemplate} filter sortable
-                       showFilterOperator={false} dataType='date' filterPlaceholder="дата рождения"
-                     filterField='patient_birth_date' sortField='patient.birth_date' 
+                       showFilterOperator={false} dataType='date' filterPlaceholder="дата смерти"
+                     filterField='patient_death_date' sortField='death_datetime' 
                      filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  
                        style={{ flexGrow: 1, flexBasis: '110px' }}> </Column>
                     <Column  header="Лет" body={ageBodyTemplate} 

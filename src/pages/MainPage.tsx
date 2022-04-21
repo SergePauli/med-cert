@@ -20,9 +20,9 @@ const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
     certificateStore.getList(()=>{layoutStore.isLoading = false},0,4)         
   },[certificateStore, layoutStore, userStore.userInfo])
   
-  const news =[{version:"3.00",record:"с учетом требований CDA_R2 уровня 3"},
-  {version:"2.10",record:"Добавлена возможность 'грязной' выборки в ОТЧЕТНОМ БЛОКЕ"},
-  {version:"2.09",record:"Добавлена возможность ввода периода времени в п.19II"}]
+  const news =[{version:"3.002",record:"Фильтрация по датам смерти в списке"},
+  {version:"3.001",record:"Исправлена ошибка нумерации в списке"},
+  {version:"3.000",record:"с учетом требований CDA_R2 уровня 3"}]
   const layoutParams= {
     title: 'Главная',     
     url: HOME_ROUTE,
