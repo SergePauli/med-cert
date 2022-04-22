@@ -194,14 +194,20 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
             </React.Fragment>
         )
     }
-  const loadCertificatesLazy = (event: {first:number, last:number}) => {           
+  const loadCertificatesLazy = (event: {first:number, last:number}) => {  
+      setLazyLoading(true)         
       certificateStore.getList(()=>{setLazyLoading(false)}, event.first, event.last)      
   }   
   const sortLazy = (e: DataTableSortParams) => {    
-    const order =  e.sortOrder ? DIRECTION[e.sortOrder] : DIRECTION[0]
-    certificateStore.sorts = [`${e.sortField} ${order}`]
-    setSortField(e.sortField)
-    if (e.sortOrder) setSortOrder(e.sortOrder)
+    setLazyLoading(true) 
+    const order =  e.sortOrder ? DIRECTION[e.sortOrder] : DIRECTION[0]    
+    if (e.sortField && e.sortField !=='rowNumber') {
+      certificateStore.sorts = [`${e.sortField} ${order}`]  
+      certificateStore.getList(()=>{setLazyLoading(false)})    
+    }  
+    if (e.sortOrder) setSortOrder(e.sortOrder)   
+    if (e.sortField) setSortField(e.sortField)
+    
   }  
   const basisDeterminingFilterTemplate = (options: any) => {
         return <MultiSelect value={options.value} options={BASIS_DERMINING}  onChange={(e) => options.filterCallback(e.value)} optionLabel="name" placeholder="не выбрано" className="p-column-filter" />;
@@ -225,7 +231,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
               <DataTable ref={dt} value={certificateStore.certs}  responsiveLayout="scroll" scrollDirection="both"
                 emptyMessage="нет данных, удовлетворяющих запросу" scrollable scrollHeight="72vh" 
                 selectionMode="single" selection={selected}  dataKey="id" size="small"
-                footer={footer}
+                footer={footer} loading={lazyLoading}
                 onSelectionChange={e =>{
                   certificateStore.select(certificateStore.certs.findIndex(el=>el.id === e.value.id))
                   setSelected(e.value)
@@ -281,13 +287,15 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                     _filters.custodian_id_in = _codes   
                   }
                   certificateStore.filters = _filters
-                  certificateStore.getList(()=>{})  
+                  setLazyLoading(true)
+                  certificateStore.getList(()=>{setLazyLoading(false)})  
                 }}                
-                virtualScrollerOptions={{ lazy: true, onLazyLoad: loadCertificatesLazy, itemSize: 6, delay: 200, showLoader: true, loading: lazyLoading }} filters={filters} filterLocale={'ru'}
+                virtualScrollerOptions={{ lazy: true, onLazyLoad: loadCertificatesLazy, itemSize: 6, delay: 200}} filters={filters} filterLocale={'ru'}
                 onRowDoubleClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=0`)}
                 onSort={sortLazy} sortField={sortField} sortOrder={sortOrder}
                 >  
                     <Column header="№ п.п"  body={orderNumberBodyTemplate} sortable
+                      sortField='rowNumber'
                       style={{ flexGrow: 1, flexBasis: '58px' }} frozen></Column>                                   
                     <Column header="Серия Номер Вид" body={seriesNumberBodyTemplate} filterField='number'
                       filter filterPlaceholder="Поиск по номеру" dataType='text' showFilterOperator ={false}                                           
