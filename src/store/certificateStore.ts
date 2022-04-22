@@ -21,6 +21,7 @@ export default class CertificateStore {
   private _sorts: string[] | undefined
   private _filters: any
   private _first: number
+  private _last: number
   private _rows: number
   private _count: number
   private _needFetch: boolean
@@ -32,6 +33,7 @@ export default class CertificateStore {
     this._certs = []
     this._filters = {}
     this._first = 0
+    this._last = 0
     this._rows = 0
     this._count = 0
     this._needFetch = true
@@ -343,8 +345,9 @@ export default class CertificateStore {
     else if (!this._userInfo) return false
     const isAdd = !this._needFetch && first === this.first
     //console.log("getList response", first, last)
-    CertificateService.getCertificates({ q: _q }, isAdd ? this._first + this._rows : first, last)
+    CertificateService.getCertificates({ q: _q }, isAdd ? this._last + 1 : first, last)
       .then((response) => {
+        if (isAdd && this._needFetch) return // case that loaded data already not needed
         let num = isAdd ? this._certs.length : 0
         const _certs = isAdd
           ? this._certs.concat(
@@ -358,7 +361,6 @@ export default class CertificateStore {
         this._certs = _certs
         const dataLength = response.data.length
         if (dataLength > 0) {
-          this._first = first
           this._rows = this._certs.length
           this._needFetch = false
           this.select(this._selected > dataLength ? dataLength - 1 : this._selected)
@@ -368,6 +370,8 @@ export default class CertificateStore {
       .finally(() => {
         if (doAfter) doAfter()
       })
+    this._first = first
+    this._last = last
   }
 
   findById(certificate_id: number, doAfter?: () => void) {

@@ -18,8 +18,9 @@ import '../styles/components/MultiSelect.css'
 import { CERT_TYPES } from '../NSI/1.2.643.5.1.13.13.99.2.19'
 import { getOneLinePersonName } from '../models/IPersonName'
 import  PrimeReact, {FilterMatchMode}  from 'primereact/api'
-import { IReference } from '../models/IReference'
+import { IReference, IReferenceId } from '../models/IReference'
 import { InputText } from 'primereact/inputtext'
+import OrganizationService from '../services/OrganizationService'
 
 type ListPageProps = {}
 
@@ -29,7 +30,16 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
   const [sortField, setSortField] = useState<string>('')
   const [sortOrder, setSortOrder] = useState<-1 | 0 | 1>(0)
   const [filters, setFilters] = useState<DataTableFilterMeta | undefined>()
- 
+  const [organizations, setOrganizations] = useState<IReferenceId[] | null>(null)
+  const isSuperUser = userStore.userInfo?.roles.includes('MIAC') || userStore.userInfo?.roles.includes('ADMIN')
+  
+  useEffect(()=>{
+    if (organizations===null && isSuperUser) OrganizationService.getOrganizations().then(response=>
+      setOrganizations(response.data.organizations)
+    ).catch(()=>{
+      setOrganizations([])      
+    })},[isSuperUser, organizations])
+    
   PrimeReact.locale = 'ru'
   const toast = useRef<Toast>(null)
   const dt = useRef(null)  
@@ -38,9 +48,12 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
 
   const initFilters = () => {
         setFilters({
-        'basis_determining': { value: null, matchMode: FilterMatchMode.IN },              
+        'basis_determining': { value: null, matchMode: FilterMatchMode.IN },  
+        'custodian_id': { value: null, matchMode: FilterMatchMode.IN },            
         'number': { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]}, 
         'patient_fio': { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]},
+        'primory_reason' : { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO},{ value: null, matchMode: FilterMatchMode.LESS_THAN_OR_EQUAL_TO}]},
+        'patient_birth_date' : { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER},{ value: null, matchMode: FilterMatchMode.DATE_BEFORE}]},
         'patient_death_date' : { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER},{ value: null, matchMode: FilterMatchMode.DATE_BEFORE}]},
         'issue_date': { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER},{ value: null, matchMode: FilterMatchMode.DATE_BEFORE}]},   
         'death_place': { value: null, matchMode: FilterMatchMode.IN },        
@@ -50,6 +63,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     useEffect(() => {        
         initFilters()
     }, [])
+
   const orderNumberBodyTemplate = (rowData: ICertificate)=>{    
     return <i>{rowData.rowNumber}</i>
   }
@@ -88,21 +102,20 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
         return <Button type="button" icon="pi pi-check" 
         onClick={options.filterApplyCallback} className="p-button-success"></Button>
     }
- 
-  const datesBodyTemplate = (rowData: ICertificate)=>{
+  const dbBodyTemplate = (rowData: ICertificate)=>{
     let _result =''
     const birth = rowData.patient?.birth_date
-    if (!!birth) _result = `${birth.slice(8,10)}.${birth.slice(5,7)}.${birth.slice(0,4)}`
+    if (!!birth) _result = `${birth.slice(8,10)}.${birth.slice(5,7)}.${birth.slice(0,4)}`  
+    return _result
+  }  
+  const ddBodyTemplate = (rowData: ICertificate)=>{
+    let _result =''    
     const death = !rowData.death_datetime ? !rowData.death_year ? false : rowData.death_year.toString() : rowData.death_datetime 
     if (death && death.length>4) {
-       if (_result.length>0)_result += `-${death?.slice(8,10)}.${death.slice(5,7)}.${death.slice(0,4)}`
-       else _result = `?-${death?.slice(8,10)}.${death.slice(5,7)}.${death.slice(0,4)}`
+       _result = `${death?.slice(8,10)}.${death.slice(5,7)}.${death.slice(0,4)}`
     } else if (death && death.length<5){
-       if (_result.length>0)_result += `-${death}`
-       else _result = `?-${death}`
-    } else if (!death && _result.length>0) {
-      _result += '-?'
-    }  
+       _result =death       
+    } 
     return _result
   }  
   const ageBodyTemplate = (rowData: ICertificate)=>{
@@ -147,10 +160,15 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     if (!cusName) return ''
     else return <span style={{fontSize:'small'}}>{cusName}</span>
   }  
-
-  const custodian = userStore.userInfo?.roles.includes('MIAC') ? 
-    <Column  header="Мед. организация" body={custodianBodyTemplate}                      
-                      style={{ flexGrow: 1, flexBasis: '100px' }}> </Column> :
+  const custodianFilterTemplate = (options: any) => {
+        return <MultiSelect value={options.value} options={organizations || []}  onChange={(e) => options.filterCallback(e.value)} optionLabel="name" placeholder="не выбрано" className="p-column-filter" />;
+    }  
+  const custodian = isSuperUser ? 
+    <Column  header="Мед. организация" body={custodianBodyTemplate}          
+        filterField='custodian_id' showFilterMatchModes={false}
+                      filterClear={filterClearTemplate} filterApply={filterApplyTemplate}
+                      filter filterElement={custodianFilterTemplate}                    
+        style={{ flexGrow: 1, flexBasis: '120px' }}> </Column> :
     <></>                  
   const doctorBodyTemplate = (rowData: ICertificate) => {
     if (!rowData.author) return ''
@@ -190,7 +208,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     }
   const deathPlaceFilterTemplate = (options: any) => {
         return <MultiSelect value={options.value} options={DEAD_PLACE_TYPES}  onChange={(e) => options.filterCallback(e.value)} optionLabel="name" placeholder="не выбрано" className="p-column-filter" />;
-    } 
+    }   
     
   const fioFilterTemplate = (options: any) => {
         return <InputText value={options.value}  onChange={(e) => options.filterCallback(e.target.value)}  placeholder="строка поиска" className="p-column-filter" />
@@ -220,6 +238,16 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                     _filters[`issue_date${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
                   if (_constraint && _constraint.constraints[1] && _constraint.constraints[1].value) 
                     _filters[`issue_date${RunsackFilterMatchMode[_constraint.constraints[1].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[1].value
+                    _constraint = e.filters['primory_reason'] 
+                  if (_constraint && _constraint.constraints[0] && _constraint.constraints[0].value) 
+                    _filters[`reason_ACME${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
+                  if (_constraint && _constraint.constraints[1] && _constraint.constraints[1].value) 
+                    _filters[`reason_ACME${RunsackFilterMatchMode[_constraint.constraints[1].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[1].value  
+                   _constraint = e.filters['patient_birth_date'] 
+                  if (_constraint && _constraint.constraints[0] && _constraint.constraints[0].value) 
+                    _filters[`patient_birth_date${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
+                  if (_constraint && _constraint.constraints[1] && _constraint.constraints[1].value) 
+                    _filters[`patient_birth_date${RunsackFilterMatchMode[_constraint.constraints[1].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[1].value  
                   _constraint = e.filters['patient_death_date'] 
                   if (_constraint && _constraint.constraints[0] && _constraint.constraints[0].value) 
                     _filters[`death_datetime${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
@@ -238,12 +266,19 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                     values.map(item=> _codes.push(item.code)) 
                     _filters.basis_determining_in = _codes   
                   }
-                   _constraint = e.filters['death_place']   
+                  _constraint = e.filters['death_place']   
                   if (_constraint && _constraint.value) {
                     const values = _constraint.value as IReference[]
                     let _codes = [] as string[]
                     values.map(item=> _codes.push(item.code)) 
                     _filters.death_place_in = _codes   
+                  }
+                  _constraint = e.filters['custodian_id']   
+                  if (_constraint && _constraint.value) {
+                    const values = _constraint.value as IReferenceId[]
+                    let _codes = [] as number[]
+                    values.map(item=> _codes.push(item.id)) 
+                    _filters.custodian_id_in = _codes   
                   }
                   certificateStore.filters = _filters
                   certificateStore.getList(()=>{})  
@@ -252,19 +287,26 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                 onRowDoubleClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=0`)}
                 onSort={sortLazy} sortField={sortField} sortOrder={sortOrder}
                 >  
-                    <Column header="№ п.п"  body={orderNumberBodyTemplate} 
-                      style={{ flexGrow: 1, flexBasis: '38px' }} frozen></Column>                                   
+                    <Column header="№ п.п"  body={orderNumberBodyTemplate} sortable
+                      style={{ flexGrow: 1, flexBasis: '58px' }} frozen></Column>                                   
                     <Column header="Серия Номер Вид" body={seriesNumberBodyTemplate} filterField='number'
                       filter filterPlaceholder="Поиск по номеру" dataType='text' showFilterOperator ={false}                                           
                       filterClear={filterClearTemplate} filterApply={filterApplyTemplate} sortField='number' sortable style={{ flexGrow: 1, flexBasis: '110px' }} frozen></Column>
-                    <Column header="Причины смерти и соп. патологии"  
+                    <Column header="Причины смерти и соп. патологии" showFilterOperator ={false}                     
+                     filterField='primory_reason'  filterPlaceholder="код ПП" filter dataType='numeric'
+                     filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  
                       style={{ flexGrow: 1, flexBasis: '250px' }} body={reasonsBodyTemplate}></Column>
                     <Column  header="ФИО" body={fioBodyTemplate} 
                       sortField='patient.person.person_name.family'
                       dataType='text' showFilterOperator ={false}
                       filter filterField='patient_fio' filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  filterElement={fioFilterTemplate}
-                      sortable style={{ flexGrow: 1, flexBasis: '140px' }}>  </Column>                    
-                    <Column  header="Даты" body={datesBodyTemplate} filter sortable
+                      sortable style={{ flexGrow: 1, flexBasis: '140px' }}></Column>                    
+                    <Column  header="ДР" body={dbBodyTemplate} filter sortable
+                       showFilterOperator={false} dataType='date' filterPlaceholder="дата рождения"
+                     filterField='patient_birth_date' sortField='patient.birth_date' 
+                     filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  
+                       style={{ flexGrow: 1, flexBasis: '110px' }}> </Column>
+                    <Column  header="ДС" body={ddBodyTemplate} filter sortable
                        showFilterOperator={false} dataType='date' filterPlaceholder="дата смерти"
                      filterField='patient_death_date' sortField='death_datetime' 
                      filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  
