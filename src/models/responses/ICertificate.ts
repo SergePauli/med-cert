@@ -49,4 +49,5 @@ export interface ICertificate extends INullFlavorable {
   participant?: IParticipant
   latest_one?: ICertificate
   create_at: string
+  rowNumber: number
 }

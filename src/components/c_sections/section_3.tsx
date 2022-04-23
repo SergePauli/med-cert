@@ -6,7 +6,6 @@ import { FC, useContext, useState} from "react"
 import { Context } from "../.."
 import { IReference } from "../../models/IReference"
 import { ASKU, NULL_FLAVORS, UNK } from "../../utils/defaults"
-import { removeEmpty } from "../../utils/functions"
 import AddressDialog from "../dialogs/AddressDialog"
 import InputAddress from "../inputs/InputAddress"
 import { AreaType } from "../inputs/AreaType"
@@ -35,16 +34,18 @@ const Section3: FC = () => {
   const onAddressCopy = () => {
     if (!patient.person) return
     certificate.deathAreaType = certificate.lifeAreaType    
-    let _lifeAddr = patient.person.address 
-    if (_lifeAddr === undefined) certificate.deathAddr = undefined      
+     
+    if (!patient.person.address) certificate.deathAddr = undefined      
     else {
-      _lifeAddr.id = undefined
-      _lifeAddr.parent_guid = undefined
-      _lifeAddr = removeEmpty(_lifeAddr) as IAddressR
-      let _deathAddr = {} as IAddressR
-      if (certificate.deathAddr?.id) _deathAddr.id = certificate.deathAddr?.id
-      if (certificate.deathAddr?.parent_guid) _deathAddr.parent_guid = certificate.deathAddr?.parent_guid
-      certificate.deathAddr = {..._lifeAddr,...certificate.deathAddr} as IAddressR              
+      certificate.deathAddr = {
+        ...patient.person.address,
+        null_flavors_attributes:
+          patient.person.address?.null_flavors_attributes?.map((item) => {
+            return { parent_attr: item.parent_attr, code: item.code } as INullFlavorR
+          }) || [],
+        id: undefined,
+        parent_guid: undefined,
+      } as IAddressR              
     }    
     setAddressDeath(certificate.deathAddr)
   }
