@@ -286,6 +286,24 @@ export const DEFAULT_CERT_SUGGESTIONS = [
     suggestion: "Указание СНИЛС или иного документа удостоверения личности - обязательно для печати",
     done: false,
   },
+  {
+    section: "11",
+    code: "1",
+    suggestion: "КриптоПро ЭЦП Browser plug-in должен быть доступен",
+    done: false,
+  },
+  {
+    section: "11",
+    code: "2",
+    suggestion: "КриптоПро CSP должен быть доступен",
+    done: false,
+  },
+  {
+    section: "11",
+    code: "3",
+    suggestion: "Сертификат подписи должен быть выбран",
+    done: false,
+  },
 ]
 export const CERT_TYPE_SUG = 0
 export const PERSON_NAME_SUG = 1
@@ -335,6 +353,9 @@ export const LEGAL_AUTHENTICATOR_SUG = 43
 export const PARTIPICIPANT_FIO_SUG = 45
 export const PARTIPICIPANT_DATE_SUG = 46
 export const PARTIPICIPANT_IDENTITY_SUG = 47
+export const CSP_PLAGIN_SUG = 48
+export const CRIPTO_PRO_CSP_SUG = 49
+export const CSP_SELECT_SUG = 50
 
 export const changeSuggestion = (code: string, suggestions: any[], done: boolean) => {
   const suggestion = suggestions.find((item) => item.code === code)
