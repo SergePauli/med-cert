@@ -262,6 +262,7 @@ export default class CertificateStore {
           }) || [],
         id: undefined,
         parent_guid: undefined,
+        null_flavors: null,
       } as IAddressR
 
     old.latest_one = this._cert.oldOne
@@ -289,6 +290,7 @@ export default class CertificateStore {
               this._certs.push(nCert)
               this.select(idx)
               if (onSuccess) onSuccess(nCert)
+              //console.log("nCert", nCert)
             } else {
               if (onError)
                 onError("Cвидетельство сохранено, но сервер не вернул результат. Необходим повторный вход в систему")
@@ -303,6 +305,7 @@ export default class CertificateStore {
             if (nCert) {
               const idx = this._certs.findIndex((cert) => cert.id === nCert.id)
               this._certs[idx] = nCert
+              //console.log("nCert", nCert)
               this.select(idx)
               if (onSuccess) onSuccess(nCert)
             } else {
@@ -381,12 +384,6 @@ export default class CertificateStore {
     })
       .then((response) => {
         if (response.data && response.data.length > 0) this._cert = new Certificate(response.data[0])
-
-        console.log(
-          "findById response",
-          { custudian_id_eq: this._userInfo?.organization.id, id_eq: certificate_id },
-          response.data
-        )
         if (response.data) {
           this.certs.push(response.data[0])
           this.select(0)
