@@ -135,8 +135,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
               layoutStore.isLoading = true
               const result = certificateStore.save((data:ICertificate)=>{                                
                   setMessage({ severity: 'success', summary: 'Успешно', detail: 'Изменения сохранены', life: 3000 })
-                  setCertID(data.id)
-                  console.log(data)   
+                  setCertID(data.id)                   
               }, (message:string)=>{                         
                 setMessage(DEFAULT_ERROR_TOAST)
                 console.log(message)

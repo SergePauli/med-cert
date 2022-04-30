@@ -38,6 +38,16 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
   const [diagnoses, setDiagnoses] = useState<IDiagnosis[]>([]) 
   const [diagnosisText, setDiagnosisText] = useState('')
   const [diagnosisCode, setDiagnosisCode] = useState('')
+  const cleanEffectiveTime = () => {
+    if (!deathReason) return
+    if (deathReason.days) deathReason.days =null 
+    if (deathReason.effectiveTime) deathReason.effectiveTime = null
+    if (deathReason.hours) deathReason.hours =null 
+    if (deathReason.minutes) deathReason.minutes = null
+    if (deathReason.months) deathReason.months = null
+    if (deathReason.weeks) deathReason.weeks = null
+    if (deathReason.years) deathReason.years = null
+  }
   const  getDiagnoses = (event: { query: string })=>{
   const option = {} as any
   if (event.query.trim().length>0) option.s_name_cont = event.query.trim()
@@ -76,14 +86,16 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
         )
     }
   const effTime = checked && !!deathReason && !!deathTime ? (<NullFlavorWrapper  
-      checked={checked && !!deathReason.effectiveTime} 
+      checked={checked && (!!deathReason.effectiveTime || deathReason.nullFlavors.findIndex(el=>el.parent_attr==='effective_time')===-1)} 
       key={`et_${deathReason.effectiveTime}`} 
       label={<label>Период времени между началом патол. состояния и смертью</label>} 
       options={options}  paraNum value={UNK}
       nullFlavors={deathReason.nullFlavors}
       setCheck={(e: CheckboxChangeParams, nullFlavors: INullFlavorR[] | undefined)=>{
-        if (!e.checked) deathReason.effectiveTime = undefined 
+        if (!e.checked) cleanEffectiveTime() 
+        //console.log('deathReason.nullFlavors',deathReason.nullFlavors)
         if (nullFlavors) deathReason.nullFlavors = nullFlavors
+        //console.log('nullFlavors', nullFlavors)
         props.onChange(deathReason)
         if (props.onTimeChecked) props.onTimeChecked(e.checked)
       }}
@@ -101,7 +113,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
                 props.certificate.saveReasonEffTime(deathReason)
                 props.onChange(deathReason)              
               }}
-             value={deathReason.years} />         
+             value={deathReason.years || ''} />         
           </div>
           <div className={CSS_classes} style={style}>
             <span className="p-inputgroup-addon">мес</span>            
@@ -112,7 +124,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               props.certificate.saveReasonEffTime(deathReason) 
               props.onChange(deathReason)
             }}
-            value={deathReason.months}/>
+            value={deathReason.months || ''}/>
           </div>
           <div className={CSS_classes} style={style}> 
             <span className="p-inputgroup-addon">нед</span>           
@@ -123,7 +135,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               props.certificate.saveReasonEffTime(deathReason)
               props.onChange(deathReason)
             }}
-            value={deathReason.weeks}/>         
+            value={deathReason.weeks || ''}/>         
           </div>
           <div className={CSS_classes} style={style}>
             <span className="p-inputgroup-addon">сут</span>            
@@ -133,7 +145,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               deathReason.days = value === 0 ? undefined : value
               if (props.certificate.saveReasonEffTime(deathReason)) props.onChange(deathReason)
             }}
-            value={deathReason.days}/>
+            value={deathReason.days || ''}/>
           </div>
           <div className={CSS_classes} style={style}>
             <span className="p-inputgroup-addon">час</span>            
@@ -143,7 +155,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               deathReason.hours = value === 0 ? undefined : value
               if (props.certificate.saveReasonEffTime(deathReason)) props.onChange(deathReason)
             }}
-             value={deathReason.hours}/>          
+             value={deathReason.hours || ''}/>          
           </div>
           <div className={CSS_classes} style={style}>
             <span className="p-inputgroup-addon">мин</span>            
@@ -154,7 +166,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
               props.certificate.saveReasonEffTime(deathReason) 
               props.onChange(deathReason)
             }}
-             value={deathReason.minutes}/>
+             value={deathReason.minutes || ''}/>
           </div>
         </div>
       }
@@ -170,7 +182,7 @@ const Reason: FC<ReasonProps> = (props: ReasonProps) => {
         } else {           
           if (!!deathReason) {             
             deathReason.nullFlavors = []
-            deathReason.effectiveTime = undefined  
+            cleanEffectiveTime()  
             deathReason.diagnosis = undefined
             deathReason.nullFlavors.push({parent_attr:'effective_time', code: NA} as INullFlavorR)   
             deathReason.nullFlavors.push({parent_attr:'diagnosis', code: NA} as INullFlavorR)       
