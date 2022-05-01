@@ -63,6 +63,7 @@ const AddressDialog: FC<AddressDialogProps> = (props: AddressDialogProps) =>{
       case 'District': value.district = {code: e.AOGUID, name: e.name}
         setDistrict(e.name)
         break
+      case "RailWayObject":  
       case 'Town': value.town = {code: e.AOGUID, name: e.name}
         setTown(e.name)
         break

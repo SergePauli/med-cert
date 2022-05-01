@@ -162,6 +162,7 @@ export default class Address {
         this._street = { code: fiasItem.AOGUID, name: `${fiasItem.name} ${fiasItem.shortname}` }
         break
       case "Town":
+      case "RailWayObject":
         this._town = { code: fiasItem.AOGUID, name: `${fiasItem.name} ${fiasItem.shortname}` }
         break
       case "City":
@@ -177,6 +178,7 @@ export default class Address {
         }
         break
       default:
+        console.log("invalid fiasItem.level", fiasItem)
         break
     }
     if (fiasItem.parent) this.parseFiasItem(fiasItem.parent)
