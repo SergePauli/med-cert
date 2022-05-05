@@ -486,6 +486,7 @@ export const cadesplagin = () => {
           window.cpcsp_chrome_nmcades.check_chrome_plugin(plugin_loaded, plugin_loaded_error)
         }
         cadesplugin_loaded_event_recieved = true
+        cadesplugin.cadesplugin_loaded = true
       },
       false
     )
@@ -614,7 +615,6 @@ export const cadesplagin = () => {
     if (isNativeMessageSupported()) {
       load_extension()
     } else if (!canPromise) {
-      console.log("!canPromise")
       window.addEventListener(
         "message",
         function (event) {
@@ -625,7 +625,6 @@ export const cadesplagin = () => {
         false
       )
     } else {
-      console.log("if (document.readyState")
       if (document.readyState === "complete") {
         load_npapi_plugin()
         check_npapi_plugin()
@@ -671,7 +670,7 @@ export const cadesplagin = () => {
   if (window.cadesplugin_load_timeout) {
     setTimeout(check_load_timeout, window.cadesplugin_load_timeout)
   } else {
-    setTimeout(check_load_timeout, 20000)
+    setTimeout(check_load_timeout, 1000)
   }
 
   set_constantValues()

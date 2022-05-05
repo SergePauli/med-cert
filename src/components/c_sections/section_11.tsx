@@ -11,7 +11,7 @@ import { Context } from "../.."
 import CertificateService from "../../services/CertificateService"
 import '../../styles/components/Steps.css'
 import XMLViewer from "../../types/react-xml-viewer"
-import { CheckForPlugIn } from "../../utils/async_code"
+import { CheckForPlugIn, FillCAdESList, STATUS_OK } from "../../utils/async_code"
 import { cadesplagin } from "../../utils/cadesplugin_api"
 import { InputTextarea } from "primereact/inputtextarea"
 import { CRIPTO_PRO_CSP_SUG, CSP_PLAGIN_SUG } from "../../utils/defaults"
@@ -29,10 +29,21 @@ interface CSP_PlagIn_Info {
     CspEnabledTxt: string  
     CSPVersionTxt?: string  
   }
+interface ICAdESInfo {
+  serialNumber: string
+  text: string
+  status: string
+}  
+interface IСAdESLists {
+  certsList: any[]
+  infoList: ICAdESInfo[] 
+}  
 const Section11: FC = () => {
   const [activeIndex, setActiveIndex] = useState(0)
-  const [versionPlagin, setVersionPlagin] = useState<CSP_PlagIn_Info | false | undefined>()
+  const [versionPlagin, setVersionPlagin] = useState<CSP_PlagIn_Info | undefined>()
   const [dataToSignXML, setDataToSignXML] = useState<null | string>(null)
+  const [cAdES, setCAdES] = useState<IСAdESLists | null>(null)
+  const [selectedCAdES, setSelectedCAdES] = useState()
   const { certificateStore, suggestionsStore, layoutStore } = useContext(Context)
   const certificate = certificateStore.cert 
   useEffect(()=>{   
@@ -55,10 +66,21 @@ const Section11: FC = () => {
   },[])
   useEffect( ()=>{
     if (!versionPlagin && dataToSignXML) {   
-      const csp_info =  CheckForPlugIn() as CSP_PlagIn_Info | false 
-      if (csp_info) setVersionPlagin(csp_info)         
+      CheckForPlugIn()
+      .then((csp_info: CSP_PlagIn_Info | undefined)=>{           
+       if (csp_info) setVersionPlagin({...csp_info})
+      })           
     }
-  },[dataToSignXML, versionPlagin])
+  },[dataToSignXML, versionPlagin, versionPlagin?.PlugInEnabled])
+  useEffect(()=>{
+    if (cAdES===null && versionPlagin) {
+      FillCAdESList().then(result=>{
+        //console.log('result',result )
+        if (result) setCAdES(result)
+        else setCAdES(null)
+      })
+    }
+  })
   useEffect(()=>{
     if (versionPlagin && versionPlagin.PlugInEnabled) 
     suggestionsStore.suggestions[CSP_PLAGIN_SUG].done = true
@@ -81,10 +103,17 @@ const Section11: FC = () => {
     }
   ]
   const footer = <span>
-    <Button label="Подписать" icon="pi pi-check" style={{marginRight: '.25em'}}/>
+    <Button label="Подписать" icon="pi pi-check" style={{marginRight: '.25em'}} disabled={!selectedCAdES}/>
     <Button label="Отозвать" icon="pi pi-times" className="p-button-secondary"/>
   </span>
-  
+  //console.log('cAdES', cAdES) 
+  const isRowSelectable = (event: any) => {
+        const data = event.data
+        return data.status===STATUS_OK
+    }
+  const rowClassName = (data: ICAdESInfo) => {
+        return data.status===STATUS_OK ? '' : 'p-disabled'
+  }  
   return (    
     <Card className="c-section p-mr-2 p-mb-2" header={header}
       footer={footer} style={{paddingLeft:'1rem'}}>
@@ -109,10 +138,9 @@ const Section11: FC = () => {
         </div>       
         <div className="p-field p-col-12">            
             <label htmlFor="CertListBox">Выберите сертификат ЭЦП:</label>
-            <DataTable id="CertListBox" emptyMessage="Не найдены доступные ЭЦП в хранилище" responsiveLayout="scroll">              
-              <Column field="subject" header="Владелец"></Column>
-              <Column field="issuer" header="Издатель"></Column>
-              <Column field="from" header="Выдан"></Column>
+            <DataTable id="CertListBox" value={cAdES?.infoList || []} emptyMessage="Не найдены доступные ЭЦП в хранилище" responsiveLayout="scroll" onSelectionChange={e => setSelectedCAdES(e.value)} dataKey="serialNumber" rowClassName={rowClassName}
+            isDataSelectable={isRowSelectable} selection={selectedCAdES}>
+              <Column field="text" header="Издатель"></Column>              
               <Column field="status" header="Статус"></Column>
             </DataTable>
         </div>

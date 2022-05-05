@@ -1,3 +1,4 @@
+export const STATUS_OK = "Действителен"
 function CertificateAdjuster() {}
 CertificateAdjuster.prototype.checkQuotes = function (str) {
   var result = 0,
@@ -56,39 +57,43 @@ CertificateAdjuster.prototype.GetCertInfoString = function (certSubjectName, cer
   return this.extract(certSubjectName, "CN=") + "; Выдан: " + this.GetCertDate(certFromDate)
 }
 
-// Получаем ИНФУ о плагине и версии КриптоПро CSP
-export function CheckForPlugIn() {
+// Получаем ИНФУ о ЭЦП Browser plug-in и версии Криптопровайдера
+export async function CheckForPlugIn() {
   let result = {
-    PlugInEnabled: true,
-    PlugInEnabledTxt: "Плагин загружен",
+    PlugInEnabled: false,
+    PlugInEnabledTxt: "ЭЦП Browser plug-in - не загружен",
     CspEnabled: false,
-    CspEnabledTxt: "КриптоПро CSP не загружен",
+    CspEnabledTxt: "Криптопровайдер - не загружен",
   }
-  function getVersion_Async(ObjectVersion, rFunction) {
-    if (typeof ObjectVersion == "string") return -1
-    window.cadesplugin.async_spawn(function* () {
-      result.PlugInVersionTxt = "Версия плагина: " + (yield ObjectVersion.toString())
-      var oAbout = yield window.cadesplugin.CreateObjectAsync("CAdESCOM.About")
-      var ver = yield oAbout.CSPVersion("", 80)
-      var ret = (yield ver.MajorVersion) + "." + (yield ver.MinorVersion) + "." + (yield ver.BuildVersion)
-      if (ret) result.CSPVersionTxt = "Версия криптопровайдера: " + ret
+  async function getVersion(ObjectVersion) {
+    if (typeof ObjectVersion == "string") return result
+    return await window.cadesplugin.async_spawn(function* () {
       try {
+        result.PlugInVersionTxt = "Версия плагина: " + (yield ObjectVersion.toString())
+        result.PlugInEnabled = true
+        var oAbout = yield window.cadesplugin.CreateObjectAsync("CAdESCOM.About")
+        var ver = yield oAbout.CSPVersion("", 80)
+        var ret = (yield ver.MajorVersion) + "." + (yield ver.MinorVersion) + "." + (yield ver.BuildVersion)
+        if (ret) result.CSPVersionTxt = "Версия криптопровайдера: " + ret
         var sCSPName = yield oAbout.CSPName(80)
         result.CspEnabled = true
-        result.CspEnabledTxt = "Криптопровайдер загружен"
+        result.CspEnabledTxt = "Криптопровайдер - загружен"
         result.CSPNameTxt = "Криптопровайдер: " + sCSPName
-      } catch (err) {}
-    })
+      } catch (err) {
+        result.CspEnabledTxt = "Криптопровайдер - не загружен: " + err.message
+      }
+      return result
+    }, result)
   }
-  window.cadesplugin.async_spawn(function* () {
+  return await window.cadesplugin.async_spawn(function* () {
     const oAbout = yield window.cadesplugin.CreateObjectAsync("CAdESCOM.About")
     if (oAbout) {
+      result.PlugInEnabledTxt = "ЭЦП Browser plug-in - загружен"
       const CurrentPluginVersion = yield oAbout.PluginVersion
-      getVersion_Async(CurrentPluginVersion)
-      return result
-    } else return false
+      result = yield getVersion(CurrentPluginVersion)
+    }
+    return result
   }, result)
-  return result
 }
 
 // function onCertificateSelected(event) {
@@ -100,49 +105,76 @@ export function CheckForPlugIn() {
 // }
 const CertStatusEmoji = (isValid) => (isValid ? "\u2705" : "\u274C")
 // получаем сертификаты из хранилища
-export const getESCertInfo = (cert) => {
-  let oOpt = {}
-  try {
-    const ValidFromDate = new Date(cert.ValidFromDate)
-    const ValidToDate = new Date(cert.ValidToDate)
-    const IsValid = ValidToDate > Date.now()
-    const emoji = CertStatusEmoji(IsValid)
-    oOpt.text = emoji + new CertificateAdjuster().GetCertInfoString(cert.SubjectName, ValidFromDate)
-    oOpt.value = cert.Thumbprint
+
+async function getESCertInfo(cert) {
+  return await window.cadesplugin.async_spawn(function* () {
+    let oOpt = {}
+    const Now = Date.now()
+    const ValidFromDate = new Date(yield cert.ValidFromDate)
+    const ValidToDate = new Date(yield cert.ValidToDate)
+    const hasPrivateKey = yield cert.HasPrivateKey()
+    let IsValid = true
+    try {
+      const Validator = yield cert.IsValid()
+      IsValid = yield Validator.Result
+    } catch (ex) {
+      alert("Ошибка при чтении сертификата ЭЦП: " + window.cadesplugin.getLastError(ex))
+    }
+    if (Now < ValidFromDate.getTime()) {
+      oOpt.status = "Срок действия не наступил"
+    } else if (Now > ValidToDate.getTime()) {
+      oOpt.status = "Срок действия истек"
+    } else if (!hasPrivateKey) {
+      oOpt.status = "Нет привязки к закрытому ключу"
+    } else if (!IsValid) {
+      oOpt.status =
+        "Ошибка при проверке цепочки сертификатов. Возможно на компьютере не установлены сертификаты УЦ, выдавшего ваш сертификат"
+    } else {
+      oOpt.status = STATUS_OK
+    }
+    try {
+      const emoji = CertStatusEmoji(IsValid === STATUS_OK)
+      oOpt.text = emoji + new CertificateAdjuster().GetCertInfoString(yield cert.SubjectName, ValidFromDate)
+      oOpt.serialNumber = yield cert.SerialNumber
+    } catch (ex) {
+      alert("Ошибка при чтении сертификата ЭЦП: " + window.cadesplugin.getLastError(ex))
+    }
     return oOpt
-  } catch (ex) {
-    alert("Ошибка при получении свойства SubjectName: " + window.cadesplugin.getLastError(ex))
-  }
+  })
 }
-export function FillCertList_Async() {
-  window.cadesplugin.async_spawn(function* () {
+export async function FillCAdESList() {
+  return await window.cadesplugin.async_spawn(function* () {
     var MyStoreExists = true
     try {
       var oStore = yield window.cadesplugin.CreateObjectAsync("CAdESCOM.Store")
       if (!oStore) {
-        alert("Create store failed")
+        alert("Ошибка доступа к хранилищу сертификатов ЭЦП")
         return false
       }
       yield oStore.Open()
     } catch (ex) {
+      alert("Ошибка открытия хранилища сертификатов ЭЦП")
       MyStoreExists = false
     }
-    let result = undefined
+    let result = {
+      certsList: [],
+      infoList: [],
+    }
     let certs = undefined
+    let certCnt = 0
     if (MyStoreExists) {
       try {
         certs = yield oStore.Certificates
+        certCnt = yield certs.Count
       } catch (ex) {
-        alert("Ошибка при получении EDSCertificates или Count: " + window.cadesplugin.getLastError(ex))
-        return false
+        result.err = "Ошибка при получении связки ЭЦП-сертификатов или их числа: " + window.cadesplugin.getLastError(ex)
       }
-      for (var i = 1; i <= certs.length; i++) {
+      for (var i = 1; i <= certCnt; i++) {
         try {
           const cert = yield certs.Item(i)
-          result.push(cert)
+          result.certsList.push(cert)
         } catch (ex) {
-          alert("Ошибка при перечислении ЭЦП-сертификатов: " + window.cadesplugin.getLastError(ex))
-          return false
+          result.err = "Ошибка при перечислении ЭЦП-сертификатов хранилища: " + window.cadesplugin.getLastError(ex)
         }
       }
       yield oStore.Close()
@@ -158,19 +190,28 @@ export function FillCertList_Async() {
         //Проверяем не добавляли ли мы такой сертификат уже?
         let found = false
         for (var j = 0; j < certs.length; j++) {
-          if ((yield certs[j].Thumbprint) === (yield cert.Thumbprint)) {
+          if ((yield certs[j].SerialNumber) === (yield cert.SerialNumber)) {
             found = true
             break
           }
         }
         if (found) continue
-        result.push(cert)
+        result.certsList.push(cert)
+      }
+      for (i = 0; i < result.certsList.length; i++) {
+        try {
+          //const cert = yield
+          const option_info = yield getESCertInfo(result.certsList[i])
+          if (option_info) result.infoList.push({ ...option_info })
+        } catch (ex) {
+          result.err = "Ошибка при чтении списка ЭЦП-сертификатов: " + window.cadesplugin.getLastError(ex)
+        }
       }
       yield oStore.Close()
+      return result
     } catch (ex) {
       alert("Ошибка при перечислении ЭЦП-сертификатов контенера")
     }
-    return result
   })
 }
 

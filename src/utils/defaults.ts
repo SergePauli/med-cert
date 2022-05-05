@@ -295,7 +295,7 @@ export const DEFAULT_CERT_SUGGESTIONS = [
   {
     section: "11",
     code: "2",
-    suggestion: "КриптоПро CSP должен быть доступен",
+    suggestion: "Криптопровайдер должен быть доступен",
     done: false,
   },
   {

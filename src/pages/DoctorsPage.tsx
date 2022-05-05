@@ -33,6 +33,7 @@ import Doctor from '../models/FormsData/Doctor'
 import { DEFAULT_ADDRESS, IAddressR } from '../models/requests/IAddressR'
 import { getOneLinePersonName, IPersonName } from '../models/IPersonName'
 import { PersonName } from '../components/inputs/PersonName'
+import { CAN_SIGN_POSITIONS } from '../NSI/1.2.643.5.1.13.13.99.2.42'
 
 const DoctorsPage: FC = () => {    
     const {addressStore, userStore} = useContext(Context)
@@ -65,7 +66,7 @@ const DoctorsPage: FC = () => {
         q:{organization_id_eq: userStore.userInfo.organization.id}        
       })
       .then(data => {        
-        setDoctors(data.data)
+        setDoctors(data.data.filter(doctor=>doctor.position && doctor.position.id in CAN_SIGN_POSITIONS))
       })
       .catch(()=>setDoctors([]))
     }, [userStore.userInfo]) // eslint-disable-line react-hooks/exhaustive-deps
