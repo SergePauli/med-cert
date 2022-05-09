@@ -670,7 +670,7 @@ export const cadesplagin = () => {
   if (window.cadesplugin_load_timeout) {
     setTimeout(check_load_timeout, window.cadesplugin_load_timeout)
   } else {
-    setTimeout(check_load_timeout, 1000)
+    setTimeout(check_load_timeout, 9000)
   }
 
   set_constantValues()

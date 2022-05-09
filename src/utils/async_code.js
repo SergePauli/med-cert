@@ -1,3 +1,122 @@
+export const Base64 = {
+  _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+
+  encode: function (input) {
+    let output = ""
+    var chr1, chr2, chr3, enc1, enc2, enc3, enc4
+    let i = 0
+
+    input = Base64._utf8_encode(input)
+
+    while (i < input.length) {
+      chr1 = input.charCodeAt(i++)
+      chr2 = input.charCodeAt(i++)
+      chr3 = input.charCodeAt(i++)
+
+      enc1 = chr1 >> 2
+      enc2 = ((chr1 & 3) << 4) | (chr2 >> 4)
+      enc3 = ((chr2 & 15) << 2) | (chr3 >> 6)
+      enc4 = chr3 & 63
+
+      if (isNaN(chr2)) {
+        enc3 = enc4 = 64
+      } else if (isNaN(chr3)) {
+        enc4 = 64
+      }
+
+      output =
+        output +
+        this._keyStr.charAt(enc1) +
+        this._keyStr.charAt(enc2) +
+        this._keyStr.charAt(enc3) +
+        this._keyStr.charAt(enc4)
+    }
+
+    return output
+  },
+
+  decode: function (input) {
+    var output = ""
+    var chr1, chr2, chr3
+    var enc1, enc2, enc3, enc4
+    var i = 0
+
+    input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "")
+
+    while (i < input.length) {
+      enc1 = this._keyStr.indexOf(input.charAt(i++))
+      enc2 = this._keyStr.indexOf(input.charAt(i++))
+      enc3 = this._keyStr.indexOf(input.charAt(i++))
+      enc4 = this._keyStr.indexOf(input.charAt(i++))
+
+      chr1 = (enc1 << 2) | (enc2 >> 4)
+      chr2 = ((enc2 & 15) << 4) | (enc3 >> 2)
+      chr3 = ((enc3 & 3) << 6) | enc4
+
+      output = output + String.fromCharCode(chr1)
+
+      if (enc3 !== 64) {
+        output = output + String.fromCharCode(chr2)
+      }
+      if (enc4 !== 64) {
+        output = output + String.fromCharCode(chr3)
+      }
+    }
+
+    output = Base64._utf8_decode(output)
+
+    return output
+  },
+
+  _utf8_encode: function (string) {
+    string = string.replace(/\r\n/g, "\n")
+    var utftext = ""
+
+    for (var n = 0; n < string.length; n++) {
+      var c = string.charCodeAt(n)
+
+      if (c < 128) {
+        utftext += String.fromCharCode(c)
+      } else if (c > 127 && c < 2048) {
+        utftext += String.fromCharCode((c >> 6) | 192)
+        utftext += String.fromCharCode((c & 63) | 128)
+      } else {
+        utftext += String.fromCharCode((c >> 12) | 224)
+        utftext += String.fromCharCode(((c >> 6) & 63) | 128)
+        utftext += String.fromCharCode((c & 63) | 128)
+      }
+    }
+
+    return utftext
+  },
+
+  _utf8_decode: function (utftext) {
+    let string = ""
+    let i = 0
+    let c = 0
+    let c2 = 0
+
+    while (i < utftext.length) {
+      c = utftext.charCodeAt(i)
+
+      if (c < 128) {
+        string += String.fromCharCode(c)
+        i++
+      } else if (c > 191 && c < 224) {
+        c2 = utftext.charCodeAt(i + 1)
+        string += String.fromCharCode(((c & 31) << 6) | (c2 & 63))
+        i += 2
+      } else {
+        c2 = utftext.charCodeAt(i + 1)
+        let c3 = utftext.charCodeAt(i + 2)
+        string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63))
+        i += 3
+      }
+    }
+
+    return string
+  },
+}
 export const STATUS_OK = "Действителен"
 function CertificateAdjuster() {}
 CertificateAdjuster.prototype.checkQuotes = function (str) {
@@ -133,7 +252,7 @@ async function getESCertInfo(cert) {
       oOpt.status = STATUS_OK
     }
     try {
-      const emoji = CertStatusEmoji(IsValid === STATUS_OK)
+      const emoji = CertStatusEmoji(IsValid)
       oOpt.text = emoji + new CertificateAdjuster().GetCertInfoString(yield cert.SubjectName, ValidFromDate)
       oOpt.serialNumber = yield cert.SerialNumber
     } catch (ex) {
@@ -215,18 +334,12 @@ export async function FillCAdESList() {
   })
 }
 
-export function SignCadesXML_Async(certificate, dataToSign, signatureType) {
+export async function SignCadesXML(certificate, dataToSign) {
   let result = {}
-  window.cadesplugin.async_spawn(
+  return await window.cadesplugin.async_spawn(
     function* (arg) {
-      if (!certificate) {
-        alert("Select certificate")
-        return false
-      }
-
       try {
-        //FillCertInfo_Async(certificate);
-        var errormes = ""
+        let errormes = ""
         try {
           var oSigner = yield window.cadesplugin.CreateObjectAsync("CAdESCOM.CPSigner")
         } catch (err) {
@@ -264,12 +377,7 @@ export function SignCadesXML_Async(certificate, dataToSign, signatureType) {
             "Данная демо страница поддерживает XML подпись сертификатами с алгоритмом ГОСТ Р 34.10-2012, ГОСТ Р 34.10-2001"
           throw errormes
         }
-
-        var CADESCOM_XML_SIGNATURE_TYPE_ENVELOPED = 0 | arg[1] //arg[1] = signatureType
-        if (arg[1] > window.cadesplugin.CADESCOM_XADES_BES) {
-          var tspService = document.getElementById("TSPServiceTxtBox").value
-          yield oSigner.propset_TSAAddress(tspService)
-        }
+        const CADESCOM_XML_SIGNATURE_TYPE_ENVELOPED = window.cadesplugin.CADESCOM_XMLDSIG_TYPE
         if (dataToSign) {
           // Данные на подпись ввели
           yield oSignedXML.propset_Content(dataToSign)
@@ -277,7 +385,6 @@ export function SignCadesXML_Async(certificate, dataToSign, signatureType) {
         yield oSignedXML.propset_SignatureType(CADESCOM_XML_SIGNATURE_TYPE_ENVELOPED)
         yield oSignedXML.propset_SignatureMethod(signMethod)
         yield oSignedXML.propset_DigestMethod(digestMethod)
-
         try {
           result.signature = yield oSignedXML.Sign(oSigner)
         } catch (err) {
@@ -292,97 +399,61 @@ export function SignCadesXML_Async(certificate, dataToSign, signatureType) {
       return result
     },
     certificate,
-    dataToSign,
-    signatureType
+    dataToSign
   ) //cadesplugin.async_spawn
 }
-
-export function FillCertInfo_Async(certificate, certBoxId, isFromContainer) {
-  var BoxId
-  var field_prefix
-  if (typeof certBoxId == "undefined" || certBoxId === "CertListBox") {
-    BoxId = "cert_info"
-    field_prefix = ""
-  } else if (certBoxId === "CertListBox1") {
-    BoxId = "cert_info1"
-    field_prefix = "cert_info1"
-  } else if (certBoxId === "CertListBox2") {
-    BoxId = "cert_info2"
-    field_prefix = "cert_info2"
-  } else {
-    BoxId = certBoxId
-    field_prefix = certBoxId
-  }
-  window.cadesplugin.async_spawn(
-    function* (args) {
-      var Adjust = new CertificateAdjuster()
-
-      var ValidToDate = new Date(yield args[0].ValidToDate)
-      var ValidFromDate = new Date(yield args[0].ValidFromDate)
-      var Validator
-      var IsValid = false
-      //если попадется сертификат с неизвестным алгоритмом
-      //тут будет исключение. В таком сертификате просто пропускаем такое поле
+export async function SignCadesBES(certificate, dataToSign, setDisplayData) {
+  const cadesplugin = window.cadesplugin
+  let result = {}
+  let errormes = ""
+  return await cadesplugin.async_spawn(function* (arg) {
+    const data = Base64.encode(dataToSign)
+    try {
+      //FillCertInfo_Async(certificate);
       try {
-        Validator = yield args[0].IsValid()
-        IsValid = yield Validator.Result
-      } catch (e) {}
-      var hasPrivateKey = yield args[0].HasPrivateKey()
-      var Now = new Date()
-
-      document.getElementById(args[1]).style.display = ""
-      document.getElementById(args[2] + "subject").innerHTML =
-        "Владелец: <b>" + Adjust.GetCertName(yield args[0].SubjectName) + "<b>"
-      document.getElementById(args[2] + "issuer").innerHTML =
-        "Издатель: <b>" + Adjust.GetIssuer(yield args[0].IssuerName) + "<b>"
-      document.getElementById(args[2] + "from").innerHTML = "Выдан: <b>" + Adjust.GetCertDate(ValidFromDate) + " UTC<b>"
-      document.getElementById(args[2] + "till").innerHTML =
-        "Действителен до: <b>" + Adjust.GetCertDate(ValidToDate) + " UTC<b>"
-      var pubKey = yield args[0].PublicKey()
-      var algo = yield pubKey.Algorithm
-      var fAlgoName = yield algo.FriendlyName
-      document.getElementById(args[2] + "algorithm").innerHTML = "Алгоритм ключа: <b>" + fAlgoName + "<b>"
-      if (hasPrivateKey) {
-        var oPrivateKey = yield args[0].PrivateKey
-        var sProviderName = yield oPrivateKey.ProviderName
-        document.getElementById(args[2] + "provname").innerHTML = "Криптопровайдер: <b>" + sProviderName + "<b>"
-        try {
-          var sPrivateKeyLink = yield oPrivateKey.UniqueContainerName
-          document.getElementById(args[2] + "privateKeyLink").innerHTML =
-            "Ссылка на закрытый ключ: <b>" + sPrivateKeyLink + "<b>"
-        } catch (e) {
-          document.getElementById(args[2] + "privateKeyLink").innerHTML =
-            "Ссылка на закрытый ключ: <b>" + e.message + "<b>"
+        const oSigner = yield cadesplugin.CreateObjectAsync("CAdESCOM.CPSigner")
+        const oSigningTimeAttr = yield cadesplugin.CreateObjectAsync("CADESCOM.CPAttribute")
+        yield oSigningTimeAttr.propset_Name(cadesplugin.CAPICOM_AUTHENTICATED_ATTRIBUTE_SIGNING_TIME)
+        const oTimeNow = new Date()
+        yield oSigningTimeAttr.propset_Value(oTimeNow)
+        const attr = yield oSigner.AuthenticatedAttributes2
+        yield attr.Add(oSigningTimeAttr)
+        const oDocumentNameAttr = yield cadesplugin.CreateObjectAsync("CADESCOM.CPAttribute")
+        yield oDocumentNameAttr.propset_Name(cadesplugin.CADESCOM_AUTHENTICATED_ATTRIBUTE_DOCUMENT_NAME)
+        yield oDocumentNameAttr.propset_Value("Document Name")
+        yield attr.Add(oDocumentNameAttr)
+        if (oSigner) {
+          yield oSigner.propset_Certificate(certificate)
+        } else {
+          errormes = "Failed to create CAdESCOM.CPSigner"
+          throw errormes
         }
-      } else {
-        document.getElementById(args[2] + "provname").innerHTML = "Криптопровайдер:<b>"
-        document.getElementById(args[2] + "privateKeyLink").innerHTML = "Ссылка на закрытый ключ:<b>"
+        const oSignedData = yield cadesplugin.CreateObjectAsync("CAdESCOM.CadesSignedData")
+        if (data) {
+          // Данные на подпись ввели
+          yield oSignedData.propset_ContentEncoding(cadesplugin.CADESCOM_BASE64_TO_BINARY) //
+          yield oSignedData.propset_Content(data)
+        }
+        yield oSigner.propset_Options(cadesplugin.CAPICOM_CERTIFICATE_INCLUDE_WHOLE_CHAIN)
+        if (setDisplayData) {
+          //Set display data flag flag for devices like Rutoken PinPad
+          yield oSignedData.propset_DisplayData(1)
+        }
+        try {
+          result.signature = yield oSignedData.SignCades(oSigner, cadesplugin.CADESCOM_CADES_BES)
+          result.signatureTxt = "Подпись сформирована успешно"
+        } catch (err) {
+          errormes = "Не удалось создать подпись из-за ошибки: " + cadesplugin.getLastError(err)
+          throw errormes
+        }
+      } catch (err) {
+        errormes = `Возникла ошибка: ${err}`
+        throw errormes
       }
-      if (Now < ValidFromDate) {
-        document.getElementById(args[2] + "status").innerHTML =
-          'Статус: <span style="color:red; font-weight:bold; font-size:16px"><b>Срок действия не наступил</b></span>'
-      } else if (Now > ValidToDate) {
-        document.getElementById(args[2] + "status").innerHTML =
-          'Статус: <span style="color:red; font-weight:bold; font-size:16px"><b>Срок действия истек</b></span>'
-      } else if (!hasPrivateKey) {
-        document.getElementById(args[2] + "status").innerHTML =
-          'Статус: <span style="color:red; font-weight:bold; font-size:16px"><b>Нет привязки к закрытому ключу</b></span>'
-      } else if (!IsValid) {
-        document.getElementById(args[2] + "status").innerHTML =
-          'Статус: <span style="color:red; font-weight:bold; font-size:16px"><b>Ошибка при проверке цепочки сертификатов. Возможно на компьютере не установлены сертификаты УЦ, выдавшего ваш сертификат</b></span>'
-      } else {
-        document.getElementById(args[2] + "status").innerHTML = "Статус: <b> Действителен<b>"
-      }
-
-      if (args[3]) {
-        document.getElementById(field_prefix + "location").innerHTML = "Установлен в хранилище: <b>Нет</b>"
-      } else {
-        document.getElementById(field_prefix + "location").innerHTML = "Установлен в хранилище: <b>Да</b>"
-      }
-    },
-    certificate,
-    BoxId,
-    field_prefix,
-    isFromContainer
-  ) //cadesplugin.async_spawn
+    } catch (err) {
+      errormes = "Failed to create CAdESCOM.CPSigner: " + err.number
+      throw errormes
+    }
+    return result
+  }, certificate) //cadesplugin.async_spawn
 }
