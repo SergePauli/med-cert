@@ -4,7 +4,7 @@ import { Card } from "primereact/card"
 import { Column } from "primereact/column"
 import { DataTable } from "primereact/datatable"
 import { Steps } from 'primereact/steps'
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { FC, useContext } from "react"
 import { Context } from "../.."
 import CertificateService from "../../services/CertificateService"
@@ -40,6 +40,7 @@ interface IСAdESLists {
 interface ISignedData {
   signatureTxt: string
   signature: string
+  errormes: string
 }
 const Section11: FC = () => {
   const [activeIndex, setActiveIndex] = useState(0)
@@ -65,28 +66,30 @@ const Section11: FC = () => {
       })      
     } 
   },[certificate.id, dataToSignXML, layoutStore])
-  useEffect(()=>{    
-    console.log('cadesplugin_loaded',cadesplugin_loaded)
+  const plugin_waiting = useCallback((count: number)=>{
+    setTimeout(()=>{
+      CheckForPlugIn()
+      .then((csp_info: CSP_PlagIn_Info | undefined)=>{                   
+       if (csp_info && csp_info.PlugInEnabled) { 
+        setVersionPlagin({...csp_info})
+        setCadesplugin_loaded(true)
+       } else if (count < 15) 
+          plugin_waiting(++count)
+        else setLoading(false)
+      })        
+    }, 500)  
+  },[])
+  useEffect(()=>{         
     if (cadesplugin_loaded === undefined) { 
       cadesplagin() 
       setCadesplugin_loaded(false)
-    } else if (!cadesplugin_loaded && dataToSignXML) {
-    setTimeout(()=>{
-      const res = window.cadesplugin.cadesplugin_loaded
-      console.log('res',res)
-      setCadesplugin_loaded(res)
-    }, 7000)  
     }   
-  },[cadesplugin_loaded, dataToSignXML])
+  },[cadesplugin_loaded])
   useEffect( ()=>{
-    if (!versionPlagin && cadesplugin_loaded && dataToSignXML) { 
-      setLoading(true)  
-      CheckForPlugIn()
-      .then((csp_info: CSP_PlagIn_Info | undefined)=>{           
-       if (csp_info) setVersionPlagin({...csp_info})
-      }).finally(()=>setLoading(false))           
+    if (cadesplugin_loaded===false && !versionPlagin) {                   
+      plugin_waiting(0)
     }
-  },[cadesplugin_loaded, dataToSignXML, versionPlagin])
+  },[cadesplugin_loaded, plugin_waiting, versionPlagin])
   useEffect(()=>{
     if (cAdES===null && versionPlagin && versionPlagin.CspEnabled) {
       setLoading(true)
@@ -111,15 +114,15 @@ const Section11: FC = () => {
     if (cAdES===null || selectedCAdES===undefined || !dataToSignXML) return
     const idx = cAdES.infoList.indexOf(selectedCAdES)
     setSignature('Подписываем....')
-    if (idx && idx>-1) SignCadesBES(cAdES.certsList[idx], dataToSignXML)
-    .then((result:ISignedData)=>{
-      console.log('result', result)
-      setSignature(`${result.signatureTxt}\n${result.signature}`)
+    if (idx > -1) SignCadesBES(cAdES.certsList[idx], dataToSignXML)
+    .then((result:ISignedData)=>{      
+     if (result.signature) setSignature(`${result.signatureTxt}\n${result.signature}`)
+     else setSignature(`${result.errormes}`)
     })
     .catch((reason)=>{
       console.log('reason',reason)
       setSignature(reason)
-    })
+    })    
   }
   const header = () => {
       return <span>Выгрузка в РРЭМД</span>

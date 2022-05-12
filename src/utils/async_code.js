@@ -405,7 +405,6 @@ export async function SignCadesXML(certificate, dataToSign) {
 export async function SignCadesBES(certificate, dataToSign, setDisplayData) {
   const cadesplugin = window.cadesplugin
   let result = {}
-  let errormes = ""
   return await cadesplugin.async_spawn(function* (arg) {
     const data = Base64.encode(dataToSign)
     try {
@@ -425,8 +424,8 @@ export async function SignCadesBES(certificate, dataToSign, setDisplayData) {
         if (oSigner) {
           yield oSigner.propset_Certificate(certificate)
         } else {
-          errormes = "Failed to create CAdESCOM.CPSigner"
-          throw errormes
+          result.errormes = "Failed to create CAdESCOM.CPSigner"
+          return result
         }
         const oSignedData = yield cadesplugin.CreateObjectAsync("CAdESCOM.CadesSignedData")
         if (data) {
@@ -443,16 +442,16 @@ export async function SignCadesBES(certificate, dataToSign, setDisplayData) {
           result.signature = yield oSignedData.SignCades(oSigner, cadesplugin.CADESCOM_CADES_BES)
           result.signatureTxt = "Подпись сформирована успешно"
         } catch (err) {
-          errormes = "Не удалось создать подпись из-за ошибки: " + cadesplugin.getLastError(err)
-          throw errormes
+          result.errormes = "Не удалось создать подпись из-за ошибки: " + cadesplugin.getLastError(err)
+          return result
         }
       } catch (err) {
-        errormes = `Возникла ошибка: ${err}`
-        throw errormes
+        result.errormes = `Возникла ошибка: ${err}`
+        return result
       }
     } catch (err) {
-      errormes = "Failed to create CAdESCOM.CPSigner: " + err.number
-      throw errormes
+      result.errormes = "Failed to create CAdESCOM.CPSigner: " + err.number
+      return result
     }
     return result
   }, certificate) //cadesplugin.async_spawn
