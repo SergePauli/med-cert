@@ -10,10 +10,13 @@ import { Context } from "../.."
 import CertificateService from "../../services/CertificateService"
 import '../../styles/components/Steps.css'
 import XMLViewer from "../../types/react-xml-viewer"
+import CRC32 from "../../types/crc-32"
 import { CheckForPlugIn, FillCAdESList, SignCadesBES, STATUS_OK } from "../../utils/async_code"
 import { cadesplagin } from "../../utils/cadesplugin_api"
 import { InputTextarea } from "primereact/inputtextarea"
 import { CRIPTO_PRO_CSP_SUG, CSP_PLAGIN_SUG, CSP_SELECT_SUG } from "../../utils/defaults"
+import RREMD_Service from "../../services/RREMDService"
+import { ISignature } from "../../models/requests/IPostDocumentR"
 declare global {
   interface Window {
     cadesplugin?: any
@@ -45,13 +48,14 @@ interface ISignedData {
 const Section11: FC = () => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [s_token, setS_token] = useState<string | undefined>()
   const [cadesplugin_loaded, setCadesplugin_loaded] = useState<boolean | undefined>()
   const [versionPlagin, setVersionPlagin] = useState<CSP_PlagIn_Info | undefined>()
   const [dataToSignXML, setDataToSignXML] = useState<null | string>(null)
   const [signature, setSignature] = useState<null | string>(null)
   const [cAdES, setCAdES] = useState<IСAdESLists | null>(null)
   const [selectedCAdES, setSelectedCAdES] = useState<ICAdESInfo | undefined>()
-  const { certificateStore, suggestionsStore, layoutStore } = useContext(Context)
+  const { certificateStore, suggestionsStore, layoutStore, userStore } = useContext(Context)
   const certificate = certificateStore.cert 
   useEffect(()=>{   
     if ( dataToSignXML===null) {
@@ -111,37 +115,69 @@ const Section11: FC = () => {
   },[selectedCAdES, suggestionsStore.suggestions, versionPlagin])
   
   const signData = () => {
-    if (cAdES===null || selectedCAdES===undefined || !dataToSignXML) return
+    if (cAdES===null || selectedCAdES===undefined || activeIndex!==1) return
     const idx = cAdES.infoList.indexOf(selectedCAdES)
     setSignature('Подписываем....')
     if (idx > -1) SignCadesBES(cAdES.certsList[idx], dataToSignXML)
     .then((result:ISignedData)=>{      
-     if (result.signature) setSignature(`${result.signatureTxt}\n${result.signature}`)
-     else setSignature(`${result.errormes}`)
+     if (result.signature) {
+       setSignature(`${result.signatureTxt}\n${result.signature}`)
+        setActiveIndex(2)
+     } else setSignature(`${result.errormes}`)
     })
     .catch((reason)=>{
       console.log('reason',reason)
       setSignature(reason)
     })    
   }
+  const getToken = () => {
+    if (cAdES===null || selectedCAdES===undefined 
+      || activeIndex!==2 || !userStore.userInfo) return
+    const idx = cAdES.infoList.indexOf(selectedCAdES)
+    const oid =  userStore.userInfo.organization.oid
+    const originalString = JSON.stringify({sub:oid})
+    if (idx > -1) SignCadesBES(cAdES.certsList[idx], originalString)
+    .then((res:ISignedData)=>{      
+     if (res.signature) {
+      RREMD_Service.auth({oid, originalString, signedString: res.signature})
+      .then(data=>{
+        console.log('data',data)
+         setActiveIndex(3)
+      })
+      .catch((reason)=>{
+        console.log('reason1',reason)      
+      })
+      if (userStore.userInfo && signature) certificateStore.postRequestGenerator(userStore.userInfo, { data: signature, checksum: CRC32.str(signature) }, {data: signature, checksum: CRC32.str(signature) } ) 
+     } 
+    })
+    .catch((reason)=>{
+      console.log('reason2',reason)      
+    })   
+  }
   const header = () => {
       return <span>Выгрузка в РРЭМД</span>
   }    
   const items = [
     {
-      label: 'Создать(обновить) СЭМД',      
+      label: 'СЭМД',      
     },    
     {
-      label: 'Подписать ЭЦП',      
+      label: 'Подпись',      
     },
     {
-      label: 'Выгрузить СЭМД в РРЭМД',      
+      label: 'Токен',      
+    },
+    {
+      label: 'РРЭМД',      
     }
   ]
-  const footer = <span>
-    <Button label="Подписать" icon="pi pi-check"
+  const footer = <span>    
+    <Button label="Подписать" icon="pi pi-pencil"
      style={{marginRight: '.25em'}} disabled={!selectedCAdES}
      onClick={signData}/>
+     <Button label="запросить токен" icon="pi pi-check" className="p-button-warning"
+     onClick={getToken}
+     title="Запросить токен безопасности в РРЭМД (используйте ЭЦП медорганизации)" style={{marginRight: '.25em'}} disabled={!selectedCAdES || !!s_token} />
     <Button label="Отозвать" icon="pi pi-times" className="p-button-secondary"/>
   </span>
   //console.log('cAdES', cAdES) 

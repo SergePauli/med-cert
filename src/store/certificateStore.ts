@@ -1,4 +1,5 @@
 import { autorun, configure, makeAutoObservable } from "mobx"
+import { v4 as uuidv4 } from "uuid"
 import Certificate from "../models/FormsData/Certificate"
 import { IPatient } from "../models/IPatient"
 import { ICertificate } from "../models/responses/ICertificate"
@@ -9,6 +10,7 @@ import { DeathReason } from "../models/FormsData/DeathReason"
 import { IDeathReason } from "../models/responses/IDeathReason"
 import { IAddressR } from "../models/requests/IAddressR"
 import { INullFlavorR } from "../models/INullFlavor"
+import { IPostDocumentR, ISignature } from "../models/requests/IPostDocumentR"
 configure({
   enforceActions: "never",
 })
@@ -393,6 +395,23 @@ export default class CertificateStore {
       .finally(() => {
         if (doAfter) doAfter()
       })
+  }
+
+  postRequestGenerator(userInfo: IUserInfo, docContent: ISignature, orgSignature: ISignature): IPostDocumentR {
+    const result = {
+      localUid: this._cert.guid,
+      messageId: uuidv4(),
+      docContent: docContent,
+      orgSignature: orgSignature,
+      documentNumber: this._cert.number,
+      organization: {
+        code: userInfo.organization.oid,
+        codeSystem: null,
+        codeSystemName: null,
+        displayName: userInfo.organization.name,
+      },
+    } as IPostDocumentR
+    return result
   }
   dispose() {
     // So, to avoid subtle memory issues, always call the

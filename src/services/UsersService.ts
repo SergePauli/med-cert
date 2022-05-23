@@ -12,7 +12,7 @@ export default class UsersService {
     return $api.post(`${API_URL}/show/model/User/${id}`, {
       render_options: { only: ["id", "roles"], include: ["person_name", "organization", "contacts"] },
       includes: ["person_name", "organization", "contacts"],
-      organization: { only: ["id", "name", "sm_code"] },
+      organization: { only: ["id", "name", "sm_code", "oid"] },
     })
   }
 }

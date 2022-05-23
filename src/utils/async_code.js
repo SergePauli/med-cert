@@ -31,7 +31,6 @@ export const Base64 = {
         this._keyStr.charAt(enc3) +
         this._keyStr.charAt(enc4)
     }
-
     return output
   },
 
@@ -62,9 +61,7 @@ export const Base64 = {
         output = output + String.fromCharCode(chr3)
       }
     }
-
     output = Base64._utf8_decode(output)
-
     return output
   },
 
@@ -453,6 +450,7 @@ export async function SignCadesBES(certificate, dataToSign, setDisplayData) {
       result.errormes = "Failed to create CAdESCOM.CPSigner: " + err.number
       return result
     }
+    //console.log("signature", result)
     return result
   }, certificate) //cadesplugin.async_spawn
 }

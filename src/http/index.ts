@@ -8,6 +8,9 @@ export const API_URL = "http://10.33.3.250:5000/REST_API/v1/"
 export const FIAS_URL = "http://fias.int.amurzdrav.ru/fias"
 //АСМЕ service (Сервис взаимодействия с АСМЕ) URL
 export const ACME_URL = "http://acme.int.amurzdrav.ru/"
+//RREMD test servise (Сервис регионального рееестра
+// эл.мед.документов -тестовая среда) URL
+export const RREMD_URL = "https://medved-webservices.hostco.ru/emds/rest/v1/"
 
 const $api = axios.create({
   withCredentials: true,
@@ -73,4 +76,13 @@ $fias.interceptors.response.use(
     throw error
   }
 )
+
+export const $rremd = axios.create({
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json; charset=utf-8",
+  },
+  baseURL: RREMD_URL,
+})
+
 export default $api

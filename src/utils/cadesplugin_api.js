@@ -562,16 +562,16 @@ export const cadesplagin = () => {
   }
 
   //проверяем что у нас хоть какое то событие ушло, и если не уходило кидаем еще раз ошибку
-  function check_load_timeout() {
+  function check_load_timeout(atempt) {
     if (plugin_resolved === 1) return
-    if (isFireFox) {
-      if (!isFireFoxExtensionLoaded) show_firefox_missing_extension_dialog()
-    }
-    plugin_resolved = 1
-    if (canPromise) {
-      plugin_reject("Истекло время ожидания загрузки плагина")
-    } else {
-      window.postMessage("cadesplugin_load_error", "*")
+    if (atempt > 0) setTimeout(check_load_timeout(atempt - 1), 1000)
+    else {
+      plugin_resolved = 1
+      if (canPromise) {
+        plugin_reject("Истекло время ожидания загрузки плагина")
+      } else {
+        window.postMessage("cadesplugin_load_error", "*")
+      }
     }
   }
 
@@ -668,9 +668,9 @@ export const cadesplagin = () => {
   }
 
   if (window.cadesplugin_load_timeout) {
-    setTimeout(check_load_timeout, window.cadesplugin_load_timeout)
+    setTimeout(check_load_timeout(15), window.cadesplugin_load_timeout)
   } else {
-    setTimeout(check_load_timeout, 9000)
+    setTimeout(check_load_timeout(15), 1000)
   }
 
   set_constantValues()
