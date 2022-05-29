@@ -153,14 +153,18 @@ import { PersonName } from '../inputs/PersonName'
                     field={<div className="p-d-flex p-jc-start p-ai-center">              
                       <Calendar id="dateBirth" className="p-mr-2" locale="ru"
                         dateFormat={yearBTChecked ? "yy" : "dd.mm.yy"}  
+                        view={yearBTChecked ? "year" : "dd.mm.yy"} 
                         mask={yearBTChecked ? "9999" : "99.99.9999"}                         
                         value={patient.birth_date} 
-                        onChange={(e)=>patient.setBirthDay(e.target.value as Date | undefined, yearBTChecked)                          
+                        onChange={(e)=>{
+                          console.log('e',e)
+                          patient.setBirthDay(e.target.value as Date | undefined, yearBTChecked)
+                        }                          
                         }
                         showIcon />
                       <div className="p-field-checkbox">              
                         <Checkbox checked={yearBTChecked} 
-                          inputId="bd_year" disabled={suggestionsStore.identified}
+                          inputId="bd_year" 
                           onChange={e=>{
                             setYearBTChecked(e.checked)
                             patient.setBirthDay(patient.birth_date as Date | undefined, e.checked) }}/>
