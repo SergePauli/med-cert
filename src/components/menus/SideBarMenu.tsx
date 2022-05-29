@@ -62,7 +62,7 @@ export const SideBarMenu:FC<IMenuProps> = (props: IMenuProps) =>{
                     {icon}{label}</a>,]
             if (item.className?.includes('layout-root-menuitem')) 
                content.push(<div key={`dv_${item.label}_${index}`} className={item.className}><div className='layout-menuitem-root-text'>{item.label}</div></div>)
-            const submenu = (item.items && item.className) && menu(item.items, item.label || UniqueComponentId())      
+            const submenu = (item.items && item.className) && menu(item.items as MenuItem[], item.label || UniqueComponentId())      
             return (
               <li key={`li_${index}_${item.className}`} 
                 className={item.className} style={item.style}       

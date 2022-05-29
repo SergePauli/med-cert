@@ -230,11 +230,11 @@ export default class Certificate implements ISerializable {
       _cert.death_addr_attributes = { ...this._deathAddr } as IAddressR
     else if (this._oldOne && this._oldOne.death_addr)
       _cert.death_addr_attributes = { id: this._oldOne.death_addr.id, _destroy: "1" } as IAddressR
-    if (this._deathAreaType) _cert.death_area_type = this._deathAreaType
-    if (this._deathDatetime) _cert.death_datetime = this._deathDatetime
-    if (this._deathYear) _cert.death_year = this._deathYear
-    if (this._deathKind) _cert.death_kind = this._deathKind
-    if (this._deathPlace) _cert.death_place = this.deathPlace
+    if (this._deathAreaType || this._oldOne?.death_area_type) _cert.death_area_type = this._deathAreaType
+    if (this._deathDatetime || this._oldOne?.death_datetime) _cert.death_datetime = this._deathDatetime
+    if (this._deathYear || this._oldOne?.death_year) _cert.death_year = this._deathYear
+    if (this._deathKind || this._oldOne?.death_kind) _cert.death_kind = this._deathKind
+    if (this._deathPlace || this._oldOne?.death_place) _cert.death_place = this.deathPlace
     if (this._deathReasons.length > 0)
       _cert.death_reasons_attributes = this._deathReasons.map((item) => item.getAttributes())
     if (this._oldOne?.death_reasons && this._oldOne.death_reasons.length > 0) {
@@ -250,14 +250,16 @@ export default class Certificate implements ISerializable {
         _cert.death_reasons_attributes = _cert.death_reasons_attributes.concat(_temp)
       else if (_temp.length > 0) _cert.death_reasons_attributes = _temp
     }
-    if (this._educationLevel) _cert.education_level = this._educationLevel
-    if (this._establishedMedic) _cert.established_medic = this._establishedMedic
-    if (this._extReasonDescription) _cert.ext_reason_description = this.extReasonDescription
-    if (this._extReasonTime) _cert.ext_reason_time = this._extReasonTime
-    if (this._lifeAreaType) _cert.life_area_type = this._lifeAreaType
-    if (this._policyOMS) _cert.policy_OMS = this._policyOMS
-    if (this._pregnancyConnection) _cert.pregnancy_connection = this.pregnancyConnection
-    if (this._maritalStatus) _cert.marital_status = this._maritalStatus
+    if (this._educationLevel || this._oldOne?.education_level) _cert.education_level = this._educationLevel
+    if (this._establishedMedic || this._oldOne?.established_medic) _cert.established_medic = this._establishedMedic
+    if (this._extReasonDescription || this._oldOne?.ext_reason_description)
+      _cert.ext_reason_description = this.extReasonDescription
+    if (this._extReasonTime || this._oldOne?.ext_reason_time) _cert.ext_reason_time = this._extReasonTime
+    if (this._lifeAreaType || this._oldOne?.life_area_type) _cert.life_area_type = this._lifeAreaType
+    if (this._policyOMS || this._oldOne?.policy_OMS) _cert.policy_OMS = this._policyOMS
+    if (this._pregnancyConnection || this._oldOne?.pregnancy_connection)
+      _cert.pregnancy_connection = this.pregnancyConnection
+    if (this._maritalStatus || this._oldOne?.marital_status) _cert.marital_status = this._maritalStatus
     if (this.nullFlavors.length > 0) _cert.null_flavors_attributes = this.null_flavors_attributes()
     if (this._reasonA && this._reasonA.diagnosis) _cert.a_reason_attributes = this._reasonA.getAttributes()
     else if (this._oldOne && this._oldOne.a_reason)
@@ -273,12 +275,12 @@ export default class Certificate implements ISerializable {
     else if (this._oldOne && this._oldOne.d_reason)
       _cert.d_reason_attributes = { id: this._oldOne.d_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._series) _cert.series = this._series
-    if (this._socialStatus) _cert.social_status = this._socialStatus
-    if (this._trafficAccident) _cert.traffic_accident = this._trafficAccident
+    if (this._socialStatus || this._oldOne?.social_status) _cert.social_status = this._socialStatus
+    if (this._trafficAccident || this._oldOne?.traffic_accident) _cert.traffic_accident = this._trafficAccident
     if (this._patient) _cert.patient_attributes = this._patient.getAttributes()
     _cert.custodian_id = this._custodian_id || _cert.patient_attributes?.organization_id
     if (this._participant) _cert.participant_attributes = this._participant.getAttributes()
-    //console.log("_cert", _cert)
+    console.log("_cert", _cert)
     return _cert
   }
   //#region Getters - Setters
