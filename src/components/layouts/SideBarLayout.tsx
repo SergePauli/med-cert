@@ -35,7 +35,7 @@ const SideBarLayout = observer((props: SideBarLayoutProps) => {
       }
       if (isActive) return true
       if (item.items) {         
-        if (findActive(item.items)) { 
+        if (findActive(item.items as MenuItem[])) { 
           item.className = item.className || 'active-menuitem'
           isActive = true  
         }  

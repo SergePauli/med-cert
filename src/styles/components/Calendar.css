@@ -379,3 +379,46 @@
     padding: 0;
   }
 }
+
+/* Time Picker */
+.p-timepicker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.p-timepicker button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+
+.p-timepicker>div {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* Touch UI */
+.p-datepicker-touch-ui,
+.p-calendar .p-datepicker-touch-ui {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  min-width: 80vw;
+  transform: translate(-50%, -50%);
+}
+
+/* Year Picker */
+.p-yearpicker-year {
+  width: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
