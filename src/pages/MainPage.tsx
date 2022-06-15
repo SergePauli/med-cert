@@ -16,8 +16,10 @@ const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
   const {userStore, certificateStore, layoutStore} = useContext(Context)
   useEffect(()=>{
     if (userStore.userInfo) certificateStore.userInfo = userStore.userInfo
-    layoutStore.isLoading = true
-    certificateStore.getList(()=>{layoutStore.isLoading = false},0,4)         
+    if (certificateStore.certs.length===0) {
+      layoutStore.isLoading = true
+      certificateStore.getList(()=>{layoutStore.isLoading = false})      
+    }            
   },[certificateStore, layoutStore, userStore.userInfo])
   
   const news =[{version:"3.004",record:"Улучшена работа вкладки ввода причин; исправлена ошибка выбора жд_ст населенных пунктов при вводе адреса."},{version:"3.003",record:"Улучшена работа списка. Фильтрация по датам рождения, первопричинам, МО в списке"},{version:"3.002",record:"Фильтрация по датам смерти в списке"},

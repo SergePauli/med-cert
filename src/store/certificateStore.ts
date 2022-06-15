@@ -60,7 +60,9 @@ export default class CertificateStore {
         CertificateService.getCount({ q: _q })
           .then((value) => {
             this._count = value.data
-            //console.log("надено", this._count)
+            console.log("надено", this._count, _q)
+            this._first = 0
+            this._last = 0
           })
           .catch((reason) => console.log(reason))
       }
@@ -342,39 +344,55 @@ export default class CertificateStore {
     this._selected = num
   }
 
-  getList(doAfter?: () => void, first = this._first, last = this._first + this._rows) {
+  getList(doAfter?: () => void, first = this._first, last = this._last) {
+    console.log("getList this._first, this._last", this._first, this._last)
     let _q = { ...this._filters, sorts: this._sorts }
     if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
     else if (!this._userInfo) return false
-    const isAdd = !this._needFetch && first === this.first
-    //console.log("getList response", first, last)
-    CertificateService.getCertificates({ q: _q }, isAdd ? this._last + 1 : first, last)
+    const isAdd = !this._needFetch && first === this._first && this._last > 0
+    const newFirst = isAdd ? this._last + 1 : first
+
+    const newLast = last && last > this._count ? this._count - 1 : last
+    if (newLast && (newLast === this._last || newLast === 0 || !(newLast > newFirst))) {
+      if (doAfter) doAfter()
+      return
+    }
+    console.log("getList first, last, isAdd", newFirst, newLast, isAdd)
+    CertificateService.getCertificates({ q: _q }, newFirst, newLast)
       .then((response) => {
-        if (isAdd && this._needFetch) return // case that loaded data already not needed
-        let num = isAdd ? this._certs.length : 0
-        const _certs = isAdd
-          ? this._certs.concat(
-              response.data.map((cert) => {
-                return { ...cert, rowNumber: ++num }
-              })
-            )
-          : response.data.map((cert) => {
-              return { ...cert, rowNumber: ++num }
-            })
+        let num = isAdd ? this._last : first
+        let _certs = Array.from<ICertificate>({ length: this._count })
+        Array.prototype.splice.apply(_certs, [
+          first,
+          last - first,
+          ...response.data.map((cert) => {
+            return { ...cert, rowNumber: ++num }
+          }),
+        ])
+        // isAdd
+        //   ? this._certs.concat(
+        //       response.data.map((cert) => {
+        //         return { ...cert, rowNumber: ++num }
+        //       })
+        //     )
+        //   : response.data.map((cert) => {
+        //       return { ...cert, rowNumber: ++num }
+        //     })
         this._certs = _certs
         const dataLength = response.data.length
+        console.log("dataLength", dataLength)
         if (dataLength > 0) {
           this._rows = this._certs.length
           this._needFetch = false
           this.select(this._selected > dataLength ? dataLength - 1 : this._selected)
         }
+        this._first = first //this._certs.length > 0 ? this._certs[0].rowNumber - 1 : 0
+        this._last = last //this._certs.length > 0 ? this._certs[this._certs.length - 1].rowNumber : 0
       })
       .catch((err) => console.log(err))
       .finally(() => {
         if (doAfter) doAfter()
       })
-    this._first = first
-    this._last = last
   }
 
   findById(certificate_id: number, doAfter?: () => void) {

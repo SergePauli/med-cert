@@ -76,7 +76,8 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
 
 export default class CertificateService {
   //POST request for get Certificate's list
-  static async getCertificates(query: any, first = 0, last = 9): Promise<AxiosResponse<ICertificate[]>> {
+  static async getCertificates(query: any, first = 0, last = first + 9): Promise<AxiosResponse<ICertificate[]>> {
+    console.log("query", query, first, last)
     return $api.post(`${API_URL}model/Certificate/`, {
       ...query,
       offset: first,

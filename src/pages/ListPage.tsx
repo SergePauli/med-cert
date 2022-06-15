@@ -4,7 +4,7 @@ import { MultiSelect } from 'primereact/multiselect'
 import { Column} from 'primereact/column'
 import { DataTable, DataTableFilterMatchModeType, DataTableFilterMeta, DataTableSortParams } from 'primereact/datatable'
 import { Toast } from 'primereact/toast'
-import { FC, useContext, useEffect, useRef, useState } from 'react'
+import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import MainLayout from '../components/layouts/MainLayout'
 import { CERTIFICATE_ROUTE, DIRECTION, LIST_ROUTE, RunsackFilterMatchMode } from '../utils/consts'
 import { ICertificate } from '../models/responses/ICertificate'
@@ -21,15 +21,18 @@ import  PrimeReact, {FilterMatchMode}  from 'primereact/api'
 import { IReference, IReferenceId } from '../models/IReference'
 import { InputText } from 'primereact/inputtext'
 import OrganizationService from '../services/OrganizationService'
+import { IRouteProps } from '../models/IRouteProps'
 
-type ListPageProps = {}
 
-const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
+
+const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
   const {certificateStore, userStore} = useContext(Context)  
   const [lazyLoading, setLazyLoading] = useState(false)
   const [sortField, setSortField] = useState<string>('')
   const [sortOrder, setSortOrder] = useState<-1 | 0 | 1>(0)
   const [filters, setFilters] = useState<DataTableFilterMeta | undefined>()
+  const [propsFilters, setPropsFilters] = useState<any | false | undefined>()
+
   const [organizations, setOrganizations] = useState<IReferenceId[] | null>(null)
   const isSuperUser = userStore.userInfo?.roles.includes('MIAC') || userStore.userInfo?.roles.includes('ADMIN')
   
@@ -39,6 +42,27 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     ).catch(()=>{
       setOrganizations([])      
     })},[isSuperUser, organizations])
+
+  useMemo(()=>{
+    if (propsFilters === undefined) {
+      if (props.location.search){
+        const _params = props.location.search.replace("?","").split("&") 
+        let _filters = {} as any
+        _params.forEach(param=>{
+          const pair = param.split("=")
+          _filters[pair[0]]=pair[1]
+        })
+        setPropsFilters(_filters)
+      } else {        
+        if (Object.keys(certificateStore.filters).length !== 0) {
+          certificateStore.filters = {}
+          setLazyLoading(true)
+          certificateStore.getList(()=>{setLazyLoading(false)})
+        }  
+        setPropsFilters(false)
+      }        
+    }    
+  },[certificateStore, props, propsFilters])  
     
   PrimeReact.locale = 'ru'
   const toast = useRef<Toast>(null)
@@ -58,11 +82,16 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
         'issue_date': { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER},{ value: null, matchMode: FilterMatchMode.DATE_BEFORE}]},   
         'death_place': { value: null, matchMode: FilterMatchMode.IN },        
         })        
-    }
-   
-    useEffect(() => {        
+    }   
+    useEffect(() => {            
         initFilters()
-    }, [])
+        if (propsFilters) { 
+          certificateStore.filters = {...propsFilters}
+          setLazyLoading(true)
+          certificateStore.getList(()=>{setLazyLoading(false)}) 
+          setPropsFilters(false)         
+        }
+    }, [certificateStore, propsFilters])
 
   const orderNumberBodyTemplate = (rowData: ICertificate)=>{    
     return <i>{rowData.rowNumber}</i>
@@ -123,6 +152,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     const dd = new Date(rowData.death_datetime)
     const db = new Date(rowData.patient?.birth_date)
     let age = dd.getFullYear() - db.getFullYear()
+    if (age === 0) return 0
     const m = dd.getMonth() - dd.getMonth()
     if (m < 0 || (m === 0 && dd.getDate() < db.getDate())) age--    
     return age
@@ -194,9 +224,10 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
             </React.Fragment>
         )
     }
-  const loadCertificatesLazy = (event: {first:number, last:number}) => {  
+  const loadCertificatesLazy = (event: {first:number, last:number}) => {
+    console.log("loadCertificatesLazy first, last", event.first, event.last)      
       setLazyLoading(true)         
-      certificateStore.getList(()=>{setLazyLoading(false)}, event.first, event.last)      
+      certificateStore.getList(()=>{setLazyLoading(false)}, event.first, event.last < certificateStore.count ?  event.last : certificateStore.count-1)      
   }   
   const sortLazy = (e: DataTableSortParams) => {    
     setLazyLoading(true) 
@@ -231,14 +262,14 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
               <DataTable ref={dt} value={certificateStore.certs}  responsiveLayout="scroll" scrollDirection="both"
                 emptyMessage="нет данных, удовлетворяющих запросу" scrollable scrollHeight="72vh" 
                 selectionMode="single" selection={selected}  dataKey="id" size="small"
-                footer={footer} loading={lazyLoading}
+                footer={footer} loading={lazyLoading} 
                 onSelectionChange={e =>{
                   certificateStore.select(certificateStore.certs.findIndex(el=>el.id === e.value.id))
                   setSelected(e.value)
                 }} filterDisplay="menu" 
                 onFilter={e=>{
                   console.log('e',e)
-                  let _filters = {} as any
+                  let _filters = {} as any                  
                   let _constraint: any = e.filters['issue_date'] 
                   if (_constraint && _constraint.constraints[0] && _constraint.constraints[0].value) 
                     _filters[`issue_date${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
