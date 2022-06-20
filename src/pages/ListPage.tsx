@@ -51,15 +51,14 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
         _params.forEach(param=>{
           const pair = param.split("=")
           _filters[pair[0]]=pair[1]
-        })
-        setPropsFilters(_filters)
+        })        
+        certificateStore.filters = {..._filters}
+        setPropsFilters({..._filters})            
       } else {        
         if (Object.keys(certificateStore.filters).length !== 0) {
-          certificateStore.filters = {}
-          setLazyLoading(true)
-          certificateStore.getList(()=>{setLazyLoading(false)})
+          certificateStore.filters = {}          
         }  
-        setPropsFilters(false)
+        setPropsFilters({})
       }        
     }    
   },[certificateStore, props, propsFilters])  
@@ -84,14 +83,8 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
         })        
     }   
     useEffect(() => {            
-        initFilters()
-        if (propsFilters) { 
-          certificateStore.filters = {...propsFilters}
-          setLazyLoading(true)
-          certificateStore.getList(()=>{setLazyLoading(false)}) 
-          setPropsFilters(false)         
-        }
-    }, [certificateStore, propsFilters])
+        initFilters()        
+    }, [])
 
   const orderNumberBodyTemplate = (rowData: ICertificate)=>{    
     return <i>{rowData.rowNumber}</i>
@@ -218,14 +211,14 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
   }
 
   const actionBodyTemplate = (rowData: ICertificate) => {       
-        return (
+        return rowData.id && (
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${rowData.id}?q=0`)} />                
             </React.Fragment>
         )
     }
   const loadCertificatesLazy = (event: {first:number, last:number}) => {
-    console.log("loadCertificatesLazy first, last", event.first, event.last)      
+    //console.log("loadCertificatesLazy first, last", event.first, event.last)      
       setLazyLoading(true)         
       certificateStore.getList(()=>{setLazyLoading(false)}, event.first, event.last < certificateStore.count ?  event.last : certificateStore.count-1)      
   }   
@@ -262,14 +255,16 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
               <DataTable ref={dt} value={certificateStore.certs}  responsiveLayout="scroll" scrollDirection="both"
                 emptyMessage="нет данных, удовлетворяющих запросу" scrollable scrollHeight="72vh" 
                 selectionMode="single" selection={selected}  dataKey="id" size="small"
-                footer={footer} loading={lazyLoading} 
+                footer={footer} loading={lazyLoading} rows={certificateStore.count}
                 onSelectionChange={e =>{
-                  certificateStore.select(certificateStore.certs.findIndex(el=>el.id === e.value.id))
-                  setSelected(e.value)
+                  if ( e.value.id ) {
+                    certificateStore.select(certificateStore.certs.findIndex(el=>el.id === e.value.id))
+                    setSelected(e.value)
+                  }
                 }} filterDisplay="menu" 
                 onFilter={e=>{
                   console.log('e',e)
-                  let _filters = {} as any                  
+                  let _filters = {...propsFilters} as any                  
                   let _constraint: any = e.filters['issue_date'] 
                   if (_constraint && _constraint.constraints[0] && _constraint.constraints[0].value) 
                     _filters[`issue_date${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
@@ -318,8 +313,8 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
                     _filters.custodian_id_in = _codes   
                   }
                   certificateStore.filters = _filters
-                  setLazyLoading(true)
-                  certificateStore.getList(()=>{setLazyLoading(false)})  
+                  //setLazyLoading(true)
+                  //certificateStore.getList(()=>{setLazyLoading(false)})  
                 }}                
                 virtualScrollerOptions={{ lazy: true, onLazyLoad: loadCertificatesLazy, itemSize: 6, delay: 200}} filters={filters} filterLocale={'ru'}
                 onRowDoubleClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=0`)}

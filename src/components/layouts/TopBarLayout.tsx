@@ -45,10 +45,10 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
       {label:"Выход", icon:"pi-power-off", command:()=>{userStore.logout()}},       
    ]
   const notif_items:ExtMenuItem[] = [    
-      {label:`Создано ${detail_templ} свидетельств`, summary:"Новых", className:'p-success', icon:"pi-user", detail:userActivity?.created || 0, url:"/#", disabled: !userActivity || userActivity.created===0},
+      {label:`Создано ${detail_templ} свидетельств`, summary:"Новых", className:'p-success', icon:"pi-user", detail:userActivity?.created || 0, url:`${LIST_ROUTE}?created_at_gt=${userActivity?.logged}&issue_date_eq=null`, disabled: !userActivity || userActivity.created===0},
       {label:`Изменено ${detail_templ} свидетельств`, summary:"Измененных", className:'p-info', icon:"pi-pencil", detail:userActivity?.updated || 0, url:`${LIST_ROUTE}?updated_at_gt=${userActivity?.logged}`, disabled: !userActivity || userActivity.updated===0},
-      {label:`Заменено ${detail_templ} свидетельств`, summary:"Замены", className:'p-info', icon:"pi-sync", detail:userActivity?.replaced || 0, url:"/#", disabled: !userActivity || userActivity.replaced===0},      
-      {label:`Выданы родственникам ${detail_templ} свидетельств`, summary:"Выданно", icon:"pi-check", detail:userActivity?.issued || 0, url:"/#", disabled: !userActivity || userActivity.issued===0}, 
+      {label:`Заменено ${detail_templ} свидетельств`, summary:"Замены", className:'p-info', icon:"pi-sync", detail:userActivity?.replaced || 0, url:`${LIST_ROUTE}?created_at_gt=${userActivity?.logged}&number_prev_neq=null`, disabled: !userActivity || userActivity.replaced===0},      
+      {label:`Выданы родственникам ${detail_templ} свидетельств`, summary:"Выданно", icon:"pi-check", detail:userActivity?.issued || 0, url:`${LIST_ROUTE}?issue_date_gt=${userActivity?.logged}`, disabled: !userActivity || userActivity.issued===0}, 
       {label:`С замечаниями ${detail_templ} свидетельств`, className:'p-danger', summary:"Замечаний", icon:"pi-comment", detail:0, url:"/#", disabled: true},
       {label:`Проверены ${detail_templ} свидетельств`, summary:"Проверенно",  className:'p-success', icon:"pi-check-circle", detail:0, url:"/#", disabled: true},  
       {label:`Отправлены в ФРМСИ ${detail_templ}`, summary:"Отправлено", className:'p-success', icon:"pi-envelope", detail:0, url:"/#", disabled: true},
