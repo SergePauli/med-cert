@@ -427,7 +427,7 @@ export default class CertificateStore {
       this._count = this._count - 1
       const dataLength = this._certs.length
       if (dataLength > 0) {
-        this.select(this._selected > dataLength - 1 ? dataLength - 1 : this._selected)
+        this.select(this._selected < dataLength ? this._selected : dataLength - 1)
       } else {
         this.createNew(-1)
         this._selected = 0
@@ -472,9 +472,7 @@ export default class CertificateStore {
         //console.log("this._count-", this._count, " this._first-", this._first, " this._last-", this._last)
         if (dataLength > 0) {
           this._rows = this._certs.length
-          this.select(
-            this._selected > this._last ? this._last : this._selected < this._first ? this._first : this._selected
-          )
+          this.select(this._selected < dataLength ? this._selected : dataLength - 1)
         }
       })
       .catch((err) => console.log(err))

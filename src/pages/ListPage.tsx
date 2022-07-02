@@ -229,7 +229,7 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
     //console.log('loadCertificatesLazy start count-', certificateStore.count, event.first, event.last, certificateStore.operation.getType()  )         
     certificateStore.getList(()=>{ 
       //console.log('loadCertificatesLazy finished, count-', certificateStore.count, event.first, event.last, certificateStore.operation.getType())
-      //
+      
       }, event.first, event.last)           
   }   
  
