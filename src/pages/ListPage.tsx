@@ -22,17 +22,13 @@ import { IReference, IReferenceId } from '../models/IReference'
 import { InputText } from 'primereact/inputtext'
 import OrganizationService from '../services/OrganizationService'
 import { IRouteProps } from '../models/IRouteProps'
-
+import { Operation, OperationType } from '../store/certificateStore'
 
 
 const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
   const {certificateStore, userStore} = useContext(Context)  
-  const [lazyLoading, setLazyLoading] = useState(false)
-  const [sortField, setSortField] = useState<string>('')
-  const [sortOrder, setSortOrder] = useState<-1 | 0 | 1>(0)
   const [filters, setFilters] = useState<DataTableFilterMeta | undefined>()
-  const [propsFilters, setPropsFilters] = useState<any | false | undefined>()
-
+  const [propsFilters, setPropsFilters] = useState<any | false | undefined>()  
   const [organizations, setOrganizations] = useState<IReferenceId[] | null>(null)
   const isSuperUser = userStore.userInfo?.roles.includes('MIAC') || userStore.userInfo?.roles.includes('ADMIN')
   
@@ -42,6 +38,7 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
     ).catch(()=>{
       setOrganizations([])      
     })},[isSuperUser, organizations])
+  
 
   useMemo(()=>{
     if (propsFilters === undefined) {
@@ -52,10 +49,12 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
           const pair = param.split("=")
           _filters[pair[0]]=pair[1]
         })        
+        certificateStore.operation = new Operation(OperationType.FILTERING)
         certificateStore.filters = {..._filters}
         setPropsFilters({..._filters})            
-      } else {        
-        if (Object.keys(certificateStore.filters).length !== 0) {
+      } else { 
+        certificateStore.operation = new Operation(OperationType.FILTERING)       
+        if (certificateStore.filters && Object.keys(certificateStore.filters).length !== 0) {
           certificateStore.filters = {}          
         }  
         setPropsFilters({})
@@ -65,7 +64,15 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
     
   PrimeReact.locale = 'ru'
   const toast = useRef<Toast>(null)
-  const dt = useRef(null)  
+  const dt = useRef<DataTable>(null) 
+  useEffect(()=>{       
+    if (certificateStore.needScroll 
+      && certificateStore.operation.is(OperationType.FILTERING)
+      && dt.current) {  
+        //console.log('useEffect resetScroll', certificateStore.operation)     
+        dt.current.resetScroll()
+      }
+  }, [ certificateStore.needScroll, certificateStore.operation])  
 
   const [selected, setSelected] = useState<ICertificate | undefined>()
 
@@ -209,7 +216,7 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
     if (!iDate ) return ''    
     else return  <span style={{fontSize:'small'}}>{`${iDate.slice(8,10)}.${iDate.slice(5,7)}.${iDate.slice(0,4)}`}</span>         
   }
-
+   
   const actionBodyTemplate = (rowData: ICertificate) => {       
         return rowData.id && (
             <React.Fragment>
@@ -217,21 +224,23 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
             </React.Fragment>
         )
     }
-  const loadCertificatesLazy = (event: {first:number, last:number}) => {
-    //console.log("loadCertificatesLazy first, last", event.first, event.last)      
-      setLazyLoading(true)         
-      certificateStore.getList(()=>{setLazyLoading(false)}, event.first, event.last < certificateStore.count ?  event.last : certificateStore.count-1)      
+  const loadCertificatesLazy = (event: any) => {  
+    if (!(certificateStore.operation.is(OperationType.FILTERING) || certificateStore.operation.is(OperationType.SCROLLING))) certificateStore.operation = new Operation(OperationType.SCROLLING)    
+    //console.log('loadCertificatesLazy start count-', certificateStore.count, event.first, event.last, certificateStore.operation.getType()  )         
+    certificateStore.getList(()=>{ 
+      //console.log('loadCertificatesLazy finished, count-', certificateStore.count, event.first, event.last, certificateStore.operation.getType())
+      //
+      }, event.first, event.last)           
   }   
-  const sortLazy = (e: DataTableSortParams) => {    
-    setLazyLoading(true) 
-    const order =  e.sortOrder ? DIRECTION[e.sortOrder] : DIRECTION[0]    
-    if (e.sortField && e.sortField !=='rowNumber') {
-      certificateStore.sorts = [`${e.sortField} ${order}`]  
-      certificateStore.getList(()=>{setLazyLoading(false)})    
-    }  
-    if (e.sortOrder) setSortOrder(e.sortOrder)   
-    if (e.sortField) setSortField(e.sortField)
-    
+ 
+  const sortLazy = (e: DataTableSortParams) => {         
+    const order =  e.sortOrder ? DIRECTION[e.sortOrder===-1 ? 0 : 1] : DIRECTION[0]    
+    if (e.sortField && e.sortOrder) {
+      certificateStore.sorts = [`${e.sortField} ${order}`]
+      certificateStore.sortField = e.sortField
+      certificateStore.sortOrder = e.sortOrder
+      certificateStore.operation = new Operation(OperationType.SORTING)
+    } 
   }  
   const basisDeterminingFilterTemplate = (options: any) => {
         return <MultiSelect value={options.value} options={BASIS_DERMINING}  onChange={(e) => options.filterCallback(e.value)} optionLabel="name" placeholder="не выбрано" className="p-column-filter" />;
@@ -241,10 +250,11 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
     }   
     
   const fioFilterTemplate = (options: any) => {
-        return <InputText value={options.value}  onChange={(e) => options.filterCallback(e.target.value)}  placeholder="строка поиска" className="p-column-filter" />
+        return <InputText value={options.value || ''}  onChange={(e) => options.filterCallback(e.target.value)}  placeholder="строка поиска" className="p-column-filter" />
     }  
   
   const footer = `Всего ${ certificateStore.count } свидетельств(а).`  
+  
   const layoutParams = {
         title: 'СПИСОК СВИДЕТЕЛЬСТВ',     
         url: LIST_ROUTE,
@@ -252,10 +262,10 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
         <>
           <Toast ref={toast} />
           <div id='tableDiv' className='p-card' >             
-              <DataTable ref={dt} value={certificateStore.certs}  responsiveLayout="scroll" scrollDirection="both"
+            <DataTable ref={dt} value={certificateStore.allCerts}  responsiveLayout="scroll" scrollDirection="both"
                 emptyMessage="нет данных, удовлетворяющих запросу" scrollable scrollHeight="72vh" 
                 selectionMode="single" selection={selected}  dataKey="id" size="small"
-                footer={footer} loading={lazyLoading} rows={certificateStore.count}
+                footer={footer} loading={certificateStore.isLoading} lazy
                 onSelectionChange={e =>{
                   if ( e.value.id ) {
                     certificateStore.select(certificateStore.certs.findIndex(el=>el.id === e.value.id))
@@ -263,7 +273,7 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
                   }
                 }} filterDisplay="menu" 
                 onFilter={e=>{
-                  console.log('e',e)
+                  //console.log('e',e)
                   let _filters = {...propsFilters} as any                  
                   let _constraint: any = e.filters['issue_date'] 
                   if (_constraint && _constraint.constraints[0] && _constraint.constraints[0].value) 
@@ -311,16 +321,14 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
                     let _codes = [] as number[]
                     values.map(item=> _codes.push(item.id)) 
                     _filters.custodian_id_in = _codes   
-                  }
-                  certificateStore.filters = _filters
-                  //setLazyLoading(true)
-                  //certificateStore.getList(()=>{setLazyLoading(false)})  
+                  }               
+                  certificateStore.filters = _filters 
                 }}                
-                virtualScrollerOptions={{ lazy: true, onLazyLoad: loadCertificatesLazy, itemSize: 6, delay: 200}} filters={filters} filterLocale={'ru'}
+                virtualScrollerOptions={{ lazy: true,  onLazyLoad: loadCertificatesLazy,  itemSize: 120, delay: 100,showLoader: false,  loading: certificateStore.isLoading}} filters={filters} filterLocale={'ru'} 
                 onRowDoubleClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=0`)}
-                onSort={sortLazy} sortField={sortField} sortOrder={sortOrder}
+                onSort={sortLazy} sortField={certificateStore.sortField} sortOrder={certificateStore.sortOrder}
                 >  
-                    <Column header="№ п.п"  body={orderNumberBodyTemplate} sortable
+                    <Column header="№ п.п"  body={orderNumberBodyTemplate} 
                       sortField='rowNumber'
                       style={{ flexGrow: 1, flexBasis: '58px' }} frozen></Column>                                   
                     <Column header="Серия Номер Вид" body={seriesNumberBodyTemplate} filterField='number'
@@ -331,13 +339,13 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
                      filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  
                       style={{ flexGrow: 1, flexBasis: '250px' }} body={reasonsBodyTemplate}></Column>
                     <Column  header="ФИО" body={fioBodyTemplate} 
-                      sortField='patient.person.person_name.family'
+                      sortField='patient_person_person_name_family'
                       dataType='text' showFilterOperator ={false}
                       filter filterField='patient_fio' filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  filterElement={fioFilterTemplate}
                       sortable style={{ flexGrow: 1, flexBasis: '140px' }}></Column>                    
                     <Column  header="ДР" body={dbBodyTemplate} filter sortable
                        showFilterOperator={false} dataType='date' filterPlaceholder="дата рождения"
-                     filterField='patient_birth_date' sortField='patient.birth_date' 
+                     filterField='patient_birth_date' sortField='patient_birth_date' 
                      filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  
                        style={{ flexGrow: 1, flexBasis: '110px' }}> </Column>
                     <Column  header="ДС" body={ddBodyTemplate} filter sortable
@@ -347,12 +355,12 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
                        style={{ flexGrow: 1, flexBasis: '110px' }}> </Column>
                     <Column  header="Лет" body={ageBodyTemplate} 
                       style={{ flexGrow: 1, flexBasis: '46px' }}> </Column>
-                    <Column  header="Пол" body={genderBodyTemplate} sortField='patient.gender'
+                    <Column  header="Пол" body={genderBodyTemplate} sortField='patient_gender'
                       sortable style={{ flexGrow: 1, flexBasis: '56px' }}> </Column>    
-                    <Column  header="Адрес проживания" sortable 
+                    <Column  header="Адрес проживания" sortable sortField='patient_person_address_streetAddressLine'
                       field='patient.person.address.streetAddressLine'
                       style={{ flexGrow: 1, flexBasis: '200px' }}> </Column>  
-                    <Column  header="Адрес смерти" sortable
+                    <Column  header="Адрес смерти" sortable sortField='death_addr_streetAddressLine'
                       field='death_addr.streetAddressLine'
                       style={{ flexGrow: 1, flexBasis: '200px' }}> </Column>                     
                     <Column  header="Смерть наступила" body={deathPlaceBodyTemplate}
@@ -361,7 +369,7 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
                       filter filterField='death_place' sortField='death_place' sortable 
                       style={{ flexGrow: 1, flexBasis: '140px' }}> </Column>  
                     <Column  header="Основание заключения" body={basisDeterminingBodyTemplate}
-                      sortField='basis_determining' sortable
+                      sortField='basis_determining' sortable 
                       filterField='basis_determining' showFilterMatchModes={false}
                       filterClear={filterClearTemplate} filterApply={filterApplyTemplate}
                       filter filterElement={basisDeterminingFilterTemplate} 

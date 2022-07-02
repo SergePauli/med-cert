@@ -76,12 +76,13 @@ export const CERTIFICATE_FULL_RENDER_OPTIONS = {
 
 export default class CertificateService {
   //POST request for get Certificate's list
-  static async getCertificates(query: any, first = 0, last = first + 9): Promise<AxiosResponse<ICertificate[]>> {
-    console.log("query", query, first, last)
+  static async getCertificates(query: any, first?: number, last?: number): Promise<AxiosResponse<ICertificate[]>> {
+    let _options = { ...query }
+    if (first) _options.offset = first
+    if (last !== undefined && first !== undefined) _options.limit = last - first + 1
+    else _options.limit = 25
     return $api.post(`${API_URL}model/Certificate/`, {
-      ...query,
-      offset: first,
-      limit: last - first + 1,
+      ..._options,
       ...CERTIFICATE_FULL_RENDER_OPTIONS,
     })
   }

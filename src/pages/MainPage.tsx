@@ -9,18 +9,37 @@ import { Column } from 'primereact/column'
 import { Divider } from 'primereact/divider'
 import { Context } from '..'
 import { ProgressSpinner } from 'primereact/progressspinner'
+import { IRouteProps } from '../models/IRouteProps'
+import { Operation, OperationType } from '../store/certificateStore'
 
-type MainPageProps = {}
 
-const MainPage: FC<MainPageProps> = (props: MainPageProps) => {
+
+const MainPage: FC<IRouteProps> = (props: IRouteProps) => {
   const {userStore, certificateStore, layoutStore} = useContext(Context)
   useEffect(()=>{
-    if (userStore.userInfo) certificateStore.userInfo = userStore.userInfo
-    if (certificateStore.certs.length===0) {
-      layoutStore.isLoading = true
-      certificateStore.getList(()=>{layoutStore.isLoading = false})      
-    }            
-  },[certificateStore, layoutStore, userStore.userInfo])
+    if (userStore.userInfo)     
+      certificateStore.userInfo = userStore.userInfo
+  },[certificateStore, userStore.userInfo])
+  useEffect(()=>{         
+      if  (certificateStore.userInfo && !certificateStore.isLoading) {
+        certificateStore.operation = new Operation(OperationType.FILTERING)        
+        if (props.location.search){
+          const _params = props.location.search.replace("?","").split("&") 
+          let _filters = {} as any
+          _params.forEach(param=>{
+          const pair = param.split("=")
+          _filters[pair[0]]=pair[1]
+          })        
+          certificateStore.filters = {..._filters} 
+        } else certificateStore.filters = {}
+        
+      }              
+  },[certificateStore, certificateStore.userInfo, layoutStore, props.location.search])
+  // useEffect(()=>{         
+  //     if  (layoutStore.isLoading && certificateStore.count) {        
+  //       layoutStore.isLoading = false        
+  //     }              
+  // },[certificateStore, certificateStore.count, layoutStore])
   
   const news =[{version:"3.005",record:"Уведомления об активности (колокольчик) теперь работают; Улучшена работа списка свидетельств; исправлена ошибка ввода дат с точностью до года."},{version:"3.004",record:"Улучшена работа вкладки ввода причин; исправлена ошибка выбора жд_ст населенных пунктов при вводе адреса."},{version:"3.003",record:"Улучшена работа списка. Фильтрация по датам рождения, первопричинам, МО в списке"},{version:"3.002",record:"Фильтрация по датам смерти в списке"},
   {version:"3.001",record:"Исправлена ошибка нумерации в списке"},
