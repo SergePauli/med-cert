@@ -93,8 +93,11 @@ export class ChildInfo implements ISerializable {
     if (this._nullFlavors.length > 0) _chInfo.null_flavors_attributes = this.null_flavors_attributes()
     if (this._relatedSubject) _chInfo.related_subject_attributes = this._relatedSubject.getAttributes()
     if (this._termPregnancy) _chInfo.term_pregnancy = this._termPregnancy
+    else _chInfo.term_pregnancy = null
     if (this._weight) _chInfo.weight = this._weight
+    else _chInfo.weight = null
     if (this._whichAccount) _chInfo.which_account = this._whichAccount
+    else _chInfo.which_account = null
     if (this._id) _chInfo.id = this._id
     if (this._address && !!this._address.state && !!this._address.streetAddressLine)
       _chInfo.address_attributes = { ...this._address }
