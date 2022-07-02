@@ -14,7 +14,7 @@ export const REPORT_ROUTE = "/report"
 export const DOCTORS_ROUTE = "/doctors"
 export const USER_ROUTE = "/user"
 export const MO_SETTINGS_ROUTE = "/organization"
-export const DIRECTION = ["asc", "desc"]
+export const DIRECTION = ["desc", "asc"]
 export const ROLES: IObjectKeys = {
   USER: "ПОЛЬЗОВАТЕЛЬ",
   ADMIN: "АДМИНИСТРАТОР",
