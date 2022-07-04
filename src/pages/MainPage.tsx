@@ -34,12 +34,7 @@ const MainPage: FC<IRouteProps> = (props: IRouteProps) => {
         } else certificateStore.filters = {}
         
       }              
-  },[certificateStore, certificateStore.userInfo, layoutStore, props.location.search])
-  // useEffect(()=>{         
-  //     if  (layoutStore.isLoading && certificateStore.count) {        
-  //       layoutStore.isLoading = false        
-  //     }              
-  // },[certificateStore, certificateStore.count, layoutStore])
+  },[certificateStore, certificateStore.userInfo, layoutStore, props.location.search])  
   
   const news =[{version:"3.005",record:"Уведомления об активности (колокольчик) теперь работают; Улучшена работа списка свидетельств; исправлена ошибка ввода дат с точностью до года."},{version:"3.004",record:"Улучшена работа вкладки ввода причин; исправлена ошибка выбора жд_ст населенных пунктов при вводе адреса."},{version:"3.003",record:"Улучшена работа списка. Фильтрация по датам рождения, первопричинам, МО в списке"},{version:"3.002",record:"Фильтрация по датам смерти в списке"},
   {version:"3.001",record:"Исправлена ошибка нумерации в списке"},

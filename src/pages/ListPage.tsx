@@ -4,7 +4,7 @@ import { MultiSelect } from 'primereact/multiselect'
 import { Column} from 'primereact/column'
 import { DataTable, DataTableFilterMatchModeType, DataTableFilterMeta, DataTableSortParams } from 'primereact/datatable'
 import { Toast } from 'primereact/toast'
-import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, useContext, useEffect, useRef, useState } from 'react'
 import MainLayout from '../components/layouts/MainLayout'
 import { CERTIFICATE_ROUTE, DIRECTION, LIST_ROUTE, RunsackFilterMatchMode } from '../utils/consts'
 import { ICertificate } from '../models/responses/ICertificate'
@@ -40,7 +40,7 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
     })},[isSuperUser, organizations])
   
 
-  useMemo(()=>{
+  useEffect(()=>{
     if (propsFilters === undefined) {
       if (props.location.search){
         const _params = props.location.search.replace("?","").split("&") 
@@ -225,15 +225,14 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
         )
     }
   const loadCertificatesLazy = (event: any) => {  
+    //console.log('loadCertificatesLazy start count-',certificateStore.count, ' start-', event.first, ' last-',event.last,' operation-',certificateStore.operation.getType()  )  
     if (!(certificateStore.operation.is(OperationType.FILTERING) || certificateStore.operation.is(OperationType.SCROLLING))) certificateStore.operation = new Operation(OperationType.SCROLLING)    
-    //console.log('loadCertificatesLazy start count-', certificateStore.count, event.first, event.last, certificateStore.operation.getType()  )         
-    certificateStore.getList(()=>{ 
-      //console.log('loadCertificatesLazy finished, count-', certificateStore.count, event.first, event.last, certificateStore.operation.getType())
-      
+    certificateStore.getList(()=>{ //console.log('loadCertificatesLazy finished, count-', certificateStore.count, ' start-', event.first,  ' last-',event.last,' operation-',certificateStore.operation.getType())      
       }, event.first, event.last)           
   }   
  
-  const sortLazy = (e: DataTableSortParams) => {         
+  const sortLazy = (e: DataTableSortParams) => { 
+    if (certificateStore.count === 0) return        
     const order =  e.sortOrder ? DIRECTION[e.sortOrder===-1 ? 0 : 1] : DIRECTION[0]    
     if (e.sortField && e.sortOrder) {
       certificateStore.sorts = [`${e.sortField} ${order}`]
@@ -324,7 +323,7 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
                   }               
                   certificateStore.filters = _filters 
                 }}                
-                virtualScrollerOptions={{ lazy: true,  onLazyLoad: loadCertificatesLazy,  itemSize: 120, delay: 100,showLoader: false,  loading: certificateStore.isLoading}} filters={filters} filterLocale={'ru'} 
+                virtualScrollerOptions={{ lazy: true,  onLazyLoad: loadCertificatesLazy,  numToleratedItems:5, itemSize: 180, delay: 100,showLoader: false,  loading: certificateStore.isLoading}} filters={filters} filterLocale={'ru'} 
                 onRowDoubleClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=0`)}
                 onSort={sortLazy} sortField={certificateStore.sortField} sortOrder={certificateStore.sortOrder}
                 >  

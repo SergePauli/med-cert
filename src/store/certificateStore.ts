@@ -54,7 +54,7 @@ export default class CertificateStore {
   private _filters: any | undefined
   private _filterStr: string | undefined
   private _first: number
-  private _last: number
+  private _last: number | undefined
   private _rows: number
   private _count: number
   private _needScroll: boolean
@@ -101,7 +101,7 @@ export default class CertificateStore {
       if (filters) {
         this._count = 0
         this._operation = new Operation(OperationType.FILTERING)
-        //console.log("filters -", filters, " waiting-", this._operation.getType())
+        //console.log("filterstr -", filterstr, " this._filterStr", this._filterStr)
         this._filterStr = filterstr
         let _q = { ...this._filters, sorts: this._sorts }
         if (this._userInfo && !this._userInfo.roles.includes("MIAC"))
@@ -116,7 +116,7 @@ export default class CertificateStore {
             } else {
               this._allCerts = Array.from<ICertificate>({ length: this._count })
             }
-            //console.log("filter apply-", this._count)
+            console.log("filter apply-", this._count, " filterstr-", filterstr)
           })
           .catch((reason) => console.log(reason))
       }
@@ -178,10 +178,10 @@ export default class CertificateStore {
   set sortField(value: string | undefined) {
     this._sortField = value
   }
-  public get sortOrder(): -1 | 1 {
+  get sortOrder(): -1 | 1 {
     return this._sortOrder
   }
-  public set sortOrder(value: -1 | 1) {
+  set sortOrder(value: -1 | 1) {
     this._sortOrder = value
   }
   get filters(): any {
@@ -222,6 +222,7 @@ export default class CertificateStore {
     this._operation = value
   }
   //#endregion
+
   createNew(id = -1) {
     this._cert = new Certificate({
       id: id,
@@ -235,6 +236,8 @@ export default class CertificateStore {
       } as IPatient,
     } as ICertificate)
   }
+
+  //замена свидетельства
   replace() {
     const old = this._certs.find((cert) => cert.id === this._cert.id)
     if (!old) return
@@ -364,6 +367,7 @@ export default class CertificateStore {
     old.latest_one = this._cert.oldOne
   }
 
+  // формирование запроса к бакэнду на сохранение свидетельства
   save(onSuccess?: (data: ICertificate) => void, onError?: (message: string) => void, sm_code?: string) {
     this._operation = new Operation(OperationType.SAVING)
     if (!this._userInfo) return false
@@ -416,11 +420,14 @@ export default class CertificateStore {
           })
           .finally(() => (this._operation = WAITING))
   }
+
+  // формирование запроса к бакэнду на удаление свидетельства
   delete() {
     if (this._cert.id === -1) return false
     else return CertificateService.removeCertificate(this._cert.id)
   }
 
+  //удаление заданного свидетельства из списка в стэйте
   clean(num = this._selected) {
     try {
       this._certs.splice(num)
@@ -437,6 +444,7 @@ export default class CertificateStore {
     }
   }
 
+  // активируем стэйт с сертификатом (подготовка данных формы ввода)
   select(num: number) {
     try {
       this._cert = new Certificate(this._certs[num])
@@ -446,16 +454,21 @@ export default class CertificateStore {
     }
   }
 
+  // формируем запрос пачки свидетельств к бакэнду и обработку результата
   getList(doAfter?: () => void, first = this._first, last?: number) {
     if (last && first > last) {
+      // если входные параметры от VirtualScroller неверные ставим индикатор сброса
       this._needScroll = true
-      return false
+      return
     }
     let _q = { ...this._filters, sorts: this._sorts }
-
     if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
+    const dataSize = this._count
+    this._first = first
+    this._last = last
     CertificateService.getCertificates({ q: _q }, first, last)
       .then((response) => {
+        if (dataSize !== this._count || first !== this._first || last !== this._last) return // запрошенны другие данные, эти не обрабатываем
         let _virtLoaded = Array.from<ICertificate>({ length: this._count })
         let num = first
         let _certs = response.data.map((cert) => {
@@ -464,8 +477,7 @@ export default class CertificateStore {
         const dataLength = response.data.length
         this._first = first
         this._last = last || first + dataLength - 1
-
-        //populate page of virtual cars
+        //populate page of certificates
         Array.prototype.splice.apply(_virtLoaded, [first, dataLength, ..._certs])
         this._certs = _certs
         this._allCerts = _virtLoaded
@@ -474,15 +486,19 @@ export default class CertificateStore {
           this._rows = this._certs.length
           this.select(this._selected < dataLength ? this._selected : dataLength - 1)
         }
+        this._operation = WAITING
+        if (this._needScroll) this._needScroll = false
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err)
+        this._operation = WAITING
+      })
       .finally(() => {
         if (doAfter) doAfter()
-        if (this._needScroll) this._needScroll = false
-        this._operation = WAITING
       })
   }
 
+  //формируем запрос к бакэнду на получение заданного свидетельства
   findById(certificate_id: number, doAfter?: () => void) {
     if (!this._userInfo) return false
     CertificateService.getCertificates({
@@ -501,6 +517,8 @@ export default class CertificateStore {
         this._operation = WAITING
       })
   }
+
+  //чистим реакции принудительно
   dispose() {
     // So, to avoid subtle memory issues, always call the
     // disposers when the reactions are no longer needed.
