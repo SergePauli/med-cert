@@ -25,6 +25,7 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
     else layoutStore.sideBarToggle()          
   } 
   const [userActivity, setUserActivity] = useState<IActivityInfo | null | undefined>()
+  const [userName, setUserName] = useState('')
   
   useEffect(()=>{
     if (userActivity===undefined) {
@@ -54,9 +55,9 @@ export const TopBarLayout = observer((props: TopBarLayoutProps) =>{
       {label:`Отправлены в ФРМСИ ${detail_templ}`, summary:"Отправлено", className:'p-success', icon:"pi-envelope", detail:0, url:"/#", disabled: true},
    ]
    
-   
-   const userName = props.userInfo!==null && props.userInfo.person_name ? 
-   `${props.userInfo.person_name?.family} ${props.userInfo.person_name?.given_1[0]} ${props.userInfo.person_name?.given_2?.charAt(0) ||''}` : ''     
+  useEffect(()=>setUserName(props.userInfo!==null && props.userInfo.person_name ? 
+   `${props.userInfo.person_name?.family} ${props.userInfo.person_name?.given_1[0]} ${props.userInfo.person_name?.given_2?.charAt(0) ||''}` : ''),[props.userInfo]) 
+
   return (
     <div className="layout-topbar">
       <div className="topbar-left">
