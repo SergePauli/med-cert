@@ -9,5 +9,5 @@ export interface IRelatedSubjectR extends INullFlavorableR, IDestroyble {
   family_connection: number
   addr_attributes?: IAddressR
   person_name_attributes?: IPersonName
-  birthTime?: String
+  birthTime?: String | null
 }

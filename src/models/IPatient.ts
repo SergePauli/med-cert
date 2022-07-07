@@ -8,7 +8,7 @@ export interface IPatient extends INullFlavorable {
   identity?: IIdentity
   gender: number | undefined
   birth_date: string | undefined
-  birth_year: number
+  birth_year: number | null
   organization_id: number
   addr_type?: number
   guid?: string

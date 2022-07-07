@@ -349,7 +349,7 @@ export const doACME = (
         }
       })
       .catch((reason) => {
-        onError(`Сбой операции: код завершения - 0, подробности: ${reason}`)
+        onError(`Сбой операции: код завершения - 0, подробности: ${reason.message}`)
       })
     _result = 0
   } catch (error) {

@@ -153,7 +153,7 @@ import { PersonName } from '../inputs/PersonName'
                     field={<div className="p-d-flex p-jc-start p-ai-center">              
                       <Calendar id="dateBirth" className="p-mr-2" locale="ru"
                         dateFormat={yearBTChecked ? "yy" : "dd.mm.yy"}  
-                        view={yearBTChecked ? "year" : "dd.mm.yy"} 
+                        view={yearBTChecked ? "year" : "date"} 
                         mask={yearBTChecked ? "9999" : "99.99.9999"}                         
                         value={patient.birth_date} 
                         onChange={(e)=>{
@@ -193,6 +193,7 @@ import { PersonName } from '../inputs/PersonName'
                       <Calendar id="dateDeath" className="p-mr-2" locale="ru"
                         dateFormat={yearDTChecked ? "yy" : "dd.mm.yy"} 
                         mask={yearDTChecked ? "9999" : "99.99.9999"}
+                        view={yearDTChecked ? "year" : "date"}
                         value={certificate.deathDatetime}
                         onChange={(e)=>certificate.setDeathDay(e.target.value as Date | undefined, yearDTChecked) 
                         } 

@@ -28,7 +28,7 @@ export const NotificationsMenu: FC<INotificationMenuProps> = (props: INotificati
     const renderItem = (item:ExtMenuItem, index:number) => {
         const renderSeparator = (index:number)=><li key={"separator_" + index} className='menu-separator' role='separator'></li>
         const renderMenuItem =(item:ExtMenuItem, index:number) => { 
-          const className =  classNames("notification-item", item.className)                           
+          const className =  classNames("notification-item", item.className, item.disabled && "p-disabled")                           
           const iconClassName = classNames("pi", item.icon, item.className)          
           const icon = item.icon && <i className={iconClassName}></i>
           const summary = item.summary && <div className="notification-summary">{item.summary}</div>

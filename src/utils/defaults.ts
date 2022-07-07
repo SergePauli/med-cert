@@ -438,3 +438,4 @@ export const DEFAULT_ERROR_TOAST = {
   life: 3000,
   baseZIndex: 999,
 }
+export const DEFAULT_BATCH_SIZE = 1000

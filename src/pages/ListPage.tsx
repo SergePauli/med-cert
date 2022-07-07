@@ -21,15 +21,17 @@ import  PrimeReact, {FilterMatchMode}  from 'primereact/api'
 import { IReference, IReferenceId } from '../models/IReference'
 import { InputText } from 'primereact/inputtext'
 import OrganizationService from '../services/OrganizationService'
+import { IRouteProps } from '../models/IRouteProps'
+import { Operation, OperationType } from '../store/certificateStore'
+import CertificateService from '../services/CertificateService'
+import { DEFAULT_BATCH_SIZE } from '../utils/defaults'
+import { exportExcel } from '../utils/functions'
 
-type ListPageProps = {}
 
-const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
+const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
   const {certificateStore, userStore} = useContext(Context)  
-  const [lazyLoading, setLazyLoading] = useState(false)
-  const [sortField, setSortField] = useState<string>('')
-  const [sortOrder, setSortOrder] = useState<-1 | 0 | 1>(0)
   const [filters, setFilters] = useState<DataTableFilterMeta | undefined>()
+  const [propsFilters, setPropsFilters] = useState<any | false | undefined>()  
   const [organizations, setOrganizations] = useState<IReferenceId[] | null>(null)
   const isSuperUser = userStore.userInfo?.roles.includes('MIAC') || userStore.userInfo?.roles.includes('ADMIN')
   
@@ -39,10 +41,41 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     ).catch(()=>{
       setOrganizations([])      
     })},[isSuperUser, organizations])
+  
+
+  useEffect(()=>{
+    if (propsFilters === undefined) {
+      if (props.location.search){
+        const _params = props.location.search.replace("?","").split("&") 
+        let _filters = {} as any
+        _params.forEach(param=>{
+          const pair = param.split("=")
+          _filters[pair[0]]=pair[1]
+        })        
+        certificateStore.operation = new Operation(OperationType.FILTERING)
+        certificateStore.filters = {..._filters}
+        setPropsFilters({..._filters})            
+      } else { 
+        certificateStore.operation = new Operation(OperationType.FILTERING)       
+        if (certificateStore.filters && Object.keys(certificateStore.filters).length !== 0) {
+          certificateStore.filters = {}          
+        }  
+        setPropsFilters({})
+      }        
+    }    
+  },[certificateStore, props, propsFilters])  
     
   PrimeReact.locale = 'ru'
   const toast = useRef<Toast>(null)
-  const dt = useRef(null)  
+  const dt = useRef<DataTable>(null) 
+  useEffect(()=>{       
+    if (certificateStore.needScroll 
+      && certificateStore.operation.is(OperationType.FILTERING)
+      && dt.current) {  
+        //console.log('useEffect resetScroll', certificateStore.operation)     
+        dt.current.resetScroll()
+      }
+  }, [ certificateStore.needScroll, certificateStore.operation])  
 
   const [selected, setSelected] = useState<ICertificate | undefined>()
 
@@ -58,20 +91,22 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
         'issue_date': { operator: 'and', constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER},{ value: null, matchMode: FilterMatchMode.DATE_BEFORE}]},   
         'death_place': { value: null, matchMode: FilterMatchMode.IN },        
         })        
-    }
-   
-    useEffect(() => {        
-        initFilters()
+    }   
+    useEffect(() => {            
+        initFilters()        
     }, [])
 
   const orderNumberBodyTemplate = (rowData: ICertificate)=>{    
     return <i>{rowData.rowNumber}</i>
   }
-  const seriesNumberBodyTemplate = (rowData: ICertificate)=>{   
+  const seriesNumberBody = (rowData: ICertificate)=>{   
     const cert_type = CERT_TYPES.find(el=>el.code===rowData.cert_type) 
-    return <>{rowData.series} {rowData.number} {cert_type?.s_name}</>
+    return `${rowData.series} ${rowData.number} ${cert_type?.s_name}`
   }
-  const reasonsBodyTemplate = (rowData: ICertificate)=>{
+  const seriesNumberBodyTemplate = (rowData: ICertificate)=>{
+    return <>{seriesNumberBody(rowData)}</>
+  }
+  const reasonsBody = (rowData: ICertificate)=>{
     const acme = rowData.reason_ACME
     const isACME = !!acme
     const cr = rowData.c_reason?.diagnosis
@@ -92,9 +127,11 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
         result +=`(${el.diagnosis?.ICD10})${el.diagnosis?.s_name}; `
       })          
     }
-    return <span style={{fontSize:'smaller'}}>{result}</span>
+    return result
   }
-
+  const reasonsBodyTemplate = (rowData: ICertificate)=>{
+    return <span style={{fontSize:'smaller'}}>{reasonsBody(rowData)}</span>
+  }
   const filterClearTemplate = (options:any) => {
         return <Button type="button" icon="pi pi-times" onClick={options.filterClearCallback} className="p-button-secondary"></Button>;
     }
@@ -107,7 +144,9 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     const birth = rowData.patient?.birth_date
     if (!!birth) _result = `${birth.slice(8,10)}.${birth.slice(5,7)}.${birth.slice(0,4)}`  
     return _result
-  }  
+  } 
+  
+  
   const ddBodyTemplate = (rowData: ICertificate)=>{
     let _result =''    
     const death = !rowData.death_datetime ? !rowData.death_year ? false : rowData.death_year.toString() : rowData.death_datetime 
@@ -123,8 +162,9 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     const dd = new Date(rowData.death_datetime)
     const db = new Date(rowData.patient?.birth_date)
     let age = dd.getFullYear() - db.getFullYear()
+    if (age === 0) return 0
     const m = dd.getMonth() - dd.getMonth()
-    if (m < 0 || (m === 0 && dd.getDate() < db.getDate())) age--    
+    if (age > 0 && (m < 0 || (m === 0 && dd.getDate() < db.getDate()))) age--    
     return age
   }
 
@@ -133,33 +173,52 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     else return GENDERS[rowData.patient.gender-1].name.slice(0,1)
   }
 
-  const fioBodyTemplate = (rowData: ICertificate)=>{
+  const fioBody = (rowData: ICertificate)=>{
       if (!rowData.patient) return ""
       else if (!rowData.patient.person) return "не иденти-фицирован"          
       const result = getOneLinePersonName(rowData.patient.person.person_name)
-      return <>{result}</>
+      return result
     }
-  const deathPlaceBodyTemplate = (rowData: ICertificate) => {
+  const fioBodyTemplate = (rowData: ICertificate)=>{
+    return <>{fioBody(rowData)}</>
+  }
+
+  const deathPlaceBody = (rowData: ICertificate) => {
     if (!rowData.death_place) return ''
     else {
      const place = DEAD_PLACE_TYPES.find(el=>el.code === rowData.death_place)
      if (!place) return ''
-     else return <span style={{fontSize:'small'}}>{place.name}</span>
+     else return place.name
     }      
-  }     
-  const basisDeterminingBodyTemplate = (rowData: ICertificate) => {
+  } 
+
+  const deathPlaceBodyTemplate = (rowData: ICertificate) => {
+    return <span style={{fontSize:'smaller'}}>{deathPlaceBody(rowData)}</span>
+  }  
+
+  const basisDeterminingBody = (rowData: ICertificate) => {
     if (!rowData.basis_determining) return ''
     else {
      const basis = BASIS_DERMINING.find(el=>el.code === rowData.basis_determining)
      if (!basis) return ''
-     else return <span style={{fontSize:'small'}}>{basis.name}</span>
+     else return basis.name
     }      
   }
-  const custodianBodyTemplate = (rowData: ICertificate) => {
+  const basisDeterminingBodyTemplate = (rowData: ICertificate) => {
+    return <span style={{fontSize:'smaller'}}>{basisDeterminingBody(rowData)}</span>
+  }
+
+
+  const custodianBody = (rowData: ICertificate) => {
     const cusName = rowData.custodian?.name
     if (!cusName) return ''
-    else return <span style={{fontSize:'small'}}>{cusName}</span>
-  }  
+    else return cusName
+  }
+  
+  const custodianBodyTemplate = (rowData: ICertificate) => {
+    return <span style={{fontSize:'small'}}>{custodianBody(rowData)}</span>
+  }
+
   const custodianFilterTemplate = (options: any) => {
         return <MultiSelect value={options.value} options={organizations || []}  onChange={(e) => options.filterCallback(e.value)} optionLabel="name" placeholder="не выбрано" className="p-column-filter" />;
     }  
@@ -170,44 +229,60 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                       filter filterElement={custodianFilterTemplate}                    
         style={{ flexGrow: 1, flexBasis: '120px' }}> </Column> :
     <></>                  
-  const doctorBodyTemplate = (rowData: ICertificate) => {
+  
+  
+    const doctorBody = (rowData: ICertificate) => {
     if (!rowData.author) return ''
     else {       
       const result = getOneLinePersonName(rowData.author.doctor.person_name)
-      return  <span style={{fontSize:'small'}}>{result}</span>
+      return result
     }      
   }
-  const positionBodyTemplate = (rowData: ICertificate) => {
-    if (!rowData.author?.doctor.position ) return ''
-    else return  <span style={{fontSize:'small'}}>{rowData.author.doctor.position.name}</span>         
-  }  
-  const issueDateBodyTemplate = (rowData: ICertificate) => {
-    const iDate = rowData.issue_date
-    if (!iDate ) return ''    
-    else return  <span style={{fontSize:'small'}}>{`${iDate.slice(8,10)}.${iDate.slice(5,7)}.${iDate.slice(0,4)}`}</span>         
+  const doctorBodyTemplate = (rowData: ICertificate) => {
+    return  <span style={{fontSize:'small'}}>{doctorBody(rowData)}</span>
   }
 
+  const positionBody = (rowData: ICertificate) => {
+    if (!rowData.author?.doctor.position ) return ''
+    else return rowData.author.doctor.position.name         
+  }
+
+  const positionBodyTemplate = (rowData: ICertificate) => {
+     return  <span style={{fontSize:'small'}}>{positionBody(rowData)}</span>         
+  }
+
+  const issueDateBody = (rowData: ICertificate) => {
+    const iDate = rowData.issue_date
+    if (!iDate ) return ''    
+    else return  `${iDate.slice(8,10)}.${iDate.slice(5,7)}.${iDate.slice(0,4)}`         
+  }
+   const issueDateBodyTemplate = (rowData: ICertificate) => {
+      return  <span style={{fontSize:'small'}}>{issueDateBody(rowData)}</span>
+   }
+   
   const actionBodyTemplate = (rowData: ICertificate) => {       
-        return (
+        return rowData.id && (
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${rowData.id}?q=0`)} />                
             </React.Fragment>
         )
     }
-  const loadCertificatesLazy = (event: {first:number, last:number}) => {  
-      setLazyLoading(true)         
-      certificateStore.getList(()=>{setLazyLoading(false)}, event.first, event.last)      
+  const loadCertificatesLazy = (event: any) => {  
+    //console.log('loadCertificatesLazy start count-',certificateStore.count, ' start-', event.first, ' last-',event.last,' operation-',certificateStore.operation.getType()  )  
+    if (!(certificateStore.operation.is(OperationType.FILTERING) || certificateStore.operation.is(OperationType.SCROLLING))) certificateStore.operation = new Operation(OperationType.SCROLLING)    
+    certificateStore.getList(()=>{ //console.log('loadCertificatesLazy finished, count-', certificateStore.count, ' start-', event.first,  ' last-',event.last,' operation-',certificateStore.operation.getType())      
+      }, event.first, event.last)           
   }   
-  const sortLazy = (e: DataTableSortParams) => {    
-    setLazyLoading(true) 
-    const order =  e.sortOrder ? DIRECTION[e.sortOrder] : DIRECTION[0]    
-    if (e.sortField && e.sortField !=='rowNumber') {
-      certificateStore.sorts = [`${e.sortField} ${order}`]  
-      certificateStore.getList(()=>{setLazyLoading(false)})    
-    }  
-    if (e.sortOrder) setSortOrder(e.sortOrder)   
-    if (e.sortField) setSortField(e.sortField)
-    
+ 
+  const sortLazy = (e: DataTableSortParams) => { 
+    if (certificateStore.count === 0) return        
+    const order =  e.sortOrder ? DIRECTION[e.sortOrder===-1 ? 0 : 1] : DIRECTION[0]    
+    if (e.sortField && e.sortOrder) {
+      certificateStore.sorts = [`${e.sortField} ${order}`]
+      certificateStore.sortField = e.sortField
+      certificateStore.sortOrder = e.sortOrder
+      certificateStore.operation = new Operation(OperationType.SORTING)
+    } 
   }  
   const basisDeterminingFilterTemplate = (options: any) => {
         return <MultiSelect value={options.value} options={BASIS_DERMINING}  onChange={(e) => options.filterCallback(e.value)} optionLabel="name" placeholder="не выбрано" className="p-column-filter" />;
@@ -217,10 +292,57 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
     }   
     
   const fioFilterTemplate = (options: any) => {
-        return <InputText value={options.value}  onChange={(e) => options.filterCallback(e.target.value)}  placeholder="строка поиска" className="p-column-filter" />
+        return <InputText value={options.value || ''}  onChange={(e) => options.filterCallback(e.target.value)}  placeholder="строка поиска" className="p-column-filter" />
     }  
   
-  const footer = `Всего ${ certificateStore.count } свидетельств(а).`  
+  const exportToExcel = ()=> {
+    let _data: any[] = [] 
+    const  recordCount = certificateStore.count
+    let _recordsDone = 0
+    let _num = 0
+    const getBatch = ()=> {      
+      if (!(_recordsDone < recordCount-1)) {        
+        exportExcel(_data,'свидетельства')
+        certificateStore.operation = new Operation(OperationType.NONE)
+        return
+      } else {   
+        const last =  _recordsDone + DEFAULT_BATCH_SIZE - 1    
+        CertificateService.getCertificates({ q: certificateStore.getQ() }, _recordsDone, last > recordCount ? recordCount - 1: last).then((response)=>{
+          _data = _data.concat(response.data.map((cert) => {
+          return     { "№ п.п.": ++_num,
+              "Серия Номер Вид":seriesNumberBody(cert),
+              "Причины смерти и соп. патологии": reasonsBody(cert),
+              "ФИО":fioBody(cert),
+              "Дата рожд.":dbBodyTemplate(cert),
+              "Дата смерти": ddBodyTemplate(cert),
+              "Лет": ageBodyTemplate(cert),
+              "Пол": genderBodyTemplate(cert),
+              "Адрес проживания": cert.patient?.person?.address?.streetAddressLine,
+              "Адрес смерти": cert.death_addr?.streetAddressLine,
+              "Смерть наступила": deathPlaceBody(cert),
+              "Основание закл.": basisDeterminingBody(cert),              
+              "Специалист": doctorBody(cert),
+              "Должность": positionBody(cert),
+              "Выдано": issueDateBody(cert),
+              "Медицинская организация": custodianBody(cert),
+             }}))
+          _recordsDone = _recordsDone + response.data.length - 1
+          getBatch()
+        })
+        }
+      }    
+    if (recordCount > 0) certificateStore.operation = new Operation(OperationType.EXPORTING)
+    else return 
+    getBatch()        
+  }    
+  const footer = <>{`Всего ${ certificateStore.count } свидетельств(а).`}  <Button type="button" icon="pi pi-file-excel" 
+  onClick={exportToExcel} 
+  className="p-button-success" 
+  data-pr-tooltip="XLS"
+  style={{float: 'right', width: '1.65rem', padding: '0.26rem 0',
+    marginTop: '-0.3rem', marginRight: '-0.3rem'}} 
+    title="Экспорт в Excel"/></>
+  
   const layoutParams = {
         title: 'СПИСОК СВИДЕТЕЛЬСТВ',     
         url: LIST_ROUTE,
@@ -228,17 +350,19 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
         <>
           <Toast ref={toast} />
           <div id='tableDiv' className='p-card' >             
-              <DataTable ref={dt} value={certificateStore.certs}  responsiveLayout="scroll" scrollDirection="both"
+            <DataTable ref={dt} value={certificateStore.allCerts}  responsiveLayout="scroll" scrollDirection="both"
                 emptyMessage="нет данных, удовлетворяющих запросу" scrollable scrollHeight="72vh" 
                 selectionMode="single" selection={selected}  dataKey="id" size="small"
-                footer={footer} loading={lazyLoading}
+                footer={footer} loading={certificateStore.isLoading} lazy
                 onSelectionChange={e =>{
-                  certificateStore.select(certificateStore.certs.findIndex(el=>el.id === e.value.id))
-                  setSelected(e.value)
+                  if ( e.value.id ) {
+                    certificateStore.select(certificateStore.certs.findIndex(el=>el.id === e.value.id))
+                    setSelected(e.value)
+                  }
                 }} filterDisplay="menu" 
                 onFilter={e=>{
-                  console.log('e',e)
-                  let _filters = {} as any
+                  //console.log('e',e)
+                  let _filters = {...propsFilters} as any                  
                   let _constraint: any = e.filters['issue_date'] 
                   if (_constraint && _constraint.constraints[0] && _constraint.constraints[0].value) 
                     _filters[`issue_date${RunsackFilterMatchMode[_constraint.constraints[0].matchMode  as DataTableFilterMatchModeType]}`]=_constraint.constraints[0].value                  
@@ -285,16 +409,14 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                     let _codes = [] as number[]
                     values.map(item=> _codes.push(item.id)) 
                     _filters.custodian_id_in = _codes   
-                  }
-                  certificateStore.filters = _filters
-                  setLazyLoading(true)
-                  certificateStore.getList(()=>{setLazyLoading(false)})  
+                  }               
+                  certificateStore.filters = _filters 
                 }}                
-                virtualScrollerOptions={{ lazy: true, onLazyLoad: loadCertificatesLazy, itemSize: 6, delay: 200}} filters={filters} filterLocale={'ru'}
+                virtualScrollerOptions={{ lazy: true,  onLazyLoad: loadCertificatesLazy,  numToleratedItems:5, itemSize: 180, delay: 100,showLoader: false,  loading: certificateStore.isLoading}} filters={filters} filterLocale={'ru'} 
                 onRowDoubleClick={()=>userStore.history().push(`${CERTIFICATE_ROUTE}/${certificateStore.cert.id}?q=0`)}
-                onSort={sortLazy} sortField={sortField} sortOrder={sortOrder}
+                onSort={sortLazy} sortField={certificateStore.sortField} sortOrder={certificateStore.sortOrder}
                 >  
-                    <Column header="№ п.п"  body={orderNumberBodyTemplate} sortable
+                    <Column header="№ п.п"  body={orderNumberBodyTemplate} 
                       sortField='rowNumber'
                       style={{ flexGrow: 1, flexBasis: '58px' }} frozen></Column>                                   
                     <Column header="Серия Номер Вид" body={seriesNumberBodyTemplate} filterField='number'
@@ -305,13 +427,13 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                      filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  
                       style={{ flexGrow: 1, flexBasis: '250px' }} body={reasonsBodyTemplate}></Column>
                     <Column  header="ФИО" body={fioBodyTemplate} 
-                      sortField='patient.person.person_name.family'
+                      sortField='patient_person_person_name_family'
                       dataType='text' showFilterOperator ={false}
                       filter filterField='patient_fio' filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  filterElement={fioFilterTemplate}
                       sortable style={{ flexGrow: 1, flexBasis: '140px' }}></Column>                    
                     <Column  header="ДР" body={dbBodyTemplate} filter sortable
                        showFilterOperator={false} dataType='date' filterPlaceholder="дата рождения"
-                     filterField='patient_birth_date' sortField='patient.birth_date' 
+                     filterField='patient_birth_date' sortField='patient_birth_date' 
                      filterClear={filterClearTemplate} filterApply={filterApplyTemplate}  
                        style={{ flexGrow: 1, flexBasis: '110px' }}> </Column>
                     <Column  header="ДС" body={ddBodyTemplate} filter sortable
@@ -321,12 +443,12 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                        style={{ flexGrow: 1, flexBasis: '110px' }}> </Column>
                     <Column  header="Лет" body={ageBodyTemplate} 
                       style={{ flexGrow: 1, flexBasis: '46px' }}> </Column>
-                    <Column  header="Пол" body={genderBodyTemplate} sortField='patient.gender'
+                    <Column  header="Пол" body={genderBodyTemplate} sortField='patient_gender'
                       sortable style={{ flexGrow: 1, flexBasis: '56px' }}> </Column>    
-                    <Column  header="Адрес проживания" sortable 
+                    <Column  header="Адрес проживания" sortable sortField='patient_person_address_streetAddressLine'
                       field='patient.person.address.streetAddressLine'
                       style={{ flexGrow: 1, flexBasis: '200px' }}> </Column>  
-                    <Column  header="Адрес смерти" sortable
+                    <Column  header="Адрес смерти" sortable sortField='death_addr_streetAddressLine'
                       field='death_addr.streetAddressLine'
                       style={{ flexGrow: 1, flexBasis: '200px' }}> </Column>                     
                     <Column  header="Смерть наступила" body={deathPlaceBodyTemplate}
@@ -335,7 +457,7 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
                       filter filterField='death_place' sortField='death_place' sortable 
                       style={{ flexGrow: 1, flexBasis: '140px' }}> </Column>  
                     <Column  header="Основание заключения" body={basisDeterminingBodyTemplate}
-                      sortField='basis_determining' sortable
+                      sortField='basis_determining' sortable 
                       filterField='basis_determining' showFilterMatchModes={false}
                       filterClear={filterClearTemplate} filterApply={filterApplyTemplate}
                       filter filterElement={basisDeterminingFilterTemplate} 
@@ -357,6 +479,8 @@ const ListPage: FC<ListPageProps> = (props: ListPageProps) => {
         </>
     }
 
+   
+    
  return (
     <>
       <MainLayout {...layoutParams} />

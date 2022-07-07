@@ -69,3 +69,22 @@ export const removeEmpty = (obj: any) => {
   })
   return newObj
 }
+
+// Exports json-data to excel
+export const exportExcel = (data: any[], fileName: string) => {
+  import("xlsx").then((xlsx) => {
+    const worksheet = xlsx.utils.json_to_sheet(data)
+    const workbook = { Sheets: { данные: worksheet }, SheetNames: ["данные"] }
+    const excelBuffer = xlsx.write(workbook, { bookType: "xlsx", type: "array" })
+    //console.log("workbook", workbook)
+    import("file-saver").then((module) => {
+      if (module && module.default) {
+        let EXCEL_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8"
+        let EXCEL_EXTENSION = ".xlsx"
+        const blobBuf = new Blob([excelBuffer], { type: EXCEL_TYPE })
+        //console.log("blobBuf", blobBuf)
+        module.default.saveAs(blobBuf, fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION)
+      }
+    })
+  })
+}
