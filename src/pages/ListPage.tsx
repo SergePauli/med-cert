@@ -23,6 +23,9 @@ import { InputText } from 'primereact/inputtext'
 import OrganizationService from '../services/OrganizationService'
 import { IRouteProps } from '../models/IRouteProps'
 import { Operation, OperationType } from '../store/certificateStore'
+import CertificateService from '../services/CertificateService'
+import { DEFAULT_BATCH_SIZE } from '../utils/defaults'
+import { exportExcel } from '../utils/functions'
 
 
 const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
@@ -96,11 +99,14 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
   const orderNumberBodyTemplate = (rowData: ICertificate)=>{    
     return <i>{rowData.rowNumber}</i>
   }
-  const seriesNumberBodyTemplate = (rowData: ICertificate)=>{   
+  const seriesNumberBody = (rowData: ICertificate)=>{   
     const cert_type = CERT_TYPES.find(el=>el.code===rowData.cert_type) 
-    return <>{rowData.series} {rowData.number} {cert_type?.s_name}</>
+    return `${rowData.series} ${rowData.number} ${cert_type?.s_name}`
   }
-  const reasonsBodyTemplate = (rowData: ICertificate)=>{
+  const seriesNumberBodyTemplate = (rowData: ICertificate)=>{
+    return <>{seriesNumberBody(rowData)}</>
+  }
+  const reasonsBody = (rowData: ICertificate)=>{
     const acme = rowData.reason_ACME
     const isACME = !!acme
     const cr = rowData.c_reason?.diagnosis
@@ -121,9 +127,11 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
         result +=`(${el.diagnosis?.ICD10})${el.diagnosis?.s_name}; `
       })          
     }
-    return <span style={{fontSize:'smaller'}}>{result}</span>
+    return result
   }
-
+  const reasonsBodyTemplate = (rowData: ICertificate)=>{
+    return <span style={{fontSize:'smaller'}}>{reasonsBody(rowData)}</span>
+  }
   const filterClearTemplate = (options:any) => {
         return <Button type="button" icon="pi pi-times" onClick={options.filterClearCallback} className="p-button-secondary"></Button>;
     }
@@ -136,7 +144,9 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
     const birth = rowData.patient?.birth_date
     if (!!birth) _result = `${birth.slice(8,10)}.${birth.slice(5,7)}.${birth.slice(0,4)}`  
     return _result
-  }  
+  } 
+  
+  
   const ddBodyTemplate = (rowData: ICertificate)=>{
     let _result =''    
     const death = !rowData.death_datetime ? !rowData.death_year ? false : rowData.death_year.toString() : rowData.death_datetime 
@@ -154,7 +164,7 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
     let age = dd.getFullYear() - db.getFullYear()
     if (age === 0) return 0
     const m = dd.getMonth() - dd.getMonth()
-    if (m < 0 || (m === 0 && dd.getDate() < db.getDate())) age--    
+    if (age > 0 && (m < 0 || (m === 0 && dd.getDate() < db.getDate()))) age--    
     return age
   }
 
@@ -163,33 +173,52 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
     else return GENDERS[rowData.patient.gender-1].name.slice(0,1)
   }
 
-  const fioBodyTemplate = (rowData: ICertificate)=>{
+  const fioBody = (rowData: ICertificate)=>{
       if (!rowData.patient) return ""
       else if (!rowData.patient.person) return "не иденти-фицирован"          
       const result = getOneLinePersonName(rowData.patient.person.person_name)
-      return <>{result}</>
+      return result
     }
-  const deathPlaceBodyTemplate = (rowData: ICertificate) => {
+  const fioBodyTemplate = (rowData: ICertificate)=>{
+    return <>{fioBody(rowData)}</>
+  }
+
+  const deathPlaceBody = (rowData: ICertificate) => {
     if (!rowData.death_place) return ''
     else {
      const place = DEAD_PLACE_TYPES.find(el=>el.code === rowData.death_place)
      if (!place) return ''
-     else return <span style={{fontSize:'small'}}>{place.name}</span>
+     else return place.name
     }      
-  }     
-  const basisDeterminingBodyTemplate = (rowData: ICertificate) => {
+  } 
+
+  const deathPlaceBodyTemplate = (rowData: ICertificate) => {
+    return <span style={{fontSize:'smaller'}}>{deathPlaceBody(rowData)}</span>
+  }  
+
+  const basisDeterminingBody = (rowData: ICertificate) => {
     if (!rowData.basis_determining) return ''
     else {
      const basis = BASIS_DERMINING.find(el=>el.code === rowData.basis_determining)
      if (!basis) return ''
-     else return <span style={{fontSize:'small'}}>{basis.name}</span>
+     else return basis.name
     }      
   }
-  const custodianBodyTemplate = (rowData: ICertificate) => {
+  const basisDeterminingBodyTemplate = (rowData: ICertificate) => {
+    return <span style={{fontSize:'smaller'}}>{basisDeterminingBody(rowData)}</span>
+  }
+
+
+  const custodianBody = (rowData: ICertificate) => {
     const cusName = rowData.custodian?.name
     if (!cusName) return ''
-    else return <span style={{fontSize:'small'}}>{cusName}</span>
-  }  
+    else return cusName
+  }
+  
+  const custodianBodyTemplate = (rowData: ICertificate) => {
+    return <span style={{fontSize:'small'}}>{custodianBody(rowData)}</span>
+  }
+
   const custodianFilterTemplate = (options: any) => {
         return <MultiSelect value={options.value} options={organizations || []}  onChange={(e) => options.filterCallback(e.value)} optionLabel="name" placeholder="не выбрано" className="p-column-filter" />;
     }  
@@ -200,22 +229,36 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
                       filter filterElement={custodianFilterTemplate}                    
         style={{ flexGrow: 1, flexBasis: '120px' }}> </Column> :
     <></>                  
-  const doctorBodyTemplate = (rowData: ICertificate) => {
+  
+  
+    const doctorBody = (rowData: ICertificate) => {
     if (!rowData.author) return ''
     else {       
       const result = getOneLinePersonName(rowData.author.doctor.person_name)
-      return  <span style={{fontSize:'small'}}>{result}</span>
+      return result
     }      
   }
-  const positionBodyTemplate = (rowData: ICertificate) => {
+  const doctorBodyTemplate = (rowData: ICertificate) => {
+    return  <span style={{fontSize:'small'}}>{doctorBody(rowData)}</span>
+  }
+
+  const positionBody = (rowData: ICertificate) => {
     if (!rowData.author?.doctor.position ) return ''
-    else return  <span style={{fontSize:'small'}}>{rowData.author.doctor.position.name}</span>         
-  }  
-  const issueDateBodyTemplate = (rowData: ICertificate) => {
+    else return rowData.author.doctor.position.name         
+  }
+
+  const positionBodyTemplate = (rowData: ICertificate) => {
+     return  <span style={{fontSize:'small'}}>{positionBody(rowData)}</span>         
+  }
+
+  const issueDateBody = (rowData: ICertificate) => {
     const iDate = rowData.issue_date
     if (!iDate ) return ''    
-    else return  <span style={{fontSize:'small'}}>{`${iDate.slice(8,10)}.${iDate.slice(5,7)}.${iDate.slice(0,4)}`}</span>         
+    else return  `${iDate.slice(8,10)}.${iDate.slice(5,7)}.${iDate.slice(0,4)}`         
   }
+   const issueDateBodyTemplate = (rowData: ICertificate) => {
+      return  <span style={{fontSize:'small'}}>{issueDateBody(rowData)}</span>
+   }
    
   const actionBodyTemplate = (rowData: ICertificate) => {       
         return rowData.id && (
@@ -252,7 +295,53 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
         return <InputText value={options.value || ''}  onChange={(e) => options.filterCallback(e.target.value)}  placeholder="строка поиска" className="p-column-filter" />
     }  
   
-  const footer = `Всего ${ certificateStore.count } свидетельств(а).`  
+  const exportToExcel = ()=> {
+    let _data: any[] = [] 
+    const  recordCount = certificateStore.count
+    let _recordsDone = 0
+    let _num = 0
+    const getBatch = ()=> {      
+      if (!(_recordsDone < recordCount-1)) {        
+        exportExcel(_data,'свидетельства')
+        certificateStore.operation = new Operation(OperationType.NONE)
+        return
+      } else {   
+        const last =  _recordsDone + DEFAULT_BATCH_SIZE - 1    
+        CertificateService.getCertificates({ q: certificateStore.getQ() }, _recordsDone, last > recordCount ? recordCount - 1: last).then((response)=>{
+          _data = _data.concat(response.data.map((cert) => {
+          return     { "№ п.п.": ++_num,
+              "Серия Номер Вид":seriesNumberBody(cert),
+              "Причины смерти и соп. патологии": reasonsBody(cert),
+              "ФИО":fioBody(cert),
+              "Дата рожд.":dbBodyTemplate(cert),
+              "Дата смерти": ddBodyTemplate(cert),
+              "Лет": ageBodyTemplate(cert),
+              "Пол": genderBodyTemplate(cert),
+              "Адрес проживания": cert.patient?.person?.address?.streetAddressLine,
+              "Адрес смерти": cert.death_addr?.streetAddressLine,
+              "Смерть наступила": deathPlaceBody(cert),
+              "Основание закл.": basisDeterminingBody(cert),              
+              "Специалист": doctorBody(cert),
+              "Должность": positionBody(cert),
+              "Выдано": issueDateBody(cert),
+              "Медицинская организация": custodianBody(cert),
+             }}))
+          _recordsDone = _recordsDone + response.data.length - 1
+          getBatch()
+        })
+        }
+      }    
+    if (recordCount > 0) certificateStore.operation = new Operation(OperationType.EXPORTING)
+    else return 
+    getBatch()        
+  }    
+  const footer = <>{`Всего ${ certificateStore.count } свидетельств(а).`}  <Button type="button" icon="pi pi-file-excel" 
+  onClick={exportToExcel} 
+  className="p-button-success" 
+  data-pr-tooltip="XLS"
+  style={{float: 'right', width: '1.65rem', padding: '0.26rem 0',
+    marginTop: '-0.3rem', marginRight: '-0.3rem'}} 
+    title="Экспорт в Excel"/></>
   
   const layoutParams = {
         title: 'СПИСОК СВИДЕТЕЛЬСТВ',     
@@ -390,6 +479,8 @@ const ListPage: FC<IRouteProps> = (props: IRouteProps) => {
         </>
     }
 
+   
+    
  return (
     <>
       <MainLayout {...layoutParams} />

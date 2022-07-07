@@ -16,7 +16,8 @@ export enum OperationType {
   FILTERING = 0x2,
   SORTING = 0x3,
   SAVING = 0x4,
-  LOADING = SCROLLING | FILTERING | SORTING | SAVING,
+  EXPORTING = 0x5,
+  LOADING = SCROLLING | FILTERING | SORTING | SAVING | EXPORTING,
 }
 
 export class Operation {
@@ -61,6 +62,12 @@ export default class CertificateStore {
   private _isLoading: boolean
   private _operation: Operation
 
+  getQ(): any {
+    let _q = { ...this._filters, sorts: this._sorts }
+    if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
+    return _q
+  }
+
   disposers: (() => void)[]
   constructor() {
     this._submitted = false
@@ -103,10 +110,7 @@ export default class CertificateStore {
         this._operation = new Operation(OperationType.FILTERING)
         //console.log("filterstr -", filterstr, " this._filterStr", this._filterStr)
         this._filterStr = filterstr
-        let _q = { ...this._filters, sorts: this._sorts }
-        if (this._userInfo && !this._userInfo.roles.includes("MIAC"))
-          _q.custodian_id_eq = this._userInfo?.organization.id
-        CertificateService.getCount({ q: _q })
+        CertificateService.getCount({ q: this.getQ() })
           .then((value) => {
             this._count = value.data
             if (this._count === 0) {
@@ -116,7 +120,7 @@ export default class CertificateStore {
             } else {
               this._allCerts = Array.from<ICertificate>({ length: this._count })
             }
-            console.log("filter apply-", this._count, " filterstr-", filterstr)
+            //console.log("filter apply-", this._count, " filterstr-", filterstr)
           })
           .catch((reason) => console.log(reason))
       }
@@ -461,12 +465,10 @@ export default class CertificateStore {
       this._needScroll = true
       return
     }
-    let _q = { ...this._filters, sorts: this._sorts }
-    if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
     const dataSize = this._count
     this._first = first
     this._last = last
-    CertificateService.getCertificates({ q: _q }, first, last)
+    CertificateService.getCertificates({ q: this.getQ() }, first, last)
       .then((response) => {
         if (dataSize !== this._count || first !== this._first || last !== this._last) return // запрошенны другие данные, эти не обрабатываем
         let _virtLoaded = Array.from<ICertificate>({ length: this._count })
