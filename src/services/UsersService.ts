@@ -2,6 +2,9 @@ import $api, { API_URL } from "../http"
 import { AxiosResponse } from "axios"
 import { IUser } from "../models/IUser"
 import { IUserInfo } from "../models/responses/IUserInfo"
+import { IActivityInfo } from "../models/responses/IActivityInfo"
+
+// сервис получения данных пользователя
 export default class UsersService {
   static async fetchUsers(): Promise<AxiosResponse<IUser[]>> {
     return $api.post(`${API_URL}model/User/`, {
@@ -14,5 +17,8 @@ export default class UsersService {
       includes: ["person_name", "organization", "contacts"],
       organization: { only: ["id", "name", "sm_code", "oid"] },
     })
+  }
+  static async getUserActivity(): Promise<AxiosResponse<IActivityInfo>> {
+    return $api.get(`${API_URL}stat`)
   }
 }

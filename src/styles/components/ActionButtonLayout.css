@@ -6,8 +6,13 @@
 }
 
 .layout-action .p-speeddial-semi-circle.p-speeddial-direction-left {
-  right: 0;
+  right: 1rem;
   top: calc(50% - 2rem);
+}
+
+.layout-action .p-speeddial-direction-up {
+  right: 2rem;
+  top: 6rem;
 }
 
 .layout-action .p-speeddial-direction-left {
@@ -16,9 +21,10 @@
 }
 
 .p-speeddial {
-  position: fixed;
+  position: absolute;
+  display: -moz-box;
   display: flex;
-  z-index: 999;
+  z-index: 100;
 }
 
 .p-speeddial-opened .p-speeddial-rotate {
@@ -51,7 +57,7 @@
   justify-content: center;
   -webkit-transition: top 0s linear .2s;
   transition: top 0s linear .2s;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .p-speeddial-circle .p-speeddial-item:first-child, .p-speeddial-circle .p-speeddial-item:last-child, .p-speeddial-semi-circle .p-speeddial-item:first-child, .p-speeddial-semi-circle .p-speeddial-item:last-child, .p-speeddial-quarter-circle .p-speeddial-item:first-child, .p-speeddial-quarter-circle .p-speeddial-item:last-child {
@@ -60,6 +66,15 @@
 
 .p-speeddial-direction-left .p-speeddial-item:first-child {
   margin-right: 0.5rem;
+}
+
+.p-speeddial-direction-up .p-speeddial-item:first-child {
+  margin-bottom: 0.5rem;
+}
+
+.p-speeddial-direction-up {
+  -moz-box-align: center;
+  align-items: center;
 }
 
 .p-speeddial-opened .p-speeddial-item {
@@ -72,7 +87,11 @@
   box-shadow: 0 3px 5px -1px rgb(0 0 0 / 20%), 0 5px 8px 0 rgb(0 0 0 / 14%), 0 1px 14px 0 rgb(0 0 0 / 12%);
 }
 
-
+.p-speeddial-direction-up, .p-speeddial-direction-up .p-speeddial-list {
+  -moz-box-orient: vertical;
+  -moz-box-direction: reverse;
+  flex-direction: column-reverse;
+}
 
 
 .p-speeddial-circle .p-speeddial-item, .p-speeddial-quarter-circle .p-speeddial-item, .p-speeddial-semi-circle .p-speeddial-item {
@@ -85,6 +104,10 @@
 
 .p-speeddial-direction-left .p-speeddial-item {
   margin: 0 0.25rem;
+}
+
+.p-speeddial-direction-up .p-speeddial-item {
+  margin: 0.25rem;
 }
 
 .p-speeddial-item {
@@ -121,8 +144,8 @@
 }
 
 .p-speeddial-button.p-button.p-button-icon-only {
-  width: 4rem;
-  height: 4rem;
+  width: 3.7rem;
+  height: 3.7rem;
   border-radius: 50%;
   opacity: 0.7;
   -webkit-box-shadow: 0 3px 5px -1px rgb(0 0 0 / 20%), 0 5px 8px 0 rgb(0 0 0 / 14%), 0 1px 14px 0 rgb(0 0 0 / 12%);
@@ -130,5 +153,5 @@
 }
 
 .p-speeddial-button.p-button.p-button-icon-only .p-button-icon {
-  font-size: 1.3rem;
+  font-size: 1rem;
 }

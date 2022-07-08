@@ -44,15 +44,23 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
   const { certificateStore, userStore, layoutStore, suggestionsStore } = useContext(Context)     
   const [certID, setCertID] = useState(Number.parseInt(props.match.params.id))
   const [message, setMessage] = useState<ToastMessageType | null>(null)
+  //вывод попап-сообщения 
   useEffect(()=>{
     if (!!message) {
       layoutStore.message = message
       setMessage(null)
     }
   },[layoutStore, message])
-  useEffect(()=>{    
-    //if (certID ===-1 && toast!==null && toast.current!==null) toast.current.show()
-    if (certID === certificateStore.cert.id || certID===-1) {
+  //привязка индикатора лоадера раскладки к индикатору загрузки стора свидетельств
+  useEffect(()=>{
+    layoutStore.isLoading = certificateStore.isLoading
+  },[certificateStore.isLoading, layoutStore]) 
+  
+  //смена сертификата
+  useEffect(()=>{ 
+   // console.log('certID-',certID,' certificateStore.cert.id-',certificateStore.cert.id)  
+    
+  if (certID === certificateStore.cert.id || certID===-1) {
       layoutStore.isLoading = false
       return
     }  
@@ -68,12 +76,15 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
       certificateStore.findById(certID, ()=>{layoutStore.isLoading = false})
     }  
   },[certID, certificateStore, layoutStore, certificateStore.cert.id])
+  
+  //очистка буфера сообщений 
   useEffect(()=>{
     if (!layoutStore.isLoading && !!layoutStore.message && !!toast.current) { 
       toast.current.show(layoutStore.message)
       layoutStore.message = null
     }
   },[layoutStore, layoutStore.isLoading, layoutStore.message])
+
   const toast = useRef<Toast>(null)  
   const secton_router = ()=>{
     switch (props.location.search) {
@@ -112,10 +123,10 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
               if (!result) {
                 layoutStore.isLoading = false
               } else {
-                result.then(response=>{
-                  layoutStore.isLoading = false
+                result.then(response=>{                  
                   certificateStore.clean() 
-                  setCertID(certificateStore.cert.id)                 
+                  layoutStore.isLoading = false
+                  //setCertID(certificateStore.cert.id)                                  
                   setMessage({ severity: 'success', summary: 'Успешно', detail: 'Запись удалена', life: 3000 })                                 
                 })
                 .catch(reason=>{
@@ -133,8 +144,7 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
               if (!suggestionsStore.suggestions[CERT_TYPE_SUG].done || !suggestionsStore.suggestions[PERSON_NAME_SUG].done ) {
                  setMessage({severity:'warn', summary:'ОТКЛОНЕНО', detail:'Внесите минимальный набор данных: вид свидетельства, ФИО умершего(для идентифицированых)', life: 6000})
                  return
-               }
-              layoutStore.isLoading = true
+               }              
               const result = certificateStore.save((data:ICertificate)=>{                                
                   setMessage({ severity: 'success', summary: 'Успешно', detail: 'Изменения сохранены', life: 3000 })
                   setCertID(data.id)                   
@@ -143,9 +153,8 @@ const CertificatePage: FC<CertificatePageProps> = (props: CertificatePageProps) 
                 console.log(message)
               }, userStore.userInfo?.organization.sm_code)
               if (!result) {
-                console.log('нет юзера')
-                layoutStore.isLoading = false
-              } else result.finally(()=>{layoutStore.isLoading = false})               
+                console.log('нет юзера')                
+              }                
             }
         },    
         {

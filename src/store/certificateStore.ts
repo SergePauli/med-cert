@@ -11,34 +11,79 @@ import { IDeathReason } from "../models/responses/IDeathReason"
 import { IAddressR } from "../models/requests/IAddressR"
 import { INullFlavorR } from "../models/INullFlavor"
 import { IPostDocumentR, ISignature } from "../models/requests/IPostDocumentR"
+
+export enum OperationType {
+  NONE = 0x0,
+  SCROLLING = 0x1,
+  FILTERING = 0x2,
+  SORTING = 0x3,
+  SAVING = 0x4,
+  EXPORTING = 0x5,
+  LOADING = SCROLLING | FILTERING | SORTING | SAVING | EXPORTING,
+}
+
+export class Operation {
+  type: number
+
+  constructor(type: OperationType) {
+    this.type = type
+    makeAutoObservable(this)
+  }
+  getType() {
+    return this.type
+  }
+  is(type: OperationType) {
+    return !!(this.type & type)
+  }
+}
+
+export const WAITING = new Operation(OperationType.NONE)
+
 configure({
   enforceActions: "never",
 })
+
 export default class CertificateStore {
   private _cert: Certificate
   private _submitted: boolean
   private _userInfo?: IUserInfo | undefined
   private _certs: ICertificate[]
+  private _allCerts: ICertificate[]
   private _selected: number
   private _sorts: string[] | undefined
-  private _filters: any
+  private _sortField: string | undefined
+  private _sortOrder: -1 | 1
+  private _sort: string | undefined
+  private _filters: any | undefined
+  private _filterStr: string | undefined
   private _first: number
-  private _last: number
+  private _last: number | undefined
   private _rows: number
   private _count: number
-  private _needFetch: boolean
+  private _needScroll: boolean
+  private _isLoading: boolean
+  private _operation: Operation
+
+  getQ(): any {
+    let _q = { ...this._filters, sorts: this._sorts }
+    if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
+    return _q
+  }
 
   disposers: (() => void)[]
   constructor() {
     this._submitted = false
     this.disposers = []
     this._certs = []
-    this._filters = {}
+    this._allCerts = []
     this._first = 0
     this._last = 0
     this._rows = 0
     this._count = 0
-    this._needFetch = true
+    this._needScroll = false
+    this._isLoading = false
+    this._sortOrder = 1
+    this._operation = WAITING
     this._cert = new Certificate({
       custodian: this._userInfo?.organization,
       patient: {
@@ -53,22 +98,45 @@ export default class CertificateStore {
     makeAutoObservable(this, undefined, { deep: false })
 
     // реакции на изменение данных
+
+    // определяем статус загрузки
     this.disposers[0] = autorun(() => {
-      let _q = { ...this._filters }
-      //console.log("фильтры", this._filters)
-      if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
-      if (this._filters) {
-        this._needFetch = true
-        CertificateService.getCount({ q: _q })
+      this._isLoading = this._operation.is(OperationType.LOADING)
+    })
+
+    this.disposers[1] = autorun(() => {
+      const filterstr = this._filters && JSON.stringify(this._filters)
+      const filters = filterstr !== this._filterStr
+      if (filters) {
+        this._count = 0
+        this._operation = new Operation(OperationType.FILTERING)
+        //console.log("filterstr -", filterstr, " this._filterStr", this._filterStr)
+        this._filterStr = filterstr
+        CertificateService.getCount({ q: this.getQ() })
           .then((value) => {
             this._count = value.data
-            //console.log("надено", this._count)
+            if (this._count === 0) {
+              this._certs = []
+              this._allCerts = []
+              this._operation = WAITING
+            } else {
+              this._allCerts = Array.from<ICertificate>({ length: this._count })
+            }
+            //console.log("filter apply-", this._count, " filterstr-", filterstr)
           })
           .catch((reason) => console.log(reason))
       }
     })
-    this.disposers[1] = autorun(() => {
-      if (this._sorts) this._needFetch = true
+    this.disposers[2] = autorun(() => {
+      let sort: string | undefined = ""
+      if (this._sorts) {
+        this._sorts.forEach((str) => (sort += str))
+      } else sort = undefined
+      if (this._sort !== sort && this._operation.is(OperationType.SORTING)) {
+        this._sort = sort
+        //console.log("sort", this._sorts)
+        this.getList(() => {}, this._first, this._last)
+      }
     })
   }
 
@@ -78,6 +146,12 @@ export default class CertificateStore {
   }
   set cert(value: Certificate) {
     this._cert = value
+  }
+  get needScroll(): boolean {
+    return this._needScroll
+  }
+  get allCerts() {
+    return this._allCerts
   }
 
   get submitted(): boolean {
@@ -103,6 +177,19 @@ export default class CertificateStore {
   set sorts(value: string[] | undefined) {
     this._sorts = value
   }
+
+  get sortField(): string | undefined {
+    return this._sortField
+  }
+  set sortField(value: string | undefined) {
+    this._sortField = value
+  }
+  get sortOrder(): -1 | 1 {
+    return this._sortOrder
+  }
+  set sortOrder(value: -1 | 1) {
+    this._sortOrder = value
+  }
   get filters(): any {
     return this._filters
   }
@@ -127,7 +214,21 @@ export default class CertificateStore {
   set count(value: number) {
     this._count = value
   }
+  get isLoading(): boolean {
+    return this._isLoading
+  }
+  set isLoading(value: boolean) {
+    this._isLoading = value
+  }
+
+  get operation(): Operation {
+    return this._operation
+  }
+  set operation(value: Operation) {
+    this._operation = value
+  }
   //#endregion
+
   createNew(id = -1) {
     this._cert = new Certificate({
       id: id,
@@ -141,6 +242,8 @@ export default class CertificateStore {
       } as IPatient,
     } as ICertificate)
   }
+
+  //замена свидетельства
   replace() {
     const old = this._certs.find((cert) => cert.id === this._cert.id)
     if (!old) return
@@ -270,7 +373,9 @@ export default class CertificateStore {
     old.latest_one = this._cert.oldOne
   }
 
+  // формирование запроса к бакэнду на сохранение свидетельства
   save(onSuccess?: (data: ICertificate) => void, onError?: (message: string) => void, sm_code?: string) {
+    this._operation = new Operation(OperationType.SAVING)
     if (!this._userInfo) return false
     if (!this._cert.patient.provider_organization)
       this._cert.patient.provider_organization = this.userInfo?.organization.id
@@ -292,7 +397,7 @@ export default class CertificateStore {
               this._certs.push(nCert)
               this.select(idx)
               if (onSuccess) onSuccess(nCert)
-              //console.log("nCert", nCert)
+              //console.log("nCert-", nCert)
             } else {
               if (onError)
                 onError("Cвидетельство сохранено, но сервер не вернул результат. Необходим повторный вход в систему")
@@ -301,6 +406,7 @@ export default class CertificateStore {
           .catch((reason) => {
             if (onError) onError(reason)
           })
+          .finally(() => (this._operation = WAITING))
       : CertificateService.updateCertificate({ Certificate: request })
           .then((response) => {
             const nCert = response.data
@@ -318,18 +424,23 @@ export default class CertificateStore {
           .catch((reason) => {
             if (onError) onError(reason)
           })
+          .finally(() => (this._operation = WAITING))
   }
+
+  // формирование запроса к бакэнду на удаление свидетельства
   delete() {
     if (this._cert.id === -1) return false
     else return CertificateService.removeCertificate(this._cert.id)
   }
 
+  //удаление заданного свидетельства из списка в стэйте
   clean(num = this._selected) {
     try {
       this._certs.splice(num)
+      this._count = this._count - 1
       const dataLength = this._certs.length
       if (dataLength > 0) {
-        this.select(this._selected > dataLength - 1 ? dataLength - 1 : this._selected)
+        this.select(this._selected < dataLength ? this._selected : dataLength - 1)
       } else {
         this.createNew(-1)
         this._selected = 0
@@ -339,46 +450,59 @@ export default class CertificateStore {
     }
   }
 
+  // активируем стэйт с сертификатом (подготовка данных формы ввода)
   select(num: number) {
-    this._cert = new Certificate(this._certs[num])
-    this._selected = num
+    try {
+      this._cert = new Certificate(this._certs[num])
+      this._selected = num
+    } catch (e) {
+      console.log("num", num, e)
+    }
   }
 
-  getList(doAfter?: () => void, first = this._first, last = this._first + this._rows) {
-    let _q = { ...this._filters, sorts: this._sorts }
-    if (this._userInfo && !this._userInfo.roles.includes("MIAC")) _q.custodian_id_eq = this._userInfo?.organization.id
-    else if (!this._userInfo) return false
-    const isAdd = !this._needFetch && first === this.first
-    //console.log("getList response", first, last)
-    CertificateService.getCertificates({ q: _q }, isAdd ? this._last + 1 : first, last)
+  // формируем запрос пачки свидетельств к бакэнду и обработку результата
+  getList(doAfter?: () => void, first = this._first, last?: number) {
+    if (last && first > last) {
+      // если входные параметры от VirtualScroller неверные ставим индикатор сброса
+      this._needScroll = true
+      return
+    }
+    const dataSize = this._count
+    this._first = first
+    this._last = last
+    CertificateService.getCertificates({ q: this.getQ() }, first, last)
       .then((response) => {
-        if (isAdd && this._needFetch) return // case that loaded data already not needed
-        let num = isAdd ? this._certs.length : 0
-        const _certs = isAdd
-          ? this._certs.concat(
-              response.data.map((cert) => {
-                return { ...cert, rowNumber: ++num }
-              })
-            )
-          : response.data.map((cert) => {
-              return { ...cert, rowNumber: ++num }
-            })
-        this._certs = _certs
+        if (dataSize !== this._count || first !== this._first || last !== this._last) return // запрошенны другие данные, эти не обрабатываем
+        let _virtLoaded = Array.from<ICertificate>({ length: this._count })
+        let num = first
+        let _certs = response.data.map((cert) => {
+          return { ...cert, rowNumber: ++num }
+        })
         const dataLength = response.data.length
+        this._first = first
+        this._last = last || first + dataLength - 1
+        //populate page of certificates
+        Array.prototype.splice.apply(_virtLoaded, [first, dataLength, ..._certs])
+        this._certs = _certs
+        this._allCerts = _virtLoaded
+        //console.log("this._count-", this._count, " this._first-", this._first, " this._last-", this._last)
         if (dataLength > 0) {
           this._rows = this._certs.length
-          this._needFetch = false
-          this.select(this._selected > dataLength ? dataLength - 1 : this._selected)
+          this.select(this._selected < dataLength ? this._selected : dataLength - 1)
         }
+        this._operation = WAITING
+        if (this._needScroll) this._needScroll = false
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err)
+        this._operation = WAITING
+      })
       .finally(() => {
         if (doAfter) doAfter()
       })
-    this._first = first
-    this._last = last
   }
 
+  //формируем запрос к бакэнду на получение заданного свидетельства
   findById(certificate_id: number, doAfter?: () => void) {
     if (!this._userInfo) return false
     CertificateService.getCertificates({
@@ -394,6 +518,7 @@ export default class CertificateStore {
       .catch((err) => console.log(err))
       .finally(() => {
         if (doAfter) doAfter()
+        this._operation = WAITING
       })
   }
 
@@ -413,6 +538,7 @@ export default class CertificateStore {
     } as IPostDocumentR
     return result
   }
+  //чистим реакции принудительно
   dispose() {
     // So, to avoid subtle memory issues, always call the
     // disposers when the reactions are no longer needed.
