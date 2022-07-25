@@ -4,7 +4,7 @@ export interface IObjectKeys {
 export const HOME_ROUTE = "/"
 export const LOGIN_ROUTE = "/login"
 export const REGISTRATION_ROUTE = "/registration"
-export const PWD_RECOVERY_ROUTE = "/pwd_recovery"
+export const PWD_RECOVERY_ROUTE = "/pass_renew"
 export const MESSAGE_ROUTE = "/message"
 export const ERROR_ROUTE = "/error"
 export const ADMIN_ROUTE = "/admin"
