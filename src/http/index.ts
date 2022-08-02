@@ -3,9 +3,9 @@ import { AuthResponse } from "../models/responses/AuthResponse"
 
 // настройки на back-end
 //Main API service (Основной API) URL
-export const API_URL = "http://10.33.3.250:5000/REST_API/v1/"
+export const API_URL = "http://localhost:5000/REST_API/v1/"
 //FIAS service (Сервис адресов ФИАС) URL
-export const FIAS_URL = "http://fias.int.amurzdrav.ru/fias"
+export const FIAS_URL = "http://localhost:5050/fias"
 //АСМЕ service (Сервис взаимодействия с АСМЕ) URL
 export const ACME_URL = "http://acme.int.amurzdrav.ru/"
 //RREMD test servise (Сервис регионального рееестра
