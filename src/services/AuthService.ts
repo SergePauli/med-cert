@@ -14,7 +14,7 @@ export default class AuthService {
     return $api.post("auth/renew_link", { email })
   }
   static async pwd_renew(user: IPassRenew): Promise<AxiosResponse<void>> {
-    return $api.post("auth/pwd_renew", { ...user })
+    return $api.post("auth/pwd_renew", { user: user })
   }
   static async logout(): Promise<void> {
     return $api.post("auth/logout")
