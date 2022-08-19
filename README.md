@@ -7,10 +7,13 @@ Frontend part of my MedicalDeathCertificate's project
 
 
 ## Compatibility
-for ES5 compatible browsers  
+* На стороне клиента: _ES5-совместимый браузер_ 
+* На стороне сервера: _NodeJS V.12_
 
-## Available Scripts
-In the project directory, you can run:
+## Scripts
+
+Загрузка зависимостей:
+### `npm install`
 
 Запустить сервер в режиме разработки
 ### `npm start`
@@ -24,7 +27,5 @@ Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 
-Создание продакшин сборки
-### `npm run build`
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
 
