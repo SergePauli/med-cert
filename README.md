@@ -3,6 +3,8 @@ Frontend part of my MedicalDeathCertificate's project
 
 ## Simple PrimeReact application as Web-client part for medical users, issuing death certificates
 Простой фронтэнд, реализованый на Primereact медицинского приложения,  используемого для выдачи медицинских свидетельств о смерти
+![скрин приложения](https://github.com/SergePauli/med-cert/blob/master/scrn.jpeg)
+
 
 ## Compatibility
 for ES5 compatible browsers  
