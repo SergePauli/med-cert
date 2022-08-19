@@ -56,6 +56,8 @@ const DoctorsPage: FC = () => {
     const [phone, setPhone] = useState<IContact>({telcom_value:'', main:true} as IContact)
     const [position, setPosition] = useState('')
     const [positions, setPositions] = useState<IReferenceId[]>([])
+    const [department, setDepartment] = useState('')
+    const [office, setOffice] = useState('')
     const toast = useRef<Toast>(null)
     const dt = useRef(null)
      
@@ -113,6 +115,7 @@ const DoctorsPage: FC = () => {
             if (doctor.id) { 
               const index = findIndexById(doctor.id)
               const request = genUpdateDoctorRequest(_doctors[index], doctor)
+              console.log('request',request)
               if (request) DoctorService.updateDoctor(request).then((response)=>{                
                 _doctors[index] = response.data
                 setDoctorDialog(false)
@@ -149,14 +152,17 @@ const DoctorsPage: FC = () => {
           
         }
     }
-
+    const departmenPrefix = `${userStore.userInfo?.organization.oid || ''}.`
     const editDoctor = (_doctor: IDoctor) => {        
         setPhone({telcom_value:'', main:true} as IContact)
         setEmail({telcom_value:'', main:false} as IContact)        
         if (_doctor.id !== doctor.id) setDoctor(new Doctor(_doctor))
-        doctor.person.contacts?.forEach((item)=>{if (item.main) setPhone({...item})
-        else setEmail({...item, telcom_value: item.telcom_value.replace('mailto:','')})})        
-        //addressStore.address = new Address(doctor.person.address || DEFAULT_ADDRESS)         
+        _doctor.person.contacts?.forEach(item=>{
+          if (item.main && item.telcom_value.length>0) setPhone({...item})
+          else if (item.telcom_value.length>0) setEmail({...item, telcom_value: item.telcom_value.replace('mailto:','')})
+        })        
+        setDepartment(doctor.department?.replace(departmenPrefix, '') ||'')   
+        setOffice(doctor.office?.replace(departmenPrefix,'').replace(department+'.','') || '')      
         setPosition(doctor.position?.name || '')
         setDoctorDialog(true)        
     }
@@ -196,13 +202,15 @@ const DoctorsPage: FC = () => {
     }      
 
     // Обработчик изменения контактов      
-    const onContactChange = (contact: IContact) => {   
+    const onContactChange = (contact: IContact) => {      
       let _contact = contact.telcom_value==='' ?
-      (contact.id ? {...contact,...DESTROY_OPTION} : {...contact}) :    
+      (contact.id ? {...contact,...DESTROY_OPTION} : undefined) :    
       (contact.id ? {id:contact.id, parent_guid: contact.parent_guid, telcom_use: contact.telcom_use, telcom_value: contact.telcom_value, main: contact.main} : {...contact}) 
-      if (doctor.person.contacts === undefined) doctor.person.contacts = []
-      if (_contact.id) {        
-          const idx = doctor.person.contacts.findIndex(item=>item.id===_contact.id)  
+      if (doctor.person.contacts === undefined) doctor.person.contacts = []      
+      if (!_contact) return
+      const id =  _contact?.id
+      if (!!id )  {                
+          const idx = doctor.person.contacts.findIndex(item=>item.id===id)  
           if (idx>-1) doctor.person.contacts[idx] = _contact        
       } else doctor.person.contacts.push(_contact)       
     } 
@@ -332,8 +340,34 @@ const DoctorsPage: FC = () => {
                     doctor.person.address = {...value}                    
                   }}
                   onChange={()=>doctor.person.address = {...addressStore.addressProps()}} 
-                />    
-               </div>               
+                />
+                <div className="p-field  p-col-12 p-md-6">
+                    <label htmlFor="department">OID подразделения</label>
+                    <div className="p-inputgroup">
+                      <span className="p-inputgroup-addon">{`${userStore.userInfo?.organization.oid}.`}</span>
+                      <InputText id="department" type="text" 
+                      value={department} 
+                      onChange={(e)=>{ 
+                          setDepartment(e.target.value) 
+                          doctor.department = `${userStore.userInfo?.organization.oid}.${e.target.value}`
+                        }} 
+                      />
+                    </div>
+                </div>
+                <div className="p-field  p-col-12 p-md-6">
+                    <label htmlFor="office">OID кабинета</label>
+                    <div className="p-inputgroup">
+                      <span className="p-inputgroup-addon">{`${userStore.userInfo?.organization.oid}.${department || '0'}.`}</span>
+                      <InputText id="office" type="text" 
+                      value={office} 
+                      onChange={(e)=>{  
+                          setOffice(e.target.value) 
+                          doctor.office = `${userStore.userInfo?.organization.oid}.${department || '0'}.${e.target.value}`
+                        }} 
+                      />
+                    </div>                                       
+                </div>  
+              </div>                              
             </Dialog>
             <AddressDialog />
             <Dialog visible={deleteDoctorDialog} style={{ width: '450px' }} header="Подтвердите" modal footer={deleteDoctorDialogFooter} onHide={hideDeleteDoctorDialog}>

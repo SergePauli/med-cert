@@ -8,6 +8,8 @@ export const genCreateDoctorRequest = (doctor: IDoctor) => {
   let _doctor = {
     id: doctor.id,
     guid: doctor.guid,
+    department: doctor.department,
+    office: doctor.office,
     position_id: doctor.position?.id,
     organization_id: doctor.organization?.id,
     person_attributes: {
@@ -17,7 +19,7 @@ export const genCreateDoctorRequest = (doctor: IDoctor) => {
       address_attributes: doctor.person?.address ? { ...doctor.person?.address } : undefined,
       contacts_attributes:
         doctor.person?.contacts && doctor.person?.contacts?.length > 0
-          ? doctor.person?.contacts.map((item) => item)
+          ? doctor.person?.contacts.filter((item) => item.telcom_value.length === 0)
           : undefined,
     },
     null_flavor_attributes:
@@ -29,7 +31,7 @@ export const genCreateDoctorRequest = (doctor: IDoctor) => {
 
 //Стандартные настройки JSON рендеринга модели врача
 export const DOCTOR_RENDER_OPTIONS = {
-  render_options: { only: ["id", "guid"], include: ["position", "person", "organization"] },
+  render_options: { only: ["id", "guid", "department", "office"], include: ["position", "person", "organization"] },
   includes: ["position", "person", "organization"],
   organization: { only: ["id", "name"] },
   position: { only: ["id", "name"] },
@@ -54,6 +56,24 @@ export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: Doctor) => {
       before: oldValue.position?.id + "",
       after: newValue.position?.id + "",
       detail: `должность: ${oldValue.position?.name} -> ${newValue.position?.name}`,
+    } as IAudit)
+  }
+  if (oldValue.department !== newValue.department) {
+    _request.Doctor.department = newValue.department
+    createAudit({
+      field: "department",
+      before: oldValue.department || "",
+      after: newValue.department || "",
+      detail: `подразделение: ${oldValue.department || ""} -> ${newValue.department || ""}`,
+    } as IAudit)
+  }
+  if (oldValue.office !== newValue.office) {
+    _request.Doctor.office = newValue.office
+    createAudit({
+      field: "office",
+      before: oldValue.office || "",
+      after: newValue.office || "",
+      detail: `кабинет: ${oldValue.office || ""} -> ${newValue.office || ""}`,
     } as IAudit)
   }
   let _person_attributes = {} as any
@@ -114,6 +134,21 @@ export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: Doctor) => {
       detail: `адрес: ${oldAddress} -> ${newAddress}`,
     } as IAudit)
   }
+  if (newPerson.contacts.length > 1) {
+    //check and clean contacts
+    let _phone = true
+    let _mail = true
+    newPerson.contacts = newPerson.contacts.reverse().map((item) => {
+      if (item.main && _phone && item.telcom_value.length > 0) _phone = false
+      else if (!item.main && _mail && item.telcom_value.length > 0) _mail = false
+      else {
+        item._destroy = "1"
+        item.telcom_value = ""
+      }
+      return item
+    })
+  }
+  oldPerson.contacts = oldPerson.contacts?.reverse()
   const oldContacts = oldPerson.contacts?.reduce<string>((u, item) => `${u} ${item.telcom_value}`, "").trim()
   const newContacts = newPerson.contacts?.reduce<string>((u, item) => `${u} ${item.telcom_value}`, "").trim()
   if (oldContacts !== newContacts) {
@@ -125,9 +160,8 @@ export const genUpdateDoctorRequest = (oldValue: IDoctor, newValue: Doctor) => {
       detail: `контакты: ${oldContacts} -> ${newContacts}`,
     } as IAudit)
   }
-  const oldNullFlavors = oldPerson.null_flavors
-    ?.reduce<string>((u, item) => `${u} ${item.parent_attr}${item.code}`, "")
-    .trim()
+  const oldNullFlavors =
+    oldPerson.null_flavors?.reduce<string>((u, item) => `${u} ${item.parent_attr}${item.code}`, "").trim() || ""
   const newNullFlavors = newPerson.nullFlavors
     ?.reduce<string>((u, item) => `${u} ${item.parent_attr}${item.code}`, "")
     .trim()

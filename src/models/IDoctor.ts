@@ -8,5 +8,7 @@ export interface IDoctor extends INullFlavorable {
   person_name?: IPersonName
   position?: { id: number; name: string }
   organization?: { id: number; name: string }
+  department?: string
+  office?: string
   guid: string
 }
