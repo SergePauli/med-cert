@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx"
+import { DESTROY_OPTION } from "../../utils/consts"
 import { NULL_FLAVOR_IDX } from "../../utils/defaults"
 import { ISerializable } from "../common/ISerializabale"
 import { IContact } from "../IContact"
@@ -33,7 +34,11 @@ export default class Person implements ISerializable {
       props.null_flavors?.map((item) => {
         return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
       }) || []
-    this._contacts = props.contacts || []
+    this._contacts = props.contacts
+      ? props.contacts.map((item) => {
+          return { ...item }
+        })
+      : []
     makeAutoObservable(this, undefined, { deep: false })
   }
 
@@ -45,7 +50,10 @@ export default class Person implements ISerializable {
       _person.address_attributes = { ...this._address }
     else if (this._oldOne && this._oldOne.address?.id)
       _person.address_attributes = { id: this._oldOne.address.id, _destroy: "1" } as IAddressR
-    if (this._contacts.length > 0) _person.contacts_attributes = [...this._contacts]
+    if (this._contacts.length > 0)
+      _person.contacts_attributes = this._contacts
+        .filter((item) => item.telcom_value.length === 0 || item.id)
+        .map((item) => (item.telcom_value.length > 0 ? item : ({ id: item.id, ...DESTROY_OPTION } as IContact)))
     if (this._nullFlavors.length > 0) _person.null_flavors_attributes = this.null_flavors_attributes()
     if (this._personName) _person.person_name_attributes = { ...this._personName }
     return _person

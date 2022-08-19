@@ -2,6 +2,7 @@ import { autorun, makeAutoObservable } from "mobx"
 import { v4 as uuidv4 } from "uuid"
 import { NA, NULL_FLAVOR_IDX, REGION_OKATO } from "../../utils/defaults"
 import { ISerializable } from "../common/ISerializabale"
+import { ITrackable } from "../common/ITraсkable"
 import { IAudit } from "../IAudit"
 import { checkFieldNullFlavor, INullFlavorR } from "../INullFlavor"
 import { IAddressR } from "../requests/IAddressR"
@@ -16,7 +17,7 @@ import { DeathReason } from "./DeathReason"
 import Participant from "./Participant"
 import Patient from "./Patient"
 
-export default class Certificate implements ISerializable {
+export default class Certificate implements ITrackable<ICertificate> {
   private _id: number
   private _series?: string
   private _number?: string
@@ -59,8 +60,8 @@ export default class Certificate implements ISerializable {
   private _audits: IAudit[]
   private _custodian_id?: number
   private _participant?: Participant | undefined
-  private _oldOne?: ICertificate | undefined
   private _latestOne?: ICertificate | undefined
+  private _oldOne?: ICertificate | undefined
   disposers: (() => void)[]
 
   constructor(props: ICertificate) {
@@ -69,7 +70,7 @@ export default class Certificate implements ISerializable {
         return { ...item, code: NULL_FLAVOR_IDX[item.code] } as INullFlavorR
       })
     else this._nullFlavors = []
-    this._oldOne = { ...props }
+    this._oldOne = props
     this._latestOne = props.latest_one
     this._audits = []
     this._id = props.id || -1
@@ -208,41 +209,40 @@ export default class Certificate implements ISerializable {
     _cert.eff_time_prev = this._effTimePrev?.toDateString()
     if (this._audithor) {
       _cert.audithor_attributes = this._audithor.getAttributes()
-      if (!_cert.audithor_attributes.id && !!this._oldOne?.audithor?.id)
-        _cert.audithor_attributes.id = this._oldOne.audithor.id
-    } else if (this._oldOne && this._oldOne.audithor)
-      _cert.audithor_attributes = { id: this._oldOne.audithor.id, _destroy: "1" }
+      if (!_cert.audithor_attributes.id && !!this.oldOne?.audithor?.id)
+        _cert.audithor_attributes.id = this.oldOne.audithor.id
+    } else if (this.oldOne && this.oldOne.audithor)
+      _cert.audithor_attributes = { id: this.oldOne.audithor.id, _destroy: "1" }
     if (this._author) {
       _cert.author_attributes = this._author.getAttributes()
-      if (!_cert.author_attributes.id && !!this._oldOne?.author?.id) _cert.author_attributes.id = this._oldOne.author.id
-    } else if (this._oldOne && this._oldOne.author)
-      _cert.author_attributes = { id: this._oldOne.author.id, _destroy: "1" }
+      if (!_cert.author_attributes.id && !!this.oldOne?.author?.id) _cert.author_attributes.id = this.oldOne.author.id
+    } else if (this.oldOne && this.oldOne.author) _cert.author_attributes = { id: this.oldOne.author.id, _destroy: "1" }
     if (this._legalAuthenticator) {
       _cert.legal_authenticator_attributes = this._legalAuthenticator.getAttributes()
-      if (!_cert.legal_authenticator_attributes.id && !!this._oldOne?.legal_authenticator?.id)
-        _cert.legal_authenticator_attributes.id = this._oldOne.legal_authenticator.id
-    } else if (this._oldOne && this._oldOne.legal_authenticator)
-      _cert.legal_authenticator_attributes = { id: this._oldOne.legal_authenticator.id, _destroy: "1" }
+      if (!_cert.legal_authenticator_attributes.id && !!this.oldOne?.legal_authenticator?.id)
+        _cert.legal_authenticator_attributes.id = this.oldOne.legal_authenticator.id
+    } else if (this.oldOne && this.oldOne.legal_authenticator)
+      _cert.legal_authenticator_attributes = { id: this.oldOne.legal_authenticator.id, _destroy: "1" }
     if (this._basisDetermining) _cert.basis_determining = this._basisDetermining
     if (this._certType) _cert.cert_type = this._certType
     if (this._childInfo) _cert.child_info_attributes = this._childInfo.getAttributes()
-    else if (this._oldOne && this._oldOne.child_info) _cert.child_info_attributes = { _destroy: "1" } as IChildInfoR
+    else if (this.oldOne && this.oldOne.child_info) _cert.child_info_attributes = { _destroy: "1" } as IChildInfoR
     if (this._deathAddr && !!this._deathAddr.state && !!this._deathAddr.streetAddressLine)
       _cert.death_addr_attributes = { ...this._deathAddr } as IAddressR
-    else if (this._oldOne && this._oldOne.death_addr)
-      _cert.death_addr_attributes = { id: this._oldOne.death_addr.id, _destroy: "1" } as IAddressR
-    if (this._deathAreaType || this._oldOne?.death_area_type)
+    else if (this.oldOne && this.oldOne.death_addr)
+      _cert.death_addr_attributes = { id: this.oldOne.death_addr.id, _destroy: "1" } as IAddressR
+    if (this._deathAreaType || this.oldOne?.death_area_type)
       _cert.death_area_type = !!this._deathAreaType ? this._deathAreaType : null
-    if (this._deathDatetime || this._oldOne?.death_datetime)
+    if (this._deathDatetime || this.oldOne?.death_datetime)
       _cert.death_datetime = !!this._deathDatetime ? this._deathDatetime : null
-    if (this._deathYear || this._oldOne?.death_year) _cert.death_year = !!this._deathYear ? this._deathYear : null
-    if (this._deathKind || this._oldOne?.death_kind) _cert.death_kind = !!this._deathKind ? this._deathKind : null
-    if (this._deathPlace || this._oldOne?.death_place) _cert.death_place = !!this.deathPlace ? this.deathPlace : null
+    if (this._deathYear || this.oldOne?.death_year) _cert.death_year = !!this._deathYear ? this._deathYear : null
+    if (this._deathKind || this.oldOne?.death_kind) _cert.death_kind = !!this._deathKind ? this._deathKind : null
+    if (this._deathPlace || this.oldOne?.death_place) _cert.death_place = !!this.deathPlace ? this.deathPlace : null
     if (this._deathReasons.length > 0)
       _cert.death_reasons_attributes = this._deathReasons.map((item) => item.getAttributes())
-    if (this._oldOne?.death_reasons && this._oldOne.death_reasons.length > 0) {
+    if (this.oldOne?.death_reasons && this.oldOne.death_reasons.length > 0) {
       let _temp = [] as IDeathReasonR[]
-      this._oldOne.death_reasons.forEach((item) => {
+      this.oldOne.death_reasons.forEach((item) => {
         if (
           !_cert.death_reasons_attributes ||
           _cert.death_reasons_attributes.findIndex((el) => el.id === item.id) === -1
@@ -253,39 +253,39 @@ export default class Certificate implements ISerializable {
         _cert.death_reasons_attributes = _cert.death_reasons_attributes.concat(_temp)
       else if (_temp.length > 0) _cert.death_reasons_attributes = _temp
     }
-    if (this._educationLevel || this._oldOne?.education_level)
+    if (this._educationLevel || this.oldOne?.education_level)
       _cert.education_level = !!this._educationLevel ? this._educationLevel : null
-    if (this._establishedMedic || this._oldOne?.established_medic)
+    if (this._establishedMedic || this.oldOne?.established_medic)
       _cert.established_medic = !!this._establishedMedic ? this._establishedMedic : null
-    if (this._extReasonDescription || this._oldOne?.ext_reason_description)
+    if (this._extReasonDescription || this.oldOne?.ext_reason_description)
       _cert.ext_reason_description = !!this.extReasonDescription ? this.extReasonDescription : null
-    if (this._extReasonTime || this._oldOne?.ext_reason_time)
+    if (this._extReasonTime || this.oldOne?.ext_reason_time)
       _cert.ext_reason_time = !!this._extReasonTime ? this._extReasonTime : null
-    if (this._lifeAreaType || this._oldOne?.life_area_type)
+    if (this._lifeAreaType || this.oldOne?.life_area_type)
       _cert.life_area_type = !!this._lifeAreaType ? this._lifeAreaType : null
-    if (this._policyOMS || this._oldOne?.policy_OMS) _cert.policy_OMS = !!this._policyOMS ? this._policyOMS : null
-    if (this._pregnancyConnection || this._oldOne?.pregnancy_connection)
+    if (this._policyOMS || this.oldOne?.policy_OMS) _cert.policy_OMS = !!this._policyOMS ? this._policyOMS : null
+    if (this._pregnancyConnection || this.oldOne?.pregnancy_connection)
       _cert.pregnancy_connection = !!this.pregnancyConnection ? this.pregnancyConnection : null
-    if (this._maritalStatus || this._oldOne?.marital_status)
+    if (this._maritalStatus || this.oldOne?.marital_status)
       _cert.marital_status = !!this._maritalStatus ? this._maritalStatus : null
     if (this.nullFlavors.length > 0) _cert.null_flavors_attributes = this.null_flavors_attributes()
     if (this._reasonA && this._reasonA.diagnosis) _cert.a_reason_attributes = this._reasonA.getAttributes()
-    else if (this._oldOne && this._oldOne.a_reason)
-      _cert.a_reason_attributes = { id: this._oldOne.a_reason.id, _destroy: "1" } as IDeathReasonR
+    else if (this.oldOne && this.oldOne.a_reason)
+      _cert.a_reason_attributes = { id: this.oldOne.a_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._reasonACME) _cert.reason_ACME = this._reasonACME.diagnosis?.ICD10
     if (this._reasonB && this._reasonB.diagnosis) _cert.b_reason_attributes = this._reasonB.getAttributes()
-    else if (this._oldOne && this._oldOne.b_reason)
-      _cert.b_reason_attributes = { id: this._oldOne.b_reason.id, _destroy: "1" } as IDeathReasonR
+    else if (this.oldOne && this.oldOne.b_reason)
+      _cert.b_reason_attributes = { id: this.oldOne.b_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._reasonC && this._reasonC.diagnosis) _cert.c_reason_attributes = this._reasonC.getAttributes()
-    else if (this._oldOne && this._oldOne.c_reason)
-      _cert.c_reason_attributes = { id: this._oldOne.c_reason.id, _destroy: "1" } as IDeathReasonR
+    else if (this.oldOne && this.oldOne.c_reason)
+      _cert.c_reason_attributes = { id: this.oldOne.c_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._reasonD && this._reasonD.diagnosis) _cert.d_reason_attributes = this._reasonD.getAttributes(true)
-    else if (this._oldOne && this._oldOne.d_reason)
-      _cert.d_reason_attributes = { id: this._oldOne.d_reason.id, _destroy: "1" } as IDeathReasonR
+    else if (this.oldOne && this.oldOne.d_reason)
+      _cert.d_reason_attributes = { id: this.oldOne.d_reason.id, _destroy: "1" } as IDeathReasonR
     if (this._series) _cert.series = this._series
-    if (this._socialStatus || this._oldOne?.social_status)
+    if (this._socialStatus || this.oldOne?.social_status)
       _cert.social_status = !!this._socialStatus ? this._socialStatus : null
-    if (this._trafficAccident || this._oldOne?.traffic_accident) _cert.traffic_accident = this._trafficAccident
+    if (this._trafficAccident || this.oldOne?.traffic_accident) _cert.traffic_accident = this._trafficAccident
     if (this._patient) _cert.patient_attributes = this._patient.getAttributes()
     _cert.custodian_id = this._custodian_id || _cert.patient_attributes?.organization_id
     if (this._participant) _cert.participant_attributes = this._participant.getAttributes()
