@@ -153,17 +153,20 @@ const DoctorsPage: FC = () => {
         }
     }
     const departmenPrefix = `${userStore.userInfo?.organization.oid || ''}.`
-    const editDoctor = (_doctor: IDoctor) => {        
+    
+    //Обработка клика редактировать (подготовка диалога редактирования)
+    const editDoctor = (_doctor: IDoctor) => {              
         setPhone({telcom_value:'', main:true} as IContact)
         setEmail({telcom_value:'', main:false} as IContact)        
         if (_doctor.id !== doctor.id) setDoctor(new Doctor(_doctor))
         _doctor.person.contacts?.forEach(item=>{
           if (item.main && item.telcom_value.length>0) setPhone({...item})
           else if (item.telcom_value.length>0) setEmail({...item, telcom_value: item.telcom_value.replace('mailto:','')})
-        })        
-        setDepartment(doctor.department?.replace(departmenPrefix, '') ||'')   
-        setOffice(doctor.office?.replace(departmenPrefix,'').replace(department+'.','') || '')      
-        setPosition(doctor.position?.name || '')
+        })      
+        let _department = _doctor.department?.replace(departmenPrefix, '') ||'' 
+        setDepartment(_department)   
+        setOffice(_doctor.office?.replace(departmenPrefix,'').replace(_department+'.','') || '')      
+        setPosition(_doctor.position?.name || '')
         setDoctorDialog(true)        
     }
 
